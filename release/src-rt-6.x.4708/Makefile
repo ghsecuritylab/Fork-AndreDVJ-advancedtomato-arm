@@ -150,12 +150,16 @@ ifneq ($(ASUS_TRX),0)
 	ctools/trx -o image/linux-lzma.trx ctools/vmlinuz-lzma ctools/target.squashfs
 # for asus RT-N18U, RT-AC56U, RT-AC68U, RT-AC68R, RT-AC68P
 ifeq ($(ASUS_TRX),ASUS)
+ifeq ($(CONFIG_BCM7),y)
+	ctools/trx_asus -i image/linux-lzma.trx -r RT-AC3200,3.0.0.4,image/tomato-RT-AC3200-$(V1)$(V2)-$(current_BUILD_DESC).trx
+else
 ifeq ($(BCMSMP),y)
 	ctools/trx_asus -i image/linux-lzma.trx -r RT-AC56U,3.0.0.4,image/tomato-RT-AC56U-$(V1)$(V2)-$(current_BUILD_DESC).trx
 	ctools/trx_asus -i image/linux-lzma.trx -r RT-AC68U,3.0.0.4,image/tomato-RT-AC68U-$(V1)$(V2)-$(current_BUILD_DESC).trx
 	ctools/trx_asus -i image/linux-lzma.trx -r RT-N18U,3.0.0.4,image/tomato-RT-N18U-$(V1)$(V2)-$(current_BUILD_DESC).trx
 else
 	ctools/trx_asus -i image/linux-lzma.trx -r RT-N18U,3.0.0.4,image/tomato-RT-N18U-$(V1)$(V2)-$(current_BUILD_DESC)-NOSMP.trx
+endif
 endif
 endif
 # for dlink
@@ -167,9 +171,13 @@ ifeq ($(ASUS_TRX),NETGEAR)
 ifeq ($(NVRAM_128K),y)
 	ctools/trx_asus -i image/linux-lzma.trx -r R6400,3.0.0.4,image/tomato-R6400-$(V1)$(V2)-$(current_BUILD_DESC).trx
 else
+ifeq ($(CONFIG_BCM7),y)
+	ctools/trx_asus -i image/linux-lzma.trx -r R8000,3.0.0.4,image/tomato-R8000-$(V1)$(V2)-$(current_BUILD_DESC).trx
+else
 	ctools/trx_asus -i image/linux-lzma.trx -r R7000,3.0.0.4,image/tomato-R7000-$(V1)$(V2)-$(current_BUILD_DESC).trx
 	ctools/trx_asus -i image/linux-lzma.trx -r R6300v2,3.0.0.4,image/tomato-R6300v2-$(V1)$(V2)-$(current_BUILD_DESC).trx
 	ctools/trx_asus -i image/linux-lzma.trx -r R6250,3.0.0.4,image/tomato-R6250-$(V1)$(V2)-$(current_BUILD_DESC).trx
+endif
 endif
 endif
 # for WS880
@@ -551,6 +559,10 @@ define RouterOptions
 	if [ "$(DHDAP)" = "y" ]; then \
 		sed -i "/TCONFIG_DHDAP/d" $(1); \
 		echo "TCONFIG_DHDAP=y" >>$(1); \
+	fi; \
+	if [ "$(AC3200)" = "y" ]; then \
+		sed -i "/TCONFIG_AC3200/d" $(1); \
+		echo "TCONFIG_AC3200=y" >>$(1); \
 	fi; \
 	if [ "$(GMAC3)" = "y" ]; then \
 		sed -i "/TCONFIG_GMAC3/d" $(1); \
@@ -1084,6 +1096,12 @@ ifeq ($(CONFIG_BCM7),y)
 
 r8000z:
 	@$(MAKE) z ARM=y BCM7=y NVRAM_64K=y NAND=y BCMSMP=y ASUS_TRX="NETGEAR" UFSD="ASUS" AC3200=y DHDAP=y GMAC3=y NOWL=y
+
+ac3200e:
+	@$(MAKE) e ARM=y BCM7=y NVRAM_64K=y NAND=y BCMSMP=y ASUS_TRX="ASUS" UFSD="ASUS" AC3200=y DHDAP=y GMAC3=y NOWL=y
+
+ac32000z:
+	@$(MAKE) z ARM=y BCM7=y NVRAM_64K=y NAND=y BCMSMP=y ASUS_TRX="ASUS" UFSD="ASUS" AC3200=y DHDAP=y GMAC3=y NOWL=y
 endif
 
 setprofile:
