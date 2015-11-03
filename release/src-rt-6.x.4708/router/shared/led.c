@@ -234,6 +234,10 @@ int do_led(int which, int mode)
 	static int r1d[]	= { 255,   1,   255,    2,  255,    3,   -8,   255, 255,  255};
 	static int wzr1750[]	= { 255, 255,   255,  255,  255,   -5,  255,   255, 255,  255};
 #endif
+#ifdef CONFIG_BCM7
+	static int ac3200[]     = { 255, 255,   255,  255,  255,   14,  255,   255, 255,  255};
+#endif
+
 //                                 WLAN  DIAG  WHITE AMBER  DMZ   AOSS BRIDG   USB2 USB3   5G
 
 	char s[16];
@@ -508,6 +512,11 @@ int do_led(int which, int mode)
 		break;
 	case MODEL_WZR1750:
 		b = wzr1750[which];
+		break;
+#endif
+#ifdef CONFIG_BCM7
+	case MODEL_RTAC3200:
+		b = ac3200[which];
 		break;
 #endif
 /*
