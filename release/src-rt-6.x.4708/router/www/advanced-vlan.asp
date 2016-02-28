@@ -77,6 +77,7 @@
 			case 'D-Link DIR868L':
 			case 'Cisco Linksys EA6500v2':
 			case 'Cisco Linksys EA6700':
+			case 'Netgear R8000':
 				COL_P0N = '0';
 				COL_P1N = '1';
 				COL_P2N = '2';
@@ -231,7 +232,11 @@
 				v += (d[ i ][ COL_VID_DEF ].toString() != '0') ? d[ i ][ 0 ] : '';
 
 				fom[ 'vlan' + d[ i ][ COL_VID ] + 'ports' ].value  = p;
-				fom[ 'vlan' + d[ i ][ COL_VID ] + 'hwname' ].value = 'et0';
+				if (nvram['model'] == 'R8000') {
+					fom['vlan'+d[i][COL_VID]+'hwname'].value = 'et2';
+				} else {
+					fom['vlan'+d[i][COL_VID]+'hwname'].value = 'et0';
+				}
 				fom[ 'vlan' + d[ i ][ COL_VID ] + 'vid' ].value    = ((d[ i ][ COL_MAP ].toString() != '') && (d[ i ][ COL_MAP ].toString() != '0')) ? d[ i ][ COL_MAP ] : '';
 
 				fom[ 'wan_ifnameX' ].value += (d[ i ][ COL_BRI ] == '2') ? 'vlan' + d[ i ][ 0 ] : '';
