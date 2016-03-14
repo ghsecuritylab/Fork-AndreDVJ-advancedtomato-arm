@@ -35,7 +35,6 @@ body {
 	color: #76838f;
 	line-height: 1.42857;
 	background-color: #f1f4f5;
-	min-width: 960px;
 }
 
 /* Replace some general styles (b, h1-h6, etc...) */
@@ -207,7 +206,8 @@ small { font-size: 80%; }
 .top-header .links li a i {
 	padding-left: 2px;
 	font-size: 16px;
-	margin-top: -4px;
+	margin-top: -2px;
+	vertical-align: middle;
 }
 
 
