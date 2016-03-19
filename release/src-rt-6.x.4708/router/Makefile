@@ -1916,7 +1916,7 @@ nocat-install:
 #Tomato RAF
 pcre/stamp-h1:
 	$(SEP)
-	cd pcre && \
+	cd pcre && autoreconf && \
 	CC=$(CC) CXX=$(HOST)-g++ AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr --disable-dependency-tracking --enable-utf8 --enable-unicode-properties --disable-cpp
 	@touch pcre/stamp-h1
