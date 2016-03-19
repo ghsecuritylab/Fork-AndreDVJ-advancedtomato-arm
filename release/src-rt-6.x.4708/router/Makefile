@@ -2067,7 +2067,7 @@ php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 
 php: php/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C php
+	@$(MAKE) -C php $(PARALLEL_BUILD)
 
 php-clean:
 	-@$(MAKE) -C php clean
@@ -2107,7 +2107,7 @@ nginx/stamp-h1: openssl zlib pcre
 
 nginx: nginx/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C nginx
+	@$(MAKE) -C nginx $(PARALLEL_BUILD)
 
 nginx-clean:
 	-@$(MAKE) -C nginx clean
@@ -2194,7 +2194,7 @@ mysql/stamp-h1: openssl zlib libncurses
 
 mysql: mysql/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C mysql
+	@$(MAKE) -C mysql $(PARALLEL_BUILD)
 	@$(MAKE) -C mysql DESTDIR=$(TOP)/mysql/staged install
 
 mysql-clean:
