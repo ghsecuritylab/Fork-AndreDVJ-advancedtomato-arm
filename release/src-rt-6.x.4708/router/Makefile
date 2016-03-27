@@ -843,7 +843,7 @@ www-install:
 
 matrixssl:
 	@$(SEP)
-	@$(MAKE) -C matrixssl/src
+	@$(MAKE) -C matrixssl/src $(PARALLEL_BUILD)
 
 matrixssl-install:
 	@true
@@ -862,7 +862,7 @@ cyassl/stamp-h1:
 
 cyassl: cyassl/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C cyassl
+	@$(MAKE) -C cyassl $(PARALLEL_BUILD)
 
 cyassl-clean:
 	-@$(MAKE) -C cyassl clean
@@ -934,7 +934,7 @@ bridge/Makefile:
 
 bridge: bridge/Makefile
 	@$(SEP)
-	@$(MAKE) -C bridge
+	@$(MAKE) -C bridge $(PARALLEL_BUILD)
 
 bridge-clean:
 	-@$(MAKE) -C bridge clean
@@ -968,7 +968,7 @@ nettle/stamp-h1: gmp
 
 nettle: nettle/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C nettle
+	@$(MAKE) -C nettle $(PARALLEL_BUILD)
 	@$(MAKE) -C nettle install
 
 nettle-clean:
@@ -985,7 +985,7 @@ gmp/stamp-h1:
 
 gmp: gmp/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C gmp
+	@$(MAKE) -C gmp $(PARALLEL_BUILD)
 
 gmp-clean:
 	@$(MAKE) -C gmp clean
@@ -1087,7 +1087,7 @@ ppp:
 #	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp DFLAGS="-DDEBUG -DDEBUGALL"
 
 ppp-%:
-	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp $(if $(TCONFIG_IPV6),HAVE_INET6=y,)
+	$(MAKE) -C ppp/pppoecd $* INSTALLDIR=$(INSTALLDIR)/ppp $(if $(TCONFIG_IPV6),HAVE_INET6=y,) $(PARALLEL_BUILD)
 
 rp-pppoe/src/stamp-h1: rp-pppoe/src/Makefile.in
 	cd rp-pppoe/src && CFLAGS="-g -O2 $(EXTRACFLAGS)" \
@@ -1125,7 +1125,7 @@ libnfnetlink/stamp-h1:
 
 libnfnetlink: libnfnetlink/stamp-h1
 	@$(SEP)
-	$(MAKE) -C libnfnetlink
+	$(MAKE) -C libnfnetlink $(PARALLEL_BUILD)
 
 libnfnetlink-install:
 	install -D libnfnetlink/src/.libs/libnfnetlink.so.0.2.0 $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
@@ -1139,7 +1139,7 @@ miniupnpd-config:
 
 miniupnpd: $(IPTABLES_TARGET) miniupnpd-config
 	@$(SEP)
-	$(MAKE) -C miniupnpd -f Makefile.linux
+	$(MAKE) -C miniupnpd -f Makefile.linux $(PARALLEL_BUILD)
 
 miniupnpd-clean:
 	-@$(MAKE) -C miniupnpd -f Makefile.linux clean
@@ -1197,7 +1197,7 @@ libusb10/Makefile: libusb10/Makefile.in
 	$(CONFIGURE) --prefix=/usr ac_cv_lib_rt_clock_gettime=no
 
 libusb10: libusb10/Makefile
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
 
 libusb10-install: libusb10
 	install -D libusb10/libusb/.libs/libusb-1.0.so $(INSTALLDIR)/libusb10/usr/lib/libusb-1.0.so
@@ -1215,7 +1215,7 @@ libusb/Makefile: libusb/Makefile.in
 		-Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share"
 
 libusb: libusb10 libusb/Makefile
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(PARALLEL_BUILD)
 
 libusb-install: libusb
 	install -D libusb/libusb/.libs/libusb-0.1.so $(INSTALLDIR)/libusb/usr/lib/libusb-0.1.so
@@ -1228,7 +1228,7 @@ libusb-clean:
 usbmodeswitch: libusb10
 	$(MAKE) -C $@ CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -DLIBUSB10 \
 	    -Wl,-R/lib:/usr/lib:/opt/usr/lib:/usr/local/share -lpthread \
-	    -I$(TOP)/libusb10/libusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0"
+	    -I$(TOP)/libusb10/libusb -L$(TOP)/libusb10/libusb/.libs -lusb-1.0" $(PARALLEL_BUILD)
 
 usbmodeswitchdb-install:
 	@mkdir -p $(TARGETDIR)/rom/etc/usb_modeswitch.d
@@ -1255,7 +1255,7 @@ dhcpv6/stamp-h1:
 
 dhcpv6: dhcpv6/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C dhcpv6 dhcp6c
+	@$(MAKE) -C dhcpv6 dhcp6c $(PARALLEL_BUILD)
 
 dhcpv6-install: dhcpv6
 	install -D dhcpv6/dhcp6c $(INSTALLDIR)/dhcpv6/usr/sbin/dhcp6c
@@ -1292,7 +1292,7 @@ pptp-client-install:
 
 
 accel-pptp: pppd accel-pptp/Makefile
-	@$(MAKE) -C accel-pptp
+	@$(MAKE) -C accel-pptp $(PARALLEL_BUILD)
 
 accel-pptp/Makefile: accel-pptp/Makefile.in $(LINUXDIR)/include/linux/version.h
 	cd accel-pptp && CFLAGS="-g -O2 $(EXTRACFLAGS) $(if $(TCONFIG_VPNC), -DTCONFIG_VPNC,)" \
@@ -1331,7 +1331,7 @@ pppd/Makefile: pppd/linux/Makefile.top
 
 pppd: pppd/Makefile
 	@$(SEP)
-	@$(MAKE) -C pppd MFLAGS='$(if $(TCONFIG_IPV6),HAVE_INET6=y,) EXTRACFLAGS="$(EXTRACFLAGS)"'
+	@$(MAKE) -C pppd MFLAGS='$(if $(TCONFIG_IPV6),HAVE_INET6=y,) EXTRACFLAGS="$(EXTRACFLAGS)"' $(PARALLEL_BUILD)
 
 pppd-clean:
 	-@$(MAKE) -C pppd clean
@@ -1362,7 +1362,7 @@ zebra/stamp-h1:
 	@touch zebra/stamp-h1
 
 zebra: zebra/stamp-h1
-	@$(MAKE) -C zebra CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD)
+	@$(MAKE) -C zebra CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) $(PARALLEL_BUILD)
 
 zebra-clean:
 	-@$(MAKE) -C zebra clean
@@ -1418,7 +1418,7 @@ libbcm-install:
 
 iproute2:
 	@$(SEP)
-	@$(MAKE) -C $@ KERNEL_INCLUDE=$(LINUXDIR)/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)"
+	@$(MAKE) -C $@ KERNEL_INCLUDE=$(LINUXDIR)/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)" $(PARALLEL_BUILD)
 
 iproute2-install: iproute2
 	install -D iproute2/tc/tc $(INSTALLDIR)/iproute2/usr/sbin/tc
@@ -1428,7 +1428,7 @@ iproute2-install: iproute2
 
 iproute2-3.x: kernel_header iptables-1.4.x
 	@$(SEP)
-	@$(MAKE) -C $@ IPTABLES_DIR=$(TOP)/iptables-1.4.x KERNEL_INCLUDE=$(TOP)/kernel_header/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)"
+	@$(MAKE) -C $@ IPTABLES_DIR=$(TOP)/iptables-1.4.x KERNEL_INCLUDE=$(TOP)/kernel_header/include EXTRACFLAGS="$(EXTRACFLAGS) $(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6)" $(PARALLEL_BUILD)
 
 iproute2-3.x-install: iproute2-3.x
 	install -D iproute2-3.x/tc/tc $(INSTALLDIR)/iproute2-3.x/usr/sbin/tc
@@ -1640,7 +1640,7 @@ libexif/stamp-h1:
 	touch libexif/stamp-h1
 
 libexif: libexif/stamp-h1
-	@$(MAKE) -C libexif all
+	@$(MAKE) -C libexif all $(PARALLEL_BUILD)
 
 libexif-clean:
 	-@$(MAKE) -C libexif clean
@@ -1660,7 +1660,7 @@ zlib/stamp-h1:
 	touch zlib/stamp-h1
 
 zlib: zlib/stamp-h1
-	@$(MAKE) -C zlib all
+	@$(MAKE) -C zlib all $(PARALLEL_BUILD)
 	@$(MAKE) -C zlib DESTDIR=$(TOP)/zlib/staged install
 
 zlib-clean:
@@ -1769,7 +1769,7 @@ igmpproxy-clean:
 
 udev:
 	$(MAKE) -C $@ CROSS_COMPILE=$(CROSS_COMPILE) EXTRACFLAGS="$(EXTRACFLAGS)" \
-	    PROGRAMS=udevtrigger
+	    PROGRAMS=udevtrigger $(PARALLEL_BUILD)
 
 udev-install: udev
 	install -d $(INSTALLDIR)
@@ -1777,14 +1777,14 @@ udev-install: udev
 	$(MAKE) -C udev DESTDIR=$(INSTALLDIR) prefix=/udev install-udevtrigger
 
 hotplug2:
-	$(MAKE) -C $@ CROSS_COMPILE=$(CROSS_COMPILE) CC=$(CC) EXTRACFLAGS="$(EXTRACFLAGS)"
+	$(MAKE) -C $@ CROSS_COMPILE=$(CROSS_COMPILE) CC=$(CC) EXTRACFLAGS="$(EXTRACFLAGS)" $(PARALLEL_BUILD)
 
 hotplug2-install: hotplug2
 	$(MAKE) -C hotplug2 install PREFIX=$(INSTALLDIR)/hotplug2 SUBDIRS=""
 	$(MAKE) -C hotplug2/examples install PREFIX=$(INSTALLDIR)/hotplug2/rom KERNELVER=$(LINUX_KERNEL)
 
 emf$(BCMEX):
-	$(MAKE) -C emf$(BCMEX)/emfconf CROSS=$(CROSS_COMPILE)
+	$(MAKE) -C emf$(BCMEX)/emfconf CROSS=$(CROSS_COMPILE) $(PARALLEL_BUILD)
 
 emf$(BCMEX)-install:
 ifeq ($(TCONFIG_EMF),y)
@@ -1823,7 +1823,7 @@ ebtables: dummy
 	CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	LOCKFILE="/var/lock/ebtables" LOCKDIR="/var/lock" \
-	BINDIR="/usr/sbin" LIBDIR="/usr/lib/ebtables" KERNEL_DIR=$(LINUXDIR) KERNEL_INCLUDES=$(LINUXDIR)/include $(if $(TCONFIG_IPV6),DO_IPV6=1,)
+	BINDIR="/usr/sbin" LIBDIR="/usr/lib/ebtables" KERNEL_DIR=$(LINUXDIR) KERNEL_INCLUDES=$(LINUXDIR)/include $(if $(TCONFIG_IPV6),DO_IPV6=1,) $(PARALLEL_BUILD)
 
 ebtables-install: ebtables
 	install -D ebtables/ebtables $(INSTALLDIR)/ebtables/usr/sbin/ebtables
@@ -2664,6 +2664,7 @@ libsodium-clean:
 	@rm -rf libsodium/stamp-h1
 
 dnscrypt/stamp-h1: libsodium
+	cd $(TOP)/dnscrypt/src/libevent-modified && aclocal && autoconf
 	cd $(TOP)/dnscrypt && CC=$(CC) STRIP=$(STRIP) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libsodium/src/libsodium/include" \
@@ -2707,7 +2708,7 @@ tor-clean:
 udpxy/stamp-h1:
 	cd udpxy \
 	$(MAKE) -C udpxy CFLAGS="-Os -Wall --host=$(HOST) --target=$(HOST) $(EXTRACFLAGS)" \
-		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections"
+		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" $(PARALLEL_BUILD)
 	touch udpxy/stamp-h1
 
 udpxy-clean:
@@ -2737,7 +2738,7 @@ libmnl/stamp-h1:
 	touch libmnl/stamp-h1
 
 libmnl: libmnl/stamp-h1
-	$(MAKE) -C libmnl
+	$(MAKE) -C libmnl $(PARALLEL_BUILD)
 	$(MAKE) -C libmnl DESTDIR=$(TOP)/libmnl/staged install
 
 libmnl-install: libmnl
@@ -2763,7 +2764,7 @@ ipset/stamp-h1: libmnl
 	touch ipset/stamp-h1
 
 ipset: ipset/stamp-h1
-	$(MAKE) -C ipset
+	$(MAKE) -C ipset $(PARALLEL_BUILD)
 
 ipset-install: ipset
 	install -D ipset/src/ipset $(INSTALLDIR)/ipset/usr/sbin/ipset
@@ -2793,7 +2794,7 @@ libjson-c-clean:
 	@rm -rf libjson-c/stamp-h1
 
 uqmi: libjson-c
-	$(MAKE) -C uqmi/libubox
+	$(MAKE) -C uqmi/libubox $(PARALLEL_BUILD)
 	$(MAKE) -C uqmi SHARED=0 CC='$(CC) -static'
 
 uqmi-install: uqmi
