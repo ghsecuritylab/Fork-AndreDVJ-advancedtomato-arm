@@ -1,4 +1,4 @@
-/* $Id: testssdppktgen.c,v 1.1 2015/10/26 16:54:31 nanard Exp $ */
+/* $Id: $ */
 #include <stdio.h>
 #include <syslog.h>
 #include <time.h>

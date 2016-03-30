@@ -1,4 +1,4 @@
-/* $Id: upnpglobalvars.h,v 1.42 2016/02/09 09:37:44 nanard Exp $ */
+/* $Id: upnpglobalvars.h,v 1.38 2014/03/10 11:04:53 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2016 Thomas Bernard

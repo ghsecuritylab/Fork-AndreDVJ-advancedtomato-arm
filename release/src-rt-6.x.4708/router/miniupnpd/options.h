@@ -1,4 +1,4 @@
-/* $Id: options.h,v 1.27 2016/02/09 09:37:44 nanard Exp $ */
+/* $Id: options.h,v 1.21 2012/06/29 19:26:09 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * author: Ryan Wagoner
