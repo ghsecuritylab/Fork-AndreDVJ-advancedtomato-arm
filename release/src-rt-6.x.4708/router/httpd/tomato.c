@@ -1025,8 +1025,6 @@ static const nvset_t nvset_list[] = {
 	{ "wl_rts",				V_RANGE(0, 2347)	},
 	{ "wl_ap_isolate",		V_01				},
 	{ "wl_plcphdr",			V_LENGTH(4, 5)		},	// long, short
-	{ "wl_antdiv",			V_RANGE(0, 3)		},
-	{ "wl_txant",			V_RANGE(0, 3)		},
 	{ "wl_txpwr",			V_RANGE(0, 400)		},
 	{ "wl_wme",			V_WORD				},	// auto, off, on
 	{ "wl_wme_no_ack",		V_ONOFF				},	// off, on

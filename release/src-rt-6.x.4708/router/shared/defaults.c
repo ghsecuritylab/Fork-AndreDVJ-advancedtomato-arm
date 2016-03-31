@@ -322,7 +322,6 @@ struct nvram_tuple router_defaults[] = {
 	{ "wl_frameburst",		"off"				, 0 },	// BRCM Frambursting mode (off|on)
 	{ "wl_wme",			"auto"				, 0 },	// WME mode (auto|off|on)
 	{ "wl1_wme",			"auto"				, 0 },	// WME mode (auto|off|on)
-	{ "wl_antdiv",			"-1"				, 0 },	// Antenna Diversity (-1|0|1|3)
 	{ "wl_infra",			"1"				, 0 },	// Network Type (BSS/IBSS)
 	{ "wl_btc_mode",		"0"				, 0 },	// !!TB - BT Coexistence Mode
 	{ "wl_sta_retry_time",		"5"				, 0 },	// !!TB - Seconds between association attempts (0 to disable retries)
@@ -605,7 +604,6 @@ struct nvram_tuple router_defaults[] = {
 	{ "trunk_vlan_so",		"0"				, 0 },	// VLAN trunk support override
 
 // advanced-wireless
-	{ "wl_txant",			"3"				, 0 },
 	{ "wl_txpwr",			"42"				, 0 },
 	{ "wl_maxassoc",		"128"				, 0 },	// Max associations driver could support
 	{ "wl_bss_maxassoc",		"128"				, 0 },
