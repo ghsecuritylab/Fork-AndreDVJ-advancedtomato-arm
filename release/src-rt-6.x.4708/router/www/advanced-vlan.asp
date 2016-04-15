@@ -1,14 +1,28 @@
 <!--
-Tomato VLAN GUI
-Copyright (C) 2011-2012 Augusto Bott
-http://code.google.com/p/tomato-sdhc-vlan/
+	Tomato VLAN GUI
+	Copyright (C) 2011-2012 Augusto Bott
+	http://code.google.com/p/tomato-sdhc-vlan/
 
-Tomato GUI
-Copyright (C) 2006-2007 Jonathan Zarate
-http://www.polarcloud.com/tomato/
+	Tomato GUI
+	Copyright (C) 2006-2007 Jonathan Zarate
+	http://www.polarcloud.com/tomato/
+	
+	Tomato VLAN update and bug correction
+	Copyright (C) 2011-2012 Vicente Soriano
+	http://tomatoraf.com
 
-For use with Tomato Firmware only.
-No part of this file may be used without permission.
+	Tomato Native VLAN support added
+	Jan	2014 by Aaron Finney
+	https://github.com/slash31/TomatoE
+
+	VLAN Port Order By 't_model_name'
+	March 2015 Tvlz
+	https://bitbucket.org/tvlz/tvlz-advanced-vlan/
+
+	** Last Updated - MAR 30 2016 - Tvlz **
+
+	For use with Tomato Firmware only.
+	No part of this file may be used without permission.
 --><title>VLAN</title>
 <content>
 	<style type="text/css">
@@ -63,6 +77,7 @@ No part of this file may be used without permission.
 			case 'D-Link DIR868L':
 			case 'Cisco Linksys EA6500v2':
 			case 'Cisco Linksys EA6700':
+			case 'Xiaomi MiWiFi':
 				COL_P0N = '0';
 				COL_P1N = '1';
 				COL_P2N = '2';
@@ -931,6 +946,8 @@ No part of this file may be used without permission.
 				<h4><a href="javascript:toggleVisibility('notes');">Notes <span id='sesdiv_notes_showhide'><i class="icon-chevron-up"></i></span></a></h4>
 				<div class="section" id="sesdiv_notes" style="display:none">
 					<ul>
+						<li>If you notice that the order of the Lan Ports are incorrectly mapped, <a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'> <b>Please Follow this Link for Instructions to get it corrected.</</b></a></li>
+						<br>
 						<li><b>VLAN</b> - Unique identifier of a VLAN.</li>
 						<li><b>VID</b> - <i>EXPERIMENTAL</i> - Allows overriding "traditional" VLAN/VID mapping with arbitrary VIDs for each VLAN (set to "0" to use "regular" VLAN/VID mappings instead). Warning: this hasn"t been verified/tested on anything but a Cisco/Linksys E3000 and may not be supported by your particular device/model (<small><b><i>see notes on "VID Offset" below</i></b></small>).</li>
 						<li><b>Ports 1-4 &amp; WAN</b> - Which ethernet ports on the router should be members of this VLAN.</li>
