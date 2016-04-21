@@ -79,6 +79,7 @@ obj-y += ntpc
 obj-y += rstats
 obj-y += cstats
 obj-y += udpxy
+obj-y += exfat-nofuse
 obj-$(TCONFIG_TOR) += tor
 obj-$(TCONFIG_TOR) += libevent
 obj-$(TCONFIG_TOR) += zlib
