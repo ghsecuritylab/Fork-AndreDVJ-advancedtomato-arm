@@ -2065,7 +2065,7 @@ php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	--enable-xmlreader \
 	--enable-xmlwriter \
 	--enable-zip \
-	--disable-filter \
+	--enable-filter \
 	--with-libxml-dir="$(TOP)/libxml2/staged/usr"
 	@touch php/stamp-h1
 
