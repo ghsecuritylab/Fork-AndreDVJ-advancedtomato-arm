@@ -423,6 +423,7 @@ extern void volume_id_free_buffer();
 extern int volume_id_probe_ext();
 extern int volume_id_probe_vfat();
 extern int volume_id_probe_ntfs();
+extern int volume_id_probe_exfat();
 extern int volume_id_probe_linux_swap();
 
 /* Put the label in *label and uuid in *uuid.
@@ -450,6 +451,9 @@ char *find_label_or_uuid(char *dev_name, char *label, char *uuid)
 		          (id.sbbuf[0x45c] & 0x0004 /* HAS_JOURNAL */) != 0) ? "ext3" : "ext2";
 	else if (!id.error && volume_id_probe_ntfs(&id) == 0)
 		fstype = "ntfs";
+	//!oneleft
+	else if (!id.error && volume_id_probe_exfat(&id) == 0)
+		fstype = "exfat";
 	else if (!id.error)
 		fstype = "unknown";
 
