@@ -285,7 +285,15 @@ int build_nginx_conf(void) {
 		nginx_write("location\t/\t{\n");
 	if ((buf = nvram_safe_get("nginx_docroot")) == NULL) buf = nginxdocrootdir;
 		nginx_write("root\t%s;\n", buf);
-		nginx_write("index\tindex.html\tindex.htm\tindex.php;\n");
+	
+	//!oneleft
+	// added ability to auto index with h5ai
+	if(!nvram_match("nginx_ai", "1")){
+		nginx_write("index\tindex.html\tindex.htm\tindex.php;\n");}
+	else{
+		nginx_write("index\tindex.html\tindex.htm\tindex.php\t/_h5ai/public/index.php;\n");
+		nginx_write("autoindex\ton;\n");
+		if (buf != nginxdocrootdir) link("/www/_h5ai",buf);}
 // Error pages section
 		nginx_write("error_page 404\t/404.html;\n");
 		nginx_write("error_page 500\t502\t503\t504\t/50x.html;\n");

@@ -12,6 +12,9 @@ install:
 	mkdir -p $(INSTALLDIR)/www/js
 	mkdir -p $(INSTALLDIR)/www/css
 
+# Copy h5ai files
+	cp -r _h5ai $(INSTALLDIR)/www
+
 # Copy files we don't want to modify to new install directory
 	cp *.ico *.html *.php robots.txt $(INSTALLDIR)/www
 
