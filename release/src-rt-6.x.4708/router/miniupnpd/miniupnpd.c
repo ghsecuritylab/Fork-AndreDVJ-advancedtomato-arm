@@ -1,4 +1,4 @@
-/* $Id: miniupnpd.c,v 1.213 2015/12/16 10:21:49 nanard Exp $ */
+/* $Id: miniupnpd.c,v 1.216 2016/03/07 12:26:00 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2015 Thomas Bernard

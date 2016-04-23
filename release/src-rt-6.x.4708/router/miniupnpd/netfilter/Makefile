@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2012/04/26 13:50:48 nanard Exp $
+# $Id: Makefile,v 1.8 2016/02/09 09:36:30 nanard Exp $
 CFLAGS?=-Wall -g -D_GNU_SOURCE -DDEBUG -Wstrict-prototypes -Wdeclaration-after-statement
 CC = gcc
 

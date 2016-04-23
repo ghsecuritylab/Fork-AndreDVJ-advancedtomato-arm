@@ -1,4 +1,4 @@
-/* $Id: upnpevents.c,v 1.35 2016/02/11 10:41:44 nanard Exp $ */
+/* $Id: upnpevents.c,v 1.37 2016/02/20 19:10:17 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2008-2016 Thomas Bernard

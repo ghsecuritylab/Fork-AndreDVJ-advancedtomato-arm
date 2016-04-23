@@ -1,4 +1,4 @@
-/* $Id: natpmp.c,v 1.52 2015/05/27 12:43:14 nanard Exp $ */
+/* $Id: natpmp.c,v 1.53 2015/09/22 10:10:54 nanard Exp $ */
 /* MiniUPnP project
  * (c) 2007-2015 Thomas Bernard
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/

@@ -1,4 +1,4 @@
-/* $Id: testupnpdescgen.c,v 1.32 2014/03/10 11:04:52 nanard Exp $ */
+/* $Id: testupnpdescgen.c,v 1.33 2016/02/16 12:15:02 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2016 Thomas Bernard

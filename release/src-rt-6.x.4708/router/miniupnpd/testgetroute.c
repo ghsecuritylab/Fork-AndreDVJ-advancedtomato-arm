@@ -1,4 +1,4 @@
-/* $Id: testgetroute.c,v 1.5 2013/02/06 12:07:36 nanard Exp $ */
+/* $Id: testgetroute.c,v 1.6 2015/11/16 19:20:21 nanard Exp $ */
 /* MiniUPnP project
  * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
  * (c) 2006-2015 Thomas Bernard

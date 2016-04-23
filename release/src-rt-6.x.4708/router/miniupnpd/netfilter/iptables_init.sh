@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: iptables_init.sh,v 1.5 2011/05/16 12:11:37 nanard Exp $
+# $Id: iptables_init.sh,v 1.9 2016/02/09 09:37:44 nanard Exp $
 IPTABLES="`which iptables`" || exit 1
 IP="`which ip`" || exit 1
 

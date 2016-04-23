@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: iptables_display.sh,v 1.6 2016/02/09 09:37:44 nanard Exp $
+# $Id: iptables_display_miniupnpd.sh,v 1.1 2016/02/12 15:23:29 nanard Exp $
 IPTABLES=/sbin/iptables
 
 #display miniupnpd chains
