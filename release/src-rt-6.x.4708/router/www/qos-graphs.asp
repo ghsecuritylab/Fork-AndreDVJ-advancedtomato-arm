@@ -6,7 +6,6 @@ http://www.polarcloud.com/tomato/
 For use with Tomato Firmware only.
 No part of this file may be used without permission.
 -->
-<<<<<<< HEAD
 <title>View Graphs</title>
 <content>
 	<style type="text/css">
@@ -45,14 +44,14 @@ No part of this file may be used without permission.
 
 		qrates_out = [0,0,0,0,0,0,0,0,0,0,0];
 		qrates_in = [0,0,0,0,0,0,0,0,0,0,0];
-		for(var i=0; i < 10; i++){
+		for ( var i = 0; i < 10; i++ ) {
 			/* MULTIWAN-BEGIN */
-			qrates_out[i] = qrates1_out[i]+qrates2_out[i]+qrates3_out[i]+qrates4_out[i];
-			qrates_in[i] = qrates1_in[i]+qrates2_in[i]+qrates3_in[i]+qrates4_in[i];
+			qrates_out[ i ] = qrates1_out[ i ] + qrates2_out[ i ] + qrates3_out[ i ] + qrates4_out[ i ];
+			qrates_in[ i ]  = qrates1_in[ i ] + qrates2_in[ i ] + qrates3_in[ i ] + qrates4_in[ i ];
 			/* MULTIWAN-END */
 			/* DUALWAN-BEGIN */
-			qrates_out[i] = qrates1_out[i]+qrates2_out[i];
-			qrates_in[i] = qrates1_in[i]+qrates2_in[i];
+			qrates_out[ i ] = qrates1_out[ i ] + qrates2_out[ i ];
+			qrates_in[ i ]  = qrates1_in[ i ] + qrates2_in[ i ];
 			/* DUALWAN-END */
 		}
 
@@ -63,7 +62,7 @@ No part of this file may be used without permission.
 		var classNames = nvram.qos_classnames.split(' ');		//Toastman Class Labels
 		var abc = Unclassified.concat(classNames,Unused);
 
-		//      var abc = ['Unclassified', 'Highest', 'High', 'Medium', 'Low', 'Lowest', 'Class A', 'Class B', 'Class C', 'Class D', 'Class E'];
+		//var abc = ['Unclassified', 'Highest', 'High', 'Medium', 'Low', 'Lowest', 'Class A', 'Class B', 'Class C', 'Class D', 'Class E'];
 
 		var colors = [
 			'c6e2ff',
@@ -89,208 +88,6 @@ No part of this file may be used without permission.
 		}
 
 		function showData()
-=======
-<html>
-<head>
-<meta http-equiv='content-type' content='text/html;charset=utf-8'>
-<meta name='robots' content='noindex,nofollow'>
-<title>[<% ident(); %>] QoS: View Graphs</title>
-<link rel='stylesheet' type='text/css' href='tomato.css'>
-<link rel='stylesheet' type='text/css' href='color.css'>
-<script type='text/javascript' src='tomato.js'></script>
-
-<!-- / / / -->
-<script type='text/javascript' src='debug.js'></script>
-
-<style type='text/css'>
-.color {
-	width: 12px;
-	height: 25px;
-}
-.title {
-}
-.count {
-	text-align: right;
-}
-.pct {
-	width:55px;
-	text-align: right;
-}
-.thead {
-	font-size: 90%;
-	font-weight: bold;
-}
-.total {
-	border-top: 1px dashed #bbb;
-	font-weight: bold;
-}
-</style>
-
-<script type='text/javascript'>
-// <% nvram("qos_classnames,web_svg,qos_enable,wan_qos_obw,wan_qos_ibw,wan2_qos_obw,wan2_qos_ibw,wan3_qos_obw,wan3_qos_ibw,wan4_qos_obw,wan4_qos_ibw"); %>
-
-//<% qrate(); %>
-
-qrates_out = [0,0,0,0,0,0,0,0,0,0,0];
-qrates_in = [0,0,0,0,0,0,0,0,0,0,0];
-for(var i=0; i < 10; i++){
-/* MULTIWAN-BEGIN */
-	qrates_out[i] = qrates1_out[i]+qrates2_out[i]+qrates3_out[i]+qrates4_out[i];
-	qrates_in[i] = qrates1_in[i]+qrates2_in[i]+qrates3_in[i]+qrates4_in[i];
-/* MULTIWAN-END */
-/* DUALWAN-BEGIN */
-	qrates_out[i] = qrates1_out[i]+qrates2_out[i];
-	qrates_in[i] = qrates1_in[i]+qrates2_in[i];
-/* DUALWAN-END */
-}
-
-var svgReady = 0;
-
-var Unclassified = ['Unclassified'];
-var Unused = ['Unused'];
-var classNames = nvram.qos_classnames.split(' ');		//Toastman Class Labels
-var abc = Unclassified.concat(classNames,Unused);
-
-var colors = [
-	'c6e2ff',
-	'b0c4de',
-	'9ACD32',
-	'3cb371',
-	'6495ed',
-	'8FBC8F',
-	'a0522d',
-	'deb887',
-	'F08080',
-	'ffa500',
-	'ffd700',
-	'D8D8D8'
-];
-
-var toggle=true;
-
-function mClick(n)
-{
-	location.href = 'qos-detailed.asp?class=' + n;
-}
-
-function showData()
-{
-	var i, n, p;
-	var totalConnections, totalOutgoingBandwidth, totalIncomingBandwidth;
-
-	totalConnections = totalOutgoingBandwidth = totalIncomingBandwidth = 0;
-	
-	for (i = 0; i < 11; ++i)
-	{
-		if (!nfmarks[i]) nfmarks[i] = 0;
-		totalConnections += nfmarks[i];
-		if (!qrates_out[i]) qrates_out[i] = 0;
-		totalOutgoingBandwidth += qrates_out[i];
-		if (!qrates_in[i]) qrates_in[i] = 0;
-		totalIncomingBandwidth += qrates_in[i];
-	}
-
-	for (i = 0; i < 11; ++i) {
-		n = nfmarks[i];
-		E('ccnt' + i).innerHTML = n;
-		if (totalConnections > 0) p = (n / totalConnections) * 100;
-			else p = 0;
-		E('cpct' + i).innerHTML = p.toFixed(2) + '%';
-	}
-	E('ccnt-total').innerHTML = totalConnections;
-		
-	obwrate = nvram.qos_obw * 1000;
-	ibwrate = nvram.qos_ibw * 1000;
-	
-	if(toggle == false)
-	{
-		totalorate = totalOutgoingBandwidth;
-		totalirate = totalIncomingBandwidth;
-		totalrateout = '100%';
-		totalratein = '100%';
-	} else 
-	{
-		FreeOutgoing = (obwrate - totalOutgoingBandwidth);
-		qrates_out.push(FreeOutgoing);
-		FreeIncoming = (ibwrate - totalIncomingBandwidth);
-		qrates_in.push(FreeIncoming);
-		totalorate = obwrate;
-		totalirate = ibwrate;
-		totalrateout = ((totalOutgoingBandwidth / totalorate) * 100).toFixed(2) + '%';
-		totalratein = ((totalIncomingBandwidth / totalirate) * 100).toFixed(2) + '%';
-	}
-
-	for (i = 1; i < 11; ++i) {
-		n = qrates_out[i];
-		E('bocnt' + i).innerHTML = (n / 1000).toFixed(2)
-		E('bocntx' + i).innerHTML = (n / 8192).toFixed(2)
-		if (totalOutgoingBandwidth > 0) p = (n / totalorate) * 100;
-			else p = 0;
-		E('bopct' + i).innerHTML = p.toFixed(2) + '%';
-	}
-	E('bocnt-total').innerHTML = (totalOutgoingBandwidth / 1000).toFixed(2)
-	E('bocntx-total').innerHTML = (totalOutgoingBandwidth / 8192).toFixed(2)
-	E('rateout').innerHTML = totalrateout;
-
-	for (i = 1; i < 11; ++i) {
-		n = qrates_in[i];
-		E('bicnt' + i).innerHTML = (n / 1000).toFixed(2)
-		E('bicntx' + i).innerHTML = (n / 8192).toFixed(2)
-		if (totalIncomingBandwidth > 0) p = (n / totalirate) * 100;
-			else p = 0;
-		E('bipct' + i).innerHTML = p.toFixed(2) + '%';
-	}
-	E('bicnt-total').innerHTML = (totalIncomingBandwidth / 1000).toFixed(2)
-	E('bicntx-total').innerHTML = (totalIncomingBandwidth / 8192).toFixed(2)
-	E('ratein').innerHTML = totalratein;
-}
-
-var ref = new TomatoRefresh('update.cgi', 'exec=qrate', 2, 'qos_graphs');
-
-ref.refresh = function(text)
-{
-	nfmarks = [];
-	qrates_out = [];
-	qrates_in = [];
-	
-	for(var i=0; i < 10; i++){
-/* MULTIWAN-BEGIN */
-		qrates_out[i] = qrates1_out[i]+qrates2_out[i]+qrates3_out[i]+qrates4_out[i];
-		qrates_in[i] = qrates1_in[i]+qrates2_in[i]+qrates3_in[i]+qrates4_in[i];
-/* MULTIWAN-END */
-/* DUALWAN-BEGIN */
-		qrates_out[i] = qrates1_out[i]+qrates2_out[i];
-		qrates_in[i] = qrates1_in[i]+qrates2_in[i];
-/* DUALWAN-END */
-	}
-	try
-	{
-		eval(text);
-	}
-	catch (ex)
-	{
-		nfmarks = [];
-		qrates_out = [];
-		qrates_in = [];
-	}
-
-	showData();
-	if (svgReady == 1) 
-	{
-		updateConnectionDistribution(nfmarks, abc);
-		updateBandwidthOutgoing(qrates_out, abc);
-		updateBandwidthIncoming(qrates_in, abc);
-	}
-}
-
-function checkSVG()
-{
-	var i, e, d, w;
-
-	try
-	{
-		for (i = 2; i >= 0; --i) 
->>>>>>> 88d442b... QOS: at least it works for 1 WAN
 		{
 			var i, n, p;
 			var totalConnections, totalOutgoingBandwidth, totalIncomingBandwidth;
@@ -373,8 +170,14 @@ function checkSVG()
 			qrates_in  = [];
 
 			for ( var i = 0; i < 10; i++ ) {
+				/* MULTIWAN-BEGIN */
 				qrates_out[ i ] = qrates1_out[ i ] + qrates2_out[ i ] + qrates3_out[ i ] + qrates4_out[ i ];
 				qrates_in[ i ]  = qrates1_in[ i ] + qrates2_in[ i ] + qrates3_in[ i ] + qrates4_in[ i ];
+				/* MULTIWAN-END */
+				/* DUALWAN-BEGIN */
+				qrates_out[ i ] = qrates1_out[ i ] + qrates2_out[ i ];
+				qrates_in[ i ]  = qrates1_in[ i ] + qrates2_in[ i ];
+				/* DUALWAN-END */
 			}
 
 			try {
