@@ -282,19 +282,31 @@ int build_nginx_conf(void) {
 	if ((buf = nvram_safe_get("nginx_fqdn")) == NULL) buf = nginxname;
 		nginx_write("server_name\t%s;\n", buf);
 		nginx_write("access_log\t%s\tmain;\n", nginxaccesslog);
-		nginx_write("location\t/\t{\n");
-	if ((buf = nvram_safe_get("nginx_docroot")) == NULL) buf = nginxdocrootdir;
-		nginx_write("root\t%s;\n", buf);
+//!oneleft
+// BEGIN: added ability to auto index with h5ai
 	
-	//!oneleft
-	// added ability to auto index with h5ai
 	if(!nvram_match("nginx_ai", "1")){
 		nginx_write("index\tindex.html\tindex.htm\tindex.php;\n");}
 	else{
 		nginx_write("index\tindex.html\tindex.htm\tindex.php\t/_h5ai/public/index.php;\n");
 		nginx_write("autoindex\ton;\n");
-		if (buf != nginxdocrootdir) xstart("ln","-s","/www/_h5ai",buf);
+		nginx_write("\n");
+		nginx_write("location\t/_h5ai/\t{\n");
+		nginx_write("root\t/www;\n");
+		nginx_write("location ~ ^(?<script_name>.+?\\.php)(?<path_info>/.*)?$ {\n");
+		nginx_write("try_files \t$script_name = 404;\n");
+		nginx_write("include\t%s;\n", fastcgiconf);
+		nginx_write("fastcgi_param PATH_INFO $path_info;\n");
+	if ((buf = nvram_safe_get("nginx_docroot")) == NULL) buf = nginxdocrootdir;
+		nginx_write("fastcgi_param ROOT_PATH %s;\n",buf);
+		nginx_write("fastcgi_pass\t127.0.0.1:9000;\n");
+		nginx_write("}}\n");
 	    }
+// END: added ability to auto index with h5ai
+//!oneleft
+		nginx_write("location\t/\t{\n");
+	if ((buf = nvram_safe_get("nginx_docroot")) == NULL) buf = nginxdocrootdir;
+		nginx_write("root\t%s;\n", buf);
 // Error pages section
 		nginx_write("error_page 404\t/404.html;\n");
 		nginx_write("error_page 500\t502\t503\t504\t/50x.html;\n");
