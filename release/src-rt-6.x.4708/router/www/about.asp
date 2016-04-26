@@ -38,7 +38,7 @@
 		<!-- OPENVPN-BEGIN -->
 		<div class="box"><div class="heading">OpenVPN integration and GUI</div>
 			<div class="content">
-				Copyright (C) 2010 Keith Moyer,<br>
+				Copyright (C) 2010 Keith Moyer<br>
 				<a href='mailto:tomatovpn@keithmoyer.com'>tomatovpn@keithmoyer.com</a><br>
 			</div>
 		</div>
@@ -118,18 +118,17 @@
 				<p>
 					- Extended Sysinfo<br>
 					<!-- NOCAT-BEGIN -->
-					- Captive Portal. (Based in NocatSplash)<br>
+					- Captive Portal (Based in NocatSplash)<br>
 					<!-- NOCAT-END -->
 					<!-- NGINX-BEGIN -->
-					- Web Server. (NGinX)<br>
+					- Web Server (NGinX)<br>
 					<!-- NGINX-END -->
 					<!-- HFS-BEGIN -->
 					- HFS / HFS+ filesystem integration<br>
 					<!-- HFS-END -->
 				</p>
-
 				Copyright (C) 2007-2011 Ofer Chen & Vicente Soriano <br>
-				<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a>
+				<a href='http://victek.is-a-geek.com' target='_new'>http://victek.is-a-geek.com</a><br>
 			</div>
 		</div>
 
@@ -161,12 +160,11 @@
 					<!-- DNSCRYPT-BEGIN -->
 					- DNSCrypt-Proxy selectable/manual resolver<br>
 					<!-- DNSCRYPT-END -->
-					- Comcast DSCP Fix GUI
+					- Comcast DSCP Fix GUI<br>
 					<!-- TINC-BEGIN -->
 					- Tinc Daemon integration and GUI<br>
 					<!-- TINC-END -->
 				</p>
-
 				Copyright (C) 2014 Lance Fredrickson<br>
 				<a href='mailto:lancethepants@gmail.com'>lancethepants@gmail.com</a><br>
 			</div>
@@ -182,7 +180,7 @@
 					- Tools-System refresh timer
 				</p>
 				Copyright (C) 2011 Toastman<br>
-				<a href='http://www.linksysinfo.org/index.php?threads/using-qos-tutorial-and-discussion.28349/' target='_new'>Using QoS - Tutorial and discussion</a>
+				<a href='http://www.linksysinfo.org/index.php?threads/using-qos-tutorial-and-discussion.28349/' target='_new'>Using QoS - Tutorial and discussion</a><br>
 			</div>
 		</div>
 
@@ -192,7 +190,7 @@
 					- IMQ based QOS Ingress<br>
 					- Incoming Class Bandwidth pie chart
 				</p>
-				Copyright (C) 2012 Tiomo
+				Copyright (C) 2012 Tiomo<br>
 			</div>
 		</div>
 
@@ -202,7 +200,7 @@
 				<p>
 					- SDHC integration and GUI
 				</p>
-				Copyright (C) 2009 Tomasz Słodkowicz <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a>
+				Copyright (C) 2009 Tomasz Słodkowicz <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a><br>
 			</div>
 		</div>
 		<!-- SDHC-END -->
@@ -216,8 +214,10 @@
 		<!-- NGINX-BEGIN -->
 		<div class="box"><div class="heading">Tomato-hyzoom feature</div>
 			<div class="content">
-				- MySQL Server integration and GUI<br>
-				<i>Copyright (C) 2014 Bao Weiquan, Hyzoom</i>, <a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a>
+				<p>
+					- MySQL Server integration and GUI<br>
+				</p>
+				Copyright (C) 2014 Bao Weiquan, Hyzoom<br> <a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a><br>
 			</div>
 		</div>
 		<!-- NGINX-END -->
