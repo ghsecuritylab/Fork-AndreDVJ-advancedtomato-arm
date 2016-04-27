@@ -7,6 +7,7 @@ This repository, while I try to keep aligned to Shibby's as much as possible, it
 
 A summary of changes from Shibby so far:
 
+* Updated Linux Broadcom BCM47XX 10/100/1000 Mbps Ethernet Controller
 * Tweaks on ~/router/Makefile to parallelize/speed up build as much as possible
 * Tweaks on ~/router/Makefile to help with compilation failures
 * Tweaks on stop_transmission.sh script
