@@ -293,7 +293,8 @@ int build_nginx_conf(void) {
 	else{
 		nginx_write("index\tindex.html\tindex.htm\tindex.php\t/_h5ai/public/index.php;\n");
 		nginx_write("autoindex\ton;\n");
-		if (buf != nginxdocrootdir) link("/www/_h5ai",buf);}
+		if (buf != nginxdocrootdir) xstart("ln","-s","/www/_h5ai",buf);
+	    }
 // Error pages section
 		nginx_write("error_page 404\t/404.html;\n");
 		nginx_write("error_page 500\t502\t503\t504\t/50x.html;\n");
