@@ -222,17 +222,17 @@
 		</div>
 		<!-- NGINX-END -->
 
-		<!-- NGINX-BEGIN -->
 		<div class="box"><div class="heading">"oneleft" features</div>
 			<div class="content">
 				<p>
-					- h5ai A modern HTTP web server index for Apache httpd, lighttpd, nginx and Cherokee.<br>
-					- ExFAT filesystem support for ARM routers.<br>
+					<!-- NGINX-BEGIN -->
+					- h5ai A modern HTTP web server index for Apache httpd, lighttpd, nginx and Cherokee<br>
+					<!-- NGINX-END -->
+					- ExFAT filesystem support for ARM routers<br>
 				</p>
-				Copyright (C) 2016 oneleft<br>
+				Copyright (C) 2016 <a href='https://bitbucket.org/oneleft/at1l' target='_new'>oneleft</a><br>
 			</div>
 		</div>
-		<!-- NGINX-END -->
 
 	</div>
 
