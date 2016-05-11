@@ -13,7 +13,7 @@ No part of this file may be used without permission.
 <content>
 	<script type='text/javascript'>
 
-		//	<% nvram("nginx_enable,nginx_php,nginx_keepconf,nginx_port,nginx_upload,nginx_remote,nginx_fqdn,nginx_docroot,nginx_priority,nginx_custom,nginx_httpcustom,nginx_servercustom,nginx_user,nginx_phpconf,nginx_override,nginx_overridefile"); %>
+		//	<% nvram("nginx_enable,nginx_php,nginx_keepconf,nginx_port,nginx_upload,nginx_remote,nginx_fqdn,nginx_docroot,nginx_priority,nginx_custom,nginx_httpcustom,nginx_servercustom,nginx_user,nginx_phpconf,nginx_override,nginx_overridefile,nginx_ai"); %>
 
 		changed = 0;
 		nginxup = parseInt ('<% psup("nginx"); %>');
@@ -40,6 +40,7 @@ No part of this file may be used without permission.
 			var a = E('_f_nginx_enable').checked;
 			var b = E('_f_nginx_override').checked;
 			E('_f_nginx_php').disabled = !a ;
+			E('_f_nginx_ai').disabled = !a || b;
 			E('_f_nginx_keepconf').disabled = !a || b;
 			E('_nginx_port').disabled = !a || b;
 			E('_nginx_upload').disabled = !a || b;
@@ -64,6 +65,7 @@ No part of this file may be used without permission.
 			fom.nginx_enable.value = E('_f_nginx_enable').checked ? 1 : 0;
 			if (fom.nginx_enable.value) {
 				fom.nginx_php.value = fom.f_nginx_php.checked ? 1 : 0;
+				fom.nginx_ai.value = fom.f_nginx_ai.checked ? 1 : 0;
 				fom.nginx_keepconf.value = fom.f_nginx_keepconf.checked ? 1 : 0;
 				fom.nginx_remote.value = fom.f_nginx_remote.checked ? 1 : 0;
 				fom.nginx_override.value = fom.f_nginx_override.checked ? 1 : 0;
@@ -91,6 +93,7 @@ No part of this file may be used without permission.
 
 		<input type="hidden" name="nginx_enable">
 		<input type="hidden" name="nginx_php">
+		<input type="hidden" name="nginx_ai">
 		<input type="hidden" name="nginx_keepconf">
 		<input type="hidden" name="nginx_remote">
 		<input type="hidden" name="nginx_override">
@@ -138,6 +141,7 @@ No part of this file may be used without permission.
 		$('.content.config-section').forms([
 			{ title: 'Enable Server on Start', name: 'f_nginx_enable', type: 'checkbox', value: nvram.nginx_enable == '1'},
 			{ title: 'Enable PHP support', name: 'f_nginx_php', type: 'checkbox', value: nvram.nginx_php == '1' },
+			{ title: 'Enable h5ai autoindex', name: 'f_nginx_ai', type: 'checkbox', value: nvram.nginx_ai == '1' },
 			{ title: 'Run As', name: 'nginx_user', type: 'select',
 				options: [['root','Root'],['nobody','Nobody']], value: nvram.nginx_user },
 			{ title: 'Keep Config Files', name: 'f_nginx_keepconf', type: 'checkbox', value: nvram.nginx_keepconf == '1' },
