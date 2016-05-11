@@ -198,7 +198,7 @@
 		<div class="box"><div class="heading">"Slodki" feature</div>
 			<div class="content">
 				<p>
-					- SDHC integration and GUI
+					- SDHC integration and GUI<br>
 				</p>
 				Copyright (C) 2009 Tomasz Słodkowicz <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a><br>
 			</div>
@@ -218,6 +218,18 @@
 					- MySQL Server integration and GUI<br>
 				</p>
 				Copyright (C) 2014 Bao Weiquan, Hyzoom<br> <a href='mailto:bwq518@gmail.com'>bwq518@gmail.com</a><br>
+			</div>
+		</div>
+		<!-- NGINX-END -->
+
+		<!-- NGINX-BEGIN -->
+		<div class="box"><div class="heading">"oneleft" features</div>
+			<div class="content">
+				<p>
+					- h5ai A modern HTTP web server index for Apache httpd, lighttpd, nginx and Cherokee.<br>
+					- ExFAT filesystem support for ARM routers.<br>
+				</p>
+				Copyright (C) 2016 oneleft<br>
 			</div>
 		</div>
 		<!-- NGINX-END -->
