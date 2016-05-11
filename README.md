@@ -2,7 +2,7 @@
 
 AdvancedTomato-ARM firmware forked off Jacky's AdvancedTomato-ARM (which is a fork of Tomato-ARM by Shibby).
 
-This is my personal fork, where I attempt to fix issues, make small adjustments, update open-source components if possible, and cherry-pick fixes from others.
+This is my personal fork, of the firmware I am currently running in my router, where I attempt to fix issues, make small adjustments, update open-source components if possible, and cherry-pick fixes from others.
 This repository, while I try to keep aligned to Shibby's as much as possible, it has diverted already as some components are newer versions.
 
 A summary of changes from Shibby so far:
@@ -22,12 +22,17 @@ A summary of changes from Shibby so far:
 * Updated NTFS-3G driver
 * Updated dnsmasq
 * Updated nano
+* Updated OpenSSL
 * Removed wireless antenna options and nvram values, as they're pointless on ARM routers.
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
+* Added ExFAT filesystem driver, from oneleft
+* Added h5ai feature, from oneleft
 
 Some of these changes are functionally pointless, but may offer potential bug and security fixes.
-Firmware size increased around 100K compared to Shibby builds. Should not be an issue to routers with 32MB of flash memory and beyond.
+Firmware size increased around 600K compared to Shibby builds. Should not be an issue to routers with 32MB of flash memory and beyond.
 
-I only have a Netgear R7000 router, so I don't have any other unit to test my builds. Build/flash at your own risk.
+I only have a Netgear R7000 router, so I don't have any other unit to test any other build. Build/flash at your own risk.
 
 If you see any issues or want to request a specific build, please let me know.
+
+If anyone wants to pick up my changes and merge them to your repository, feel free and go ahead. That's the reason Tomato is an open-source project.
