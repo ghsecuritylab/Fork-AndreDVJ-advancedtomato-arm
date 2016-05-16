@@ -23,6 +23,7 @@ A summary of changes from Shibby so far:
 * Updated dnsmasq
 * Updated nano
 * Updated OpenSSL
+* Updated OpenVPN
 * Removed wireless antenna options and nvram values, as they're pointless on ARM routers.
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
 * Added ExFAT filesystem driver, from oneleft
