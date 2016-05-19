@@ -2380,18 +2380,29 @@ static int init_nvram(void)
 			nvram_set("pci/1/1/macaddr", s);
 			nvram_set("wl0_hwaddr", s);
 
-			// force wl0 settings
+			// force 5G settings
 			nvram_set("wl0_bw", "3");
 			nvram_set("wl0_bw_cap", "7");
 			nvram_set("wl0_chanspec", "149/80");
 			nvram_set("wl0_nctrlsb", "lower");
+			// force 2G settings
+			nvram_set("wl1_bw_cap","3");
+			nvram_set("wl1_chanspec","6l");
+			nvram_set("wl1_nctrlsb", "lower");
+			nvram_set("wl1_nbw", "40");
+			nvram_set("wl1_nbw_cap", "1");
+			// country set
 			nvram_set("pci/1/1/ccode", "SG");
 			nvram_set("pci/2/1/ccode", "SG");
 			nvram_set("pci/1/1/regrev", "0");
 			nvram_set("pci/2/1/regrev", "0");
-			nvram_set("wl_country", "SG");
-			nvram_set("wl_country_code", "SG");
-			nvram_set("wl_ssid", "MiWiFi_5G");
+			nvram_set("wl0_country", "SG");
+			nvram_set("wl0_country_code", "SG");
+			nvram_set("wl0_country_rev", "0");
+			nvram_set("wl1_country", "SG");
+			nvram_set("wl1_country_code", "SG");
+			nvram_set("wl1_country_rev", "0");
+			nvram_set("wl0_ssid", "MiWiFi_5G");
 			nvram_set("wl1_ssid", "MiWiFi");
 
 			// usb settings
