@@ -2381,14 +2381,20 @@ static int init_nvram(void)
 			nvram_set("wl0_hwaddr", s);
 
 			// force 5G settings
+			nvram_set("wl0_channel", "149");
 			nvram_set("wl0_bw", "3");
 			nvram_set("wl0_bw_cap", "7");
 			nvram_set("wl0_chanspec", "149/80");
 			nvram_set("wl0_nctrlsb", "lower");
+			nvram_set("wl0_nband", "1");
+			nvram_set("wl0_nbw", "80");
+			nvram_set("wl0_nbw_cap", "3");
 			// force 2G settings
+			nvram_set("wl1_channel", "6");
 			nvram_set("wl1_bw_cap","3");
 			nvram_set("wl1_chanspec","6l");
 			nvram_set("wl1_nctrlsb", "lower");
+			nvram_set("wl1_nband", "2");
 			nvram_set("wl1_nbw", "40");
 			nvram_set("wl1_nbw_cap", "1");
 			// country set
