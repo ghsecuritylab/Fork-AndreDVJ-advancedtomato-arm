@@ -26,11 +26,12 @@ SWAN=`cat /tmp/ethernet.state.tmp | grep "Port $VPORT" | awk '{print $3}'`
 echo "Port 0: $SWAN" > /tmp/ethernet.state
 sed -n -e "/Port $VPORT:/!p" /tmp/ethernet.state.tmp > /tmp/ethernet.state1
 
-MODEL=`nvram get model`
-if [ "$MODEL" == "R1D" ]; then
-sed -i '/Port 1/d' /tmp/ethernet.state1
-sed -i '/Port 3/d' /tmp/ethernet.state1
-fi
+#R1D have only 3 ports, but this confuse GUI
+#MODEL=`nvram get model`
+#if [ "$MODEL" == "R1D" ]; then
+#sed -i '/Port 1/d' /tmp/ethernet.state1
+#sed -i '/Port 3/d' /tmp/ethernet.state1
+#fi
 
 sed -i '/Port 5/d' /tmp/ethernet.state1
 sed -i '/Port 8/d' /tmp/ethernet.state1
