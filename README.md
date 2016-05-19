@@ -5,6 +5,8 @@ AdvancedTomato-ARM firmware forked off Jacky's AdvancedTomato-ARM (which is a fo
 This is my personal fork, of the firmware I am currently running in my router, where I attempt to fix issues, make small adjustments, update open-source components if possible, and cherry-pick fixes from others.
 This repository, while I try to keep aligned to Shibby's as much as possible, it has diverted already as some components are newer versions.
 
+## WARNING: Highly experimental at the moment. See changes below.
+
 A summary of changes from Shibby so far:
 
 * Updated Linux Broadcom BCM47XX 10/100/1000 Mbps Ethernet Controller
@@ -24,6 +26,7 @@ A summary of changes from Shibby so far:
 * Updated nano
 * Updated OpenSSL
 * Updated OpenVPN
+* Updated other components. See commits for history.
 * Removed wireless antenna options and nvram values, as they're pointless on ARM routers.
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
 * Added ExFAT filesystem driver, from oneleft
