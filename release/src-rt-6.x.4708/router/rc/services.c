@@ -112,6 +112,7 @@ void start_dnsmasq()
 
 	fprintf(f,
 		"pid-file=/var/run/dnsmasq.pid\n");
+
 	if (((nv = nvram_get("wan_domain")) != NULL) || ((nv = nvram_get("wan_get_domain")) != NULL)) {
 		if (*nv) fprintf(f, "domain=%s\n", nv);
 	}
@@ -486,7 +487,7 @@ void start_dnsmasq()
 	TRACE_PT("run dnsmasq\n");
 
 	// Default to some values we like, but allow the user to override them.
-	eval("dnsmasq", "-c", "1500", "--log-async");
+	eval("dnsmasq", "-c", "4096", "--log-async");
 
 	if (!nvram_contains_word("debug_norestart", "dnsmasq")) {
 		pid_dnsmasq = -2;
