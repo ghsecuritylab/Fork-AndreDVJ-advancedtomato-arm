@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <syslog.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,6 +18,7 @@
 #include "shutils.h"
 #include "shared.h"
 
+//#define dbG(fmt, args...) syslog(LOG_DEBUG, fmt, ##args)
 
 const char *led_names[] = { "wlan", "diag", "white", "amber", "dmz", "aoss", "bridge", "usb", "usb3", "5g"};
 
@@ -181,17 +183,17 @@ int do_led(int which, int mode)
 {
 //				    WLAN  DIAG  WHITE AMBER  DMZ  AOSS  BRIDG  USB2 USB3   5G
 //				    ----- ----- ----- -----  ---  ----  -----  ---- ----   --
-	static int wrt54g[]	= { 255,  1,    2,    3,    7,    255,  255,   255, 255,  255};
-	static int wrtsl[]	= { 255,  1,    5,    7,    0,    255,  255,   255, 255,  255};
-	static int whrg54[]	= { 2,    7,    255,  255,  255,  6,    1,       3, 255,  255};
-	static int wbr2g54[]	= { 255,  -1,   255,  255,  255,  -6,   255,   255, 255,  255};
-	static int wzrg54[]	= { 2,    7,    255,  255,  255,  6,    255,   255, 255,  255};
-	static int wr850g1[]	= { 7,    3,    255,  255,  255,  255,  255,   255, 255,  255};
-	static int wr850g2[]	= { 0,    1,    255,  255,  255,  255,  255,   255, 255,  255};
-	static int wtr54gs[]	= { 1,    -1,   255,  255,  255,  255,  255,   255, 255,  255};
+	static int wrt54g[]	= { 255,   1,     2,    3,    7,  255,  255,   255, 255,  255};
+	static int wrtsl[]	= { 255,   1,     5,    7,    0,  255,  255,   255, 255,  255};
+	static int whrg54[]	= {   2,   7,   255,  255,  255,    6,    1,     3, 255,  255};
+	static int wbr2g54[]	= { 255,  -1,   255,  255,  255,   -6,  255,   255, 255,  255};
+	static int wzrg54[]	= {   2,   7,   255,  255,  255,    6,  255,   255, 255,  255};
+	static int wr850g1[]	= {   7,   3,   255,  255,  255,  255,  255,   255, 255,  255};
+	static int wr850g2[]	= {   0,   1,   255,  255,  255,  255,  255,   255, 255,  255};
+	static int wtr54gs[]	= {   1,  -1,   255,  255,  255,  255,  255,   255, 255,  255};
 	static int dir320[]	= { -99,   1,     4,    3,  255,  255,  255,    -5, 255,  255};
 	static int h618b[]	= { 255,  -1,   255,  255,  255,   -5,   -3,    -4, 255,  255};
-	static int wl1600gl[]	= { 1,    -5, 	  0,  255,  255,  2,    255,   255, 255,  255};
+	static int wl1600gl[]	= {   1,  -5, 	  0,  255,  255,  2,    255,   255, 255,  255};
 	static int wrt310nv1[]	= { 255,   1,     9,    3,  255,  255,  255,   255, 255,  255};
 	static int wrt160nv1[]	= { 255,   1,     5,    3,  255,  255,  255,   255, 255,  255};
 #ifdef CONFIG_BCMWL5
@@ -213,27 +215,25 @@ int do_led(int which, int mode)
 	static int l600n[]	= { 255, 255,   255,  255,  255,   -7,  255,    -8, 255,  255};
 	static int dir620c1[]	= {  -6,  -8,   255,  255,  255,   -7,  255,   255, 255,  255};
 	static int rtn66u[]	= { 255, -12,   255,  255,  255,  255,  255,    15, 255,   13};
-	static int w1800r[]     = { 255, -13,   255,  255,  255,  255,  255,   -12, 255,   -5};
-	static int d1800h[]     = { -12, -13,     8,  255,  255,  -10,  255,    15, 255,   11};
-	static int tdn6[]       = { 255,  -6,     8,  255,  255,  255,  255,   255, 255,  255};
+	static int w1800r[]	= { 255, -13,   255,  255,  255,  255,  255,   -12, 255,   -5};
+	static int d1800h[]	= { -12, -13,     8,  255,  255,  -10,  255,    15, 255,   11};
+	static int tdn6[]	= { 255,  -6,     8,  255,  255,  255,  255,   255, 255,  255};
 #endif
 #ifdef CONFIG_BCMWL6A
-	static int ac68u[]      = { 255, 255,   255,  255,  255,   -4,  255,    -0, -14,  255};
-	static int ac56u[]      = { 255, 255,   255,  255,  255,   -3,  255,    -0, -14,  255};
-	static int n18u[]       = { 255, 255,     6,  255,  255,  255,  255,     3,  14,  255};
-	static int r6250[]      = {  11, 255,    15,  255,  255,    1,  255,     8,   8,  255};
-	static int r6300v2[]    = {  11, 255,    10,  255,  255,    1,  255,     8,   8,  255};
-	static int r7000[]      = {  13, 255,   255,  255,  255,  -15,  255,   -17, -18,   12};
-	static int dir868[]     = { 255, 255,     3,  255,  255,   -0,  255,   255, 255,  255};
-	static int ea6700[]     = { 255, 255,    -6,   -6,  255,  255,  255,   255, 255,  255};
-	static int ea6900[]     = { 255, 255,     8,  255,  255,    6,  255,   255, 255,  255};
-	static int ws880[]      = {   0, 255,   -12,  255,  255,    6,    1,    14,  14,    6};
-	static int r1d[]        = { 255, 255,   255,  255,  255,    1,   -8,   255, 255,  255};
-	static int wzr1750[]    = { 255, 255,   255,  255,  255,   -5,  255,   255, 255,  255};
-
+	static int ac68u[]	= { 255, 255,   255,  255,  255,   -4,  255,    -0, -14,  255};
+	static int ac56u[]	= { 255, 255,   255,  255,  255,   -3,  255,    -0, -14,  255};
+	static int n18u[]	= { 255, 255,     6,  255,  255,  255,  255,     3,  14,  255};
+	static int r6250[]	= {  11, 255,    15,  255,  255,    1,  255,     8,   8,  255};
+	static int r6300v2[]	= {  11, 255,    10,  255,  255,    1,  255,     8,   8,  255};
+	static int r7000[]	= {  13, 255,   255,  255,  255,  -15,  255,   -17, -18,   12};
+	static int dir868[]	= { 255, 255,     3,  255,  255,   -0,  255,   255, 255,  255};
+	static int ea6700[]	= { 255, 255,    -6,   -6,  255,  255,  255,   255, 255,  255};
+	static int ea6900[]	= { 255, 255,     8,  255,  255,    6,  255,   255, 255,  255};
+	static int ws880[]	= {   0, 255,   -12,  255,  255,    6,    1,    14,  14,    6};
+	static int r1d[]	= { 255,   1,   255,    2,  255,    3,   -8,   255, 255,  255};
+	static int wzr1750[]	= { 255, 255,   255,  255,  255,   -5,  255,   255, 255,  255};
 #endif
 //                                 WLAN  DIAG  WHITE AMBER  DMZ   AOSS BRIDG   USB2 USB3   5G
-
 
 	char s[16];
 	int n;
@@ -478,12 +478,19 @@ int do_led(int which, int mode)
 	case MODEL_WS880:
 		b = ws880[which];
 		break;
-	case MODEL_R1D:
-		if (which == LED_DIAG) {
-			// power led gpio: -2 - orange, -3 - blue
-			b = (mode) ? 3 : 2;
-			c = (mode) ? 2 : 3;
-		} else
+	case MODEL_R1D: // power led gpio: -1 - red, -2 - orange, -3 - blue
+		if (which == LED_WHITE) {
+			// blue / orange switch
+			b = (mode) ?  3 :-2;
+			c = (mode) ?  2 : 3;
+/*			// blue / red switch
+			b = (mode) ?  3 :-1;
+			c = (mode) ?  1 : 3;
+		} else if (which == LED_DIAG) {
+			// red / orange switch (don't turn orange led back when off)
+			b = (mode) ?  1 : 2;
+			c = (mode) ?  2 :-1;
+*/		} else
 			b = r1d[which];
 		break;
 	case MODEL_EA6700:
@@ -493,7 +500,6 @@ int do_led(int which, int mode)
 	case MODEL_WZR1750:
 		b = wzr1750[which];
 		break;
-
 #endif
 /*
 	case MODEL_RT390W:
@@ -527,26 +533,26 @@ int do_led(int which, int mode)
 		return ret;
 	}
 
-	ret = b;
+	ret = b; // for gpio -2 and -3: [1] 3|-2(1), [2+] 3|2(1) || [3] 2|3(0), [4+] -2|3(0), [5] 2|-3(0), [6] -2|-3(0)
 	if (b < 0) {
 		if (b == -99) b = 0; // -0 substitute
-			else b = -b;
+		else b = -b;	// [4] 2|3(0), [6] 2|-3(0)
 	}
 	else if (mode != LED_PROBE) {
-		mode = !mode;
+		mode = !mode;	// [1] 3|-2(0), [2] 3|2(0), [3] 2|3(1), [5]2|-3(1)
 	}
 
 SET:
 	if (b < 16) {
 		if (mode != LED_PROBE) {
-			gpio_write(1 << b, mode);
+			gpio_write(1 << b, mode);	// [1] 3(0), [2] 3(0), [3] 2(1), [4] 2(0), [5] 2(1), [6] 2(0)
 
 			if (c < 0) {
 				if (c == -99) c = 0;
-				else c = -c;
+				else c = -c;	// [1] 2(0), [5] 3(1), [6] 3(0)
 			}
-			else mode = !mode;
-			if (c < 16) gpio_write(1 << c, mode);
+			else mode = !mode;	// [2] 2(1), [3] 3(0), [4] 3(1)
+			if (c < 16) gpio_write(1 << c, mode);	// [1] 2(0), [2] 2(1), [3] 3(0), [4] 3(1), [5] 3(1), [6] 3(0)
 		}
 	}
 
