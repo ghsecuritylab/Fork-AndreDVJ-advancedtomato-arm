@@ -600,9 +600,9 @@ define BusyboxOptions
 	if [ "$(USB)" = "USB" ]; then \
 		if [ "$(USBEXTRAS)" = "y" ]; then \
 			sed -i "/CONFIG_E2FSCK/d" $(1); \
-			echo "CONFIG_E2FSCK=y" >>$(1); \
+			echo "CONFIG_E2FSCK=n" >>$(1); \
 			sed -i "/CONFIG_MKE2FS/d" $(1); \
-			echo "CONFIG_MKE2FS=y" >>$(1); \
+			echo "CONFIG_MKE2FS=n" >>$(1); \
 			sed -i "/CONFIG_FDISK/d" $(1); \
 			echo "CONFIG_FDISK=y" >>$(1); \
 			sed -i "/CONFIG_FEATURE_FDISK_WRITABLE/d" $(1); \
@@ -616,9 +616,9 @@ define BusyboxOptions
 			sed -i "/CONFIG_FSYNC/d" $(1); \
 			echo "CONFIG_FSYNC=y" >>$(1); \
 			sed -i "/CONFIG_TUNE2FS/d" $(1); \
-			echo "CONFIG_TUNE2FS=y" >>$(1); \
+			echo "CONFIG_TUNE2FS=n" >>$(1); \
 			sed -i "/CONFIG_E2LABEL/d" $(1); \
-			echo "CONFIG_E2LABEL=y" >>$(1); \
+			echo "CONFIG_E2LABEL=n" >>$(1); \
 			sed -i "/CONFIG_FEATURE_VOLUMEID_EXFAT/d" $(1); \
 			echo "CONFIG_FEATURE_VOLUMEID_EXFAT=y" >>$(1); \
 			if [ "$(CONFIG_LINUX26)" = "y" ]; then \
@@ -914,6 +914,14 @@ define KernelConfig
 		echo "# CONFIG_ATA_VERBOSE_ERROR is not set" >>$(1); \
 	fi; \
 	sed -i "/CONFIG_FAILSAFE_UPGRADE/d" $(1); \
+	sed -i "/CONFIG_EXT2_/d" $(1); \
+	sed -i "/CONFIG_EXT3_/d" $(1); \
+	sed -i "/CONFIG_EXT4_/d" $(1); \
+	echo "# CONFIG_EXT2_FS is not set" >>$(1); \
+	echo "# CONFIG_EXT3_FS is not set" >>$(1); \
+	echo "CONFIG_EXT4_FS=m" >>$(1); \
+	echo "CONFIG_EXT4_USE_FOR_EXT23=y" >>$(1); \
+	echo "CONFIG_EXT4_FS_XATTR=y" >>$(1); \
 	if [ "$(FAILSAFE_UPGRADE)" = "y" ]; then \
 		echo "CONFIG_FAILSAFE_UPGRADE=y" >>$(1); \
 	else \

@@ -225,7 +225,6 @@ No part of this file may be used without permission.
 			/* MICROSD-END */
 			/* LINUX26-END */
 
-			E( '_f_ext3' ).disabled   = b || a;
 			E( '_f_ext4' ).disabled   = b || a;
 			E( '_f_fat' ).disabled    = b || a;
 			E( '_f_exfat' ).disabled  = b || a;
@@ -275,7 +274,6 @@ No part of this file may be used without permission.
 			/* MICROSD-END */
 			/* LINUX26-END */
 
-			fom.usb_fs_ext3.value  = E( '_f_ext3' ).checked ? 1 : 0;
 			fom.usb_fs_ext4.value  = E( '_f_ext4' ).checked ? 1 : 0;
 			fom.usb_fs_fat.value   = E( '_f_fat' ).checked ? 1 : 0;
 			fom.usb_fs_exfat.value = E( '_f_exfat' ).checked ? 1 : 0;
@@ -312,7 +310,6 @@ No part of this file may be used without permission.
 		<input type="hidden" name="usb_storage">
 		<input type="hidden" name="usb_printer">
 		<input type="hidden" name="usb_printer_bidirect">
-		<input type="hidden" name="usb_fs_ext3">
 		<input type="hidden" name="usb_fs_ext4">
 		<input type="hidden" name="usb_fs_fat">
 		<input type="hidden" name="usb_fs_exfat">
@@ -349,8 +346,7 @@ No part of this file may be used without permission.
 		                  null,
 		                  { title: 'USB Storage Support', name: 'f_storage', type: 'checkbox', value: nvram.usb_storage == 1 },
 		                  { title: 'File Systems Support', indent: 2, multi: [
-		                      { suffix: '&nbsp; Ext2 / Ext3 &nbsp;&nbsp;&nbsp;', name: 'f_ext3', type: 'checkbox', value: nvram.usb_fs_ext3 == 1 },
-		                      { suffix: '&nbsp; Ext4 &nbsp;&nbsp;&nbsp;', name: 'f_ext4', type: 'checkbox', value: nvram.usb_fs_ext4 == 1 },
+		                      { suffix: '&nbsp; Ext2 / Ext3 / Ext4 &nbsp;&nbsp;&nbsp;', name: 'f_ext4', type: 'checkbox', value: nvram.usb_fs_ext4 == 1 },
 		                      /* NTFS-BEGIN */
 		                      { suffix: '&nbsp; NTFS &nbsp;&nbsp;&nbsp;', name: 'f_ntfs', type: 'checkbox', value: nvram.usb_fs_ntfs == 1 },
 		                      /* NTFS-END */
