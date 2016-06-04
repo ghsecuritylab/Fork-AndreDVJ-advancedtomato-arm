@@ -112,10 +112,6 @@ void start_dnsmasq()
 
 	fprintf(f,
 		"pid-file=/var/run/dnsmasq.pid\n");
-	
-	fprintf(f,
-		"cache-size=4096\n");
-	
 	if (((nv = nvram_get("wan_domain")) != NULL) || ((nv = nvram_get("wan_get_domain")) != NULL)) {
 		if (*nv) fprintf(f, "domain=%s\n", nv);
 	}
