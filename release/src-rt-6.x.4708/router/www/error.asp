@@ -55,7 +55,7 @@
 
 		<div class="container" style="text-align: center;">
 			<div class="row">
-				<h2>Somthing went wrong...</h2>
+				<h2>Something went wrong...</h2>
 				<p><script type="text/javascript">
 						//<% resmsg("Unknown error"); %>
 						document.write(resmsg);
