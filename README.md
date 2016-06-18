@@ -31,11 +31,19 @@ A summary of changes from Shibby so far:
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
 * Added ExFAT filesystem driver, from oneleft
 * Added h5ai feature, from oneleft
+* Added ext4 filesystem driver and e2fsprogs, from nikk gitanes
+
+Known issues:
+
+* Restore of BWM/IPT graphs from backup does not work. AT GUI bug.
+* Report of R6300v2 crashing when USB drive is plugged in. However no details of which filesystem, driver, port, etc. was provided.
+
+-------------------------------------------------------------------------------
 
 Some of these changes are functionally pointless, but may offer potential bug and security fixes.
 Firmware size increased around 600K compared to Shibby builds. Should not be an issue to routers with 32MB of flash memory and beyond.
 
-I only have a Netgear R7000 router, so I don't have any other unit to test any other build. Build/flash at your own risk.
+I only have a Netgear R7000 router, (My WNR3500Lv2 died) so I don't have any other unit to test any other build. Build/flash at your own risk.
 
 If you see any issues or want to request a specific build, please let me know.
 
