@@ -94,6 +94,9 @@ endif
 ifneq ($(TCONFIG_NGINX)$(TCONFIG_NANO),)
 obj-y += libncurses
 endif
+ifneq ($(TCONFIG_USB)$(TCONFIG_NFS),)
+obj-y += e2fsprogs
+endif
 
 obj-y += exfat-nofuse
 obj-$(TCONFIG_TOR) += tor
@@ -108,7 +111,6 @@ obj-y += mdu
 obj-$(TCONFIG_RAID) += mdadm
 
 obj-$(TCONFIG_NFS) += portmap
-obj-$(TCONFIG_NFS) += e2fsprogs
 obj-$(TCONFIG_NFS) += libnfsidmap
 obj-$(TCONFIG_NFS) += nfs-utils
 
@@ -2479,25 +2481,28 @@ e2fsprogs: e2fsprogs/stamp-h1
 	@$(SEP)
 	$(MAKE) -C e2fsprogs $(PARALLEL_BUILD)
 
+e2fsprogs-install: e2fsprogs
+	cp e2fsprogs/misc/mke2fs.conf $(INSTALLDIR)/rom/rom/etc/mke2fs.conf
+	install -d $(INSTALLDIR)/e2fsprogs/sbin
+	install -D e2fsprogs/e2fsck/e2fsck $(INSTALLDIR)/e2fsprogs/sbin/e2fsck
+	install -D e2fsprogs/misc/mke2fs $(INSTALLDIR)/e2fsprogs/sbin/mke2fs
+	install -D e2fsprogs/misc/tune2fs $(INSTALLDIR)/e2fsprogs/sbin/tune2fs
+	$(STRIP) -s $(INSTALLDIR)/e2fsprogs/sbin/e2fsck
+	$(STRIP) -s $(INSTALLDIR)/e2fsprogs/sbin/mke2fs
+	$(STRIP) -s $(INSTALLDIR)/e2fsprogs/sbin/tune2fs
+	cd $(INSTALLDIR)/e2fsprogs/sbin/ && \
+		ln -sf e2fsck fsck.ext2 && \
+		ln -sf e2fsck fsck.ext3 && \
+		ln -sf e2fsck fsck.ext4 && \
+		ln -sf mke2fs mkfs.ext2 && \
+		ln -sf mke2fs mkfs.ext3 && \
+		ln -sf mke2fs mkfs.ext4
+
 e2fsprogs-clean:
 	-@$(MAKE) -C e2fsprogs clean
 	@rm -f e2fsprogs/stamp-h1
 	@rm -f e2fsprogs/Makefile
 	@rm -rf e2fsprogs/staged
-
-e2fsprogs-install: e2fsprogs
-	-@install -D e2fsprogs/e2fsck/e2fsck $(INSTALLDIR)/e2fsprogs/sbin/e2fsck
-	-@install -D e2fsprogs/misc/mke2fs $(INSTALLDIR)/e2fsprogs/sbin/mke2fs
-	-@install -D e2fsprogs/misc/tune2fs $(INSTALLDIR)/e2fsprogs/sbin/tune2fs
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf e2fsck fsck.ext2
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf e2fsck fsck.ext3
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf e2fsck fsck.ext4
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf mke2fs mkfs.ext2
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf mke2fs mkfs.ext3
-	-@cd $(INSTALLDIR)/e2fsprogs/sbin && ln -sf mke2fs mkfs.ext4
-	-@$(STRIP) $(INSTALLDIR)/e2fsprogs/sbin/e2fsck
-	-@$(STRIP) $(INSTALLDIR)/e2fsprogs/sbin/mke2fs
-	-@$(STRIP) $(INSTALLDIR)/e2fsprogs/sbin/tune2fs
 
 nfs-utils/stamp-h1: libevent-install e2fsprogs portmap libnfsidmap-install
 	cd nfs-utils && STRIP=$(STRIP) \
