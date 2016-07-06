@@ -1,6 +1,6 @@
 # AndreDVJ's AdvancedTomato-ARM #
 
-AdvancedTomato-ARM firmware forked off Jacky's AdvancedTomato-ARM (which is a fork of Tomato-ARM by Shibby).
+Forked off from Jacky's AdvancedTomato-ARM (which is a fork of Tomato-ARM by Shibby).
 
 This is my personal fork, of the firmware I am currently running in my router, where I attempt to fix issues, make small adjustments, update open-source components if possible, and cherry-pick fixes from others.
 This repository, while I try to keep aligned to Shibby's as much as possible, it has diverted already as some components are newer versions.
@@ -24,10 +24,9 @@ A summary of changes from Shibby so far:
 * Updated NTFS-3G driver
 * Updated dnsmasq
 * Updated nano
-* Updated OpenSSL
 * Updated OpenVPN
 * Updated other components. See commits for history.
-* Removed wireless antenna options and nvram values, as they're pointless on ARM routers.
+* Removed wireless antenna options and nvram values, as they're pointless on ARM routers such as R7000/AC68U.
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
 * Added ExFAT filesystem driver, from oneleft
 * Added h5ai feature, from oneleft
@@ -35,8 +34,8 @@ A summary of changes from Shibby so far:
 
 Known issues:
 
-* Restore of BWM/IPT graphs from backup does not work. AT GUI bug.
-* Report of R6300v2 crashing when USB drive is plugged in. However no details of which filesystem, driver, port, etc. was provided.
+* Restoring BWM/IPT graphs from backup does not work. AT-GUI bug.
+* A report of R6300v2 crashing (Actually bootloop) when USB drive is plugged in. However no details of which filesystem, driver, port, etc. was provided.
 
 -------------------------------------------------------------------------------
 
