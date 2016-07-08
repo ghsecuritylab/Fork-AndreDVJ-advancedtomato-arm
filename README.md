@@ -10,6 +10,7 @@ This repository, while I try to keep aligned to Shibby's as much as possible, it
 A summary of changes from Shibby so far:
 
 * Updated Linux Broadcom BCM47XX 10/100/1000 Mbps Ethernet Controller
+* Kernel: tcp_cubic patches
 * Tweaks on ~/router/Makefile to parallelize/speed up build as much as possible
 * Tweaks on ~/router/Makefile to help with compilation failures
 * Tweaks on stop_transmission.sh script
@@ -34,7 +35,7 @@ A summary of changes from Shibby so far:
 
 Known issues:
 
-* Restoring BWM/IPT graphs from backup does not work. AT-GUI bug.
+* Restoring BWM/IPT graphs from backup does not work. Investigating relationship between GUI and rstats/cstats.
 * A report of R6300v2 crashing (Actually bootloop) when USB drive is plugged in. However no details of which filesystem, driver, port, etc. was provided.
 
 -------------------------------------------------------------------------------
