@@ -19,7 +19,7 @@
 	March 2015 Tvlz
 	https://bitbucket.org/tvlz/tvlz-advanced-vlan/
 
-	** Last Updated - MAR 30 2016 - Tvlz **
+	** Last Updated - May 26 2016 - Tvlz **
 
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
@@ -71,7 +71,7 @@
 		// http://wiki.openwrt.org/toh/asus/start
 		// http://wiki.openwrt.org/toh/linksys/start
 		// http://wiki.openwrt.org/toh/start
-		switch ( nvram[ 't_model_name' ] ) { //Added by Tvlz, June 2014, ARM March 2015
+		switch ( nvram[ 't_model_name' ] ) {
 			case 'vlan-testid0':
 			case 'Asus RT-AC56U':
 			case 'D-Link DIR868L':
@@ -91,7 +91,7 @@
 			case 'Huawei WS880':
 			case 'Linksys EA6900':
 			case 'Netgear R6400':
-			case 'Netgear R7000': // newer versions
+			case 'Netgear R7000':
 				COL_P0N = '1';
 				COL_P1N = '2';
 				COL_P2N = '3';
@@ -114,7 +114,7 @@
 				COL_P3N = '1';
 				COL_P4N = '0';
 				break;
-			case 'Xiaomi MiWiFi': // #FIXME This router has only two LAN ports. How can we show two ports instead of four, in this page, for this particular router model?
+			case 'Xiaomi MiWiFi': //only has 2 Lan Ports
 				COL_P0N = '0';
 				COL_P1N = '2';
 				COL_P2N = '1';
@@ -912,8 +912,8 @@
 
 		<div style="display: none;" class="alert alert-warning" id='unknown_router'>
 			<h5>Unknown Port Mapping!</h5>
-			<a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'>Please follow these instructions to get it corrected.</a>
-			Include Router Brand/Model (<% nv('t_model_name'); %>), Results from "robocfg show" - VLANs section only &amp; and Port Numbers on Router Case (Left -> Right viewed from Front).
+			<a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'>Please Follow this Link for Instructions to get it corrected.</a>
+			Include Router Brand/Model (<% nv('t_model_name'); %>), Results from "nvram show | grep vlan1ports"&amp; Port Numbers on BACK of Router Case (Left -> Right viewed from Front).
 		</div>
 
 		<div id="sesdiv" class="box" style="display:none">
@@ -953,7 +953,7 @@
 				<h4><a href="javascript:toggleVisibility('notes');">Notes <span id='sesdiv_notes_showhide'><i class="icon-chevron-up"></i></span></a></h4>
 				<div class="section" id="sesdiv_notes" style="display:none">
 					<ul>
-						<li>If you notice that the order of the Lan Ports are incorrectly mapped, <a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'> <b>Please Follow this Link for Instructions to get it corrected.</b></a></li>
+						<li>If you notice that the order of the Lan Ports are incorrectly mapped, <a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'> <b>Please Follow these Instructions to get it corrected.</b></a></li>
 						<li><b>VLAN</b> - Unique identifier of a VLAN.</li>
 						<li><b>VID</b> - <i>EXPERIMENTAL</i> - Allows overriding "traditional" VLAN/VID mapping with arbitrary VIDs for each VLAN (set to "0" to use "regular" VLAN/VID mappings instead). Warning: this hasn"t been verified/tested on anything but a Cisco/Linksys E3000 and may not be supported by your particular device/model (<small><b><i>see notes on "VID Offset" below</i></b></small>).</li>
 						<li><b>Ports 1-4 &amp; WAN</b> - Which ethernet ports on the router should be members of this VLAN.</li>
