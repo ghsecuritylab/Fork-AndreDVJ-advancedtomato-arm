@@ -21,6 +21,7 @@
  **************************************************************************/
 
 #include "proto.h"
+#include "revision.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -28,17 +29,27 @@
 #include <unistd.h>
 #include <ctype.h>
 
+#ifdef REVISION
+#define BRANDING REVISION
+#else
+#define BRANDING PACKAGE_STRING
+#endif
+
 static int *key_buffer = NULL;
 	/* The keystroke buffer, containing all the keystrokes we
 	 * haven't handled yet at a given point. */
 static size_t key_buffer_len = 0;
 	/* The length of the keystroke buffer. */
+static bool solitary = FALSE;
+	/* Whether an Esc arrived by itself -- not as leader of a sequence. */
 static int statusblank = 0;
 	/* The number of keystrokes left before we blank the statusbar. */
 static bool suppress_cursorpos = FALSE;
 	/* Should we skip constant position display for one keystroke? */
+#ifdef USING_OLD_NCURSES
 static bool seen_wide = FALSE;
 	/* Whether we've seen a multicolumn character in the current line. */
+#endif
 
 #ifndef NANO_TINY
 static sig_atomic_t last_sigwinch_counter = 0;
@@ -57,18 +68,13 @@ bool the_window_resized(void)
 
 /* Control character compatibility:
  *
- * - NANO_BACKSPACE_KEY is Ctrl-H, which is Backspace under ASCII, ANSI,
- *   VT100, and VT220.
- * - NANO_TAB_KEY is Ctrl-I, which is Tab under ASCII, ANSI, VT100,
- *   VT220, and VT320.
- * - NANO_ENTER_KEY is Ctrl-M, which is Enter under ASCII, ANSI, VT100,
- *   VT220, and VT320.
- * - NANO_XON_KEY is Ctrl-Q, which is XON under ASCII, ANSI, VT100,
- *   VT220, and VT320.
- * - NANO_XOFF_KEY is Ctrl-S, which is XOFF under ASCII, ANSI, VT100,
- *   VT220, and VT320.
- * - NANO_CONTROL_8 is Ctrl-8 (Ctrl-?), which is Delete under ASCII,
- *   ANSI, VT100, and VT220, and which is Backspace under VT320.
+ * - Ctrl-H is Backspace under ASCII, ANSI, VT100, and VT220.
+ * - Ctrl-I is Tab under ASCII, ANSI, VT100, VT220, and VT320.
+ * - Ctrl-M is Enter under ASCII, ANSI, VT100, VT220, and VT320.
+ * - Ctrl-Q is XON under ASCII, ANSI, VT100, VT220, and VT320.
+ * - Ctrl-S is XOFF under ASCII, ANSI, VT100, VT220, and VT320.
+ * - Ctrl-8 (Ctrl-?, NANO_CONTROL_8) is Delete under ASCII, ANSI,
+ *          VT100, and VT220, but is Backspace under VT320.
  *
  * Note: VT220 and VT320 also generate Esc [ 3 ~ for Delete.  By
  * default, xterm assumes it's running on a VT320 and generates Ctrl-8
@@ -85,8 +91,8 @@ bool the_window_resized(void)
  *
  * We support escape sequences for ANSI, VT100, VT220, VT320, the Linux
  * console, the FreeBSD console, the Mach console, xterm, rxvt, Eterm,
- * and Terminal.  Among these, there are several conflicts and
- * omissions, outlined as follows:
+ * and Terminal, and some for iTerm2.  Among these, there are several
+ * conflicts and omissions, outlined as follows:
  *
  * - Tab on ANSI == PageUp on FreeBSD console; the former is omitted.
  *   (Ctrl-I is also Tab on ANSI, which we already support.)
@@ -134,8 +140,10 @@ void get_key_buffer(WINDOW *win)
     input = wgetch(win);
 
 #ifndef NANO_TINY
-    if (the_window_resized())
+    if (the_window_resized()) {
+	ungetch(input);
 	input = KEY_WINCH;
+    }
 #endif
 
     if (input == ERR && nodelay_mode)
@@ -353,6 +361,7 @@ int parse_kbinput(WINDOW *win)
 	    /* If there are four consecutive escapes, discard three of them. */
 	    if (escapes > 3)
 		escapes = 1;
+	    solitary = (escapes == 1 && get_key_buffer_len() == 0);
 	    /* Wait for more input. */
 	    break;
 	default:
@@ -364,10 +373,12 @@ int parse_kbinput(WINDOW *win)
 		case 1:
 		    /* Reset the escape counter. */
 		    escapes = 0;
-		    if (get_key_buffer_len() == 0 || key_buffer[0] == 0x1b) {
+		    if ((*kbinput != 'O' && *kbinput != 'o' && *kbinput != '[') ||
+				get_key_buffer_len() == 0 || *key_buffer == 0x1B) {
 			/* One escape followed by a single non-escape:
 			 * meta key sequence mode. */
-			meta_key = TRUE;
+			if (!solitary || (*kbinput >= 0x20 && *kbinput < 0x7F))
+			    meta_key = TRUE;
 			retval = tolower(*kbinput);
 		    } else
 			/* One escape followed by a non-escape, and there
@@ -392,9 +403,6 @@ int parse_kbinput(WINDOW *win)
 				retval = controlleft;
 				break;
 #endif
-			    default:
-				retval = ERR;
-				break;
 			}
 			double_esc = FALSE;
 			escapes = 0;
@@ -458,7 +466,8 @@ int parse_kbinput(WINDOW *win)
 				retval = *kbinput;
 			    }
 			}
-		    } else if (*kbinput=='[') {
+		    } else if (*kbinput == '[' && key_buffer_len > 0 &&
+				'A' <= *key_buffer && *key_buffer <= 'D') {
 			/* This is an iTerm2 sequence: ^[ ^[ [ X. */
 			double_esc = TRUE;
 		    } else {
@@ -490,45 +499,65 @@ int parse_kbinput(WINDOW *win)
 
     if (retval != ERR) {
 	switch (retval) {
-	    case NANO_CONTROL_8:
-		retval = ISSET(REBIND_DELETE) ? sc_seq_or(do_delete, 0) :
-			sc_seq_or(do_backspace, 0);
-		break;
-	    case KEY_DOWN:
-#ifdef KEY_SDOWN
-	    /* ncurses and Slang don't support KEY_SDOWN. */
-	    case KEY_SDOWN:
-#endif
-		retval = sc_seq_or(do_down_void, *kbinput);
-		break;
-	    case KEY_UP:
-#ifdef KEY_SUP
-	    /* ncurses and Slang don't support KEY_SUP. */
-	    case KEY_SUP:
-#endif
-		retval = sc_seq_or(do_up_void, *kbinput);
-		break;
-	    case KEY_LEFT:
 #ifdef KEY_SLEFT
 	    /* Slang doesn't support KEY_SLEFT. */
 	    case KEY_SLEFT:
 #endif
+	    case KEY_LEFT:
 		retval = sc_seq_or(do_left, *kbinput);
 		break;
-	    case KEY_RIGHT:
 #ifdef KEY_SRIGHT
 	    /* Slang doesn't support KEY_SRIGHT. */
 	    case KEY_SRIGHT:
 #endif
+	    case KEY_RIGHT:
 		retval = sc_seq_or(do_right, *kbinput);
+		break;
+#ifdef KEY_SUP
+	    /* ncurses and Slang don't support KEY_SUP. */
+	    case KEY_SUP:
+#endif
+	    case KEY_UP:
+		retval = sc_seq_or(do_up_void, *kbinput);
+		break;
+#ifdef KEY_SDOWN
+	    /* ncurses and Slang don't support KEY_SDOWN. */
+	    case KEY_SDOWN:
+#endif
+	    case KEY_DOWN:
+		retval = sc_seq_or(do_down_void, *kbinput);
 		break;
 #ifdef KEY_SHOME
 	    /* HP-UX 10-11 and Slang don't support KEY_SHOME. */
 	    case KEY_SHOME:
 #endif
-	    case KEY_A1:	/* Home (7) on numeric keypad with
-				 * NumLock off. */
+#ifdef KEY_HOME
+	    case KEY_HOME:
+#endif
+	    case KEY_A1:	/* Home (7) on keypad with NumLock off. */
 		retval = sc_seq_or(do_home, *kbinput);
+		break;
+#ifdef KEY_SEND
+	    /* HP-UX 10-11 and Slang don't support KEY_SEND. */
+	    case KEY_SEND:
+#endif
+#ifdef KEY_END
+	    case KEY_END:
+#endif
+	    case KEY_C1:	/* End (1) on keypad with NumLock off. */
+		retval = sc_seq_or(do_end, *kbinput);
+		break;
+	    case KEY_PPAGE:
+	    case KEY_A3:	/* PageUp (9) on keypad with NumLock off. */
+		retval = sc_seq_or(do_page_up, *kbinput);
+		break;
+	    case KEY_NPAGE:
+	    case KEY_C3:	/* PageDown (3) on keypad with NumLock off. */
+		retval = sc_seq_or(do_page_down, *kbinput);
+		break;
+
+	    case KEY_ENTER:
+		retval = sc_seq_or(do_enter, *kbinput);
 		break;
 	    case KEY_BACKSPACE:
 		retval = sc_seq_or(do_backspace, *kbinput);
@@ -536,72 +565,45 @@ int parse_kbinput(WINDOW *win)
 #ifdef KEY_SDC
 	    /* Slang doesn't support KEY_SDC. */
 	    case KEY_SDC:
+#endif
+	    case NANO_CONTROL_8:
 		if (ISSET(REBIND_DELETE))
 		    retval = sc_seq_or(do_delete, *kbinput);
 		else
 		    retval = sc_seq_or(do_backspace, *kbinput);
 		break;
-#endif
 #ifdef KEY_SIC
 	    /* Slang doesn't support KEY_SIC. */
 	    case KEY_SIC:
 		retval = sc_seq_or(do_insertfile_void, *kbinput);
 		break;
 #endif
-	    case KEY_C3:	/* PageDown (4) on numeric keypad with
-				 * NumLock off. */
-		retval = sc_seq_or(do_page_down, *kbinput);
-		break;
-	    case KEY_A3:	/* PageUp (9) on numeric keypad with
-				 * NumLock off. */
-		retval = sc_seq_or(do_page_up, *kbinput);
-		break;
-	    case KEY_ENTER:
-		retval = sc_seq_or(do_enter, *kbinput);
-		break;
-	    case KEY_B2:	/* Center (5) on numeric keypad with
-				 * NumLock off. */
-		retval = ERR;
-		break;
-	    case KEY_C1:	/* End (1) on numeric keypad with
-				 * NumLock off. */
-#ifdef KEY_SEND
-	    /* HP-UX 10-11 and Slang don't support KEY_SEND. */
-	    case KEY_SEND:
+#ifdef KEY_SBEG
+	    /* Slang doesn't support KEY_SBEG. */
+	    case KEY_SBEG:
 #endif
-		retval = sc_seq_or(do_end, *kbinput);
-		break;
 #ifdef KEY_BEG
 	    /* Slang doesn't support KEY_BEG. */
-	    case KEY_BEG:	/* Center (5) on numeric keypad with
-				 * NumLock off. */
+	    case KEY_BEG:
+#endif
+	    case KEY_B2:	/* Center (5) on keypad with NumLock off. */
 		retval = ERR;
 		break;
-#endif
 #ifdef KEY_CANCEL
-	    /* Slang doesn't support KEY_CANCEL. */
-	    case KEY_CANCEL:
 #ifdef KEY_SCANCEL
 	    /* Slang doesn't support KEY_SCANCEL. */
 	    case KEY_SCANCEL:
 #endif
+	    /* Slang doesn't support KEY_CANCEL. */
+	    case KEY_CANCEL:
 		retval = first_sc_for(currmenu, do_cancel)->seq;
 		break;
 #endif
-#ifdef KEY_SBEG
-	    /* Slang doesn't support KEY_SBEG. */
-	    case KEY_SBEG:	/* Center (5) on numeric keypad with
-				 * NumLock off. */
-		retval = ERR;
-		break;
-#endif
+#ifdef KEY_SUSPEND
 #ifdef KEY_SSUSPEND
 	    /* Slang doesn't support KEY_SSUSPEND. */
 	    case KEY_SSUSPEND:
-		retval = sc_seq_or(do_suspend_void, 0);
-		break;
 #endif
-#ifdef KEY_SUSPEND
 	    /* Slang doesn't support KEY_SUSPEND. */
 	    case KEY_SUSPEND:
 		retval = sc_seq_or(do_suspend_void, 0);
@@ -633,6 +635,10 @@ int parse_kbinput(WINDOW *win)
 	    retval = sc_seq_or(do_prev_word_void, 0);
 	else if (retval == controlright)
 	    retval = sc_seq_or(do_next_word_void, 0);
+	else if (retval == controlup)
+	    retval = sc_seq_or(do_prev_block, 0);
+	else if (retval == controldown)
+	    retval = sc_seq_or(do_next_block, 0);
 #endif
 
 	/* If our result is an extended keypad value (i.e. a value
@@ -694,8 +700,9 @@ int convert_sequence(const int *seq, size_t seq_len)
 		if (seq_len >= 5) {
 		    switch (seq[4]) {
 			case 'A': /* Esc O 1 ; 5 A == Ctrl-Up on Terminal. */
+			    return CONTROL_UP;
 			case 'B': /* Esc O 1 ; 5 B == Ctrl-Down on Terminal. */
-			    return arrow_from_abcd(seq[4]);
+			    return CONTROL_DOWN;
 			case 'C': /* Esc O 1 ; 5 C == Ctrl-Right on Terminal. */
 			    return CONTROL_RIGHT;
 			case 'D': /* Esc O 1 ; 5 D == Ctrl-Left on Terminal. */
@@ -764,8 +771,9 @@ int convert_sequence(const int *seq, size_t seq_len)
 		    case 'Y': /* Esc O Y == F10 on Mach console. */
 			return KEY_F(10);
 		    case 'a': /* Esc O a == Ctrl-Up on rxvt. */
+			return CONTROL_UP;
 		    case 'b': /* Esc O b == Ctrl-Down on rxvt. */
-			return arrow_from_abcd(seq[1]);
+			return CONTROL_DOWN;
 		    case 'c': /* Esc O c == Ctrl-Right on rxvt. */
 			return CONTROL_RIGHT;
 		    case 'd': /* Esc O d == Ctrl-Left on rxvt. */
@@ -839,8 +847,9 @@ int convert_sequence(const int *seq, size_t seq_len)
 	    case 'o':
 		switch (seq[1]) {
 		    case 'a': /* Esc o a == Ctrl-Up on Eterm. */
+			return CONTROL_UP;
 		    case 'b': /* Esc o b == Ctrl-Down on Eterm. */
-			return arrow_from_abcd(seq[1]);
+			return CONTROL_DOWN;
 		    case 'c': /* Esc o c == Ctrl-Right on Eterm. */
 			return CONTROL_RIGHT;
 		    case 'd': /* Esc o d == Ctrl-Left on Eterm. */
@@ -893,8 +902,9 @@ int convert_sequence(const int *seq, size_t seq_len)
 		if (seq_len >= 5) {
 		    switch (seq[4]) {
 			case 'A': /* Esc [ 1 ; 5 A == Ctrl-Up on xterm. */
+			    return CONTROL_UP;
 			case 'B': /* Esc [ 1 ; 5 B == Ctrl-Down on xterm. */
-			    return arrow_from_abcd(seq[4]);
+			    return CONTROL_DOWN;
 			case 'C': /* Esc [ 1 ; 5 C == Ctrl-Right on xterm. */
 			    return CONTROL_RIGHT;
 			case 'D': /* Esc [ 1 ; 5 D == Ctrl-Left on xterm. */
@@ -1220,7 +1230,7 @@ long add_unicode_digit(int kbinput, long factor, long *uni)
 /* Translate a Unicode sequence: turn a six-digit hexadecimal number
  * (from 000000 to 10FFFF, case-insensitive) into its corresponding
  * multibyte value. */
-long get_unicode_kbinput(int kbinput)
+long get_unicode_kbinput(WINDOW *win, int kbinput)
 {
     static int uni_digits = 0;
     static long uni = 0;
@@ -1231,65 +1241,62 @@ long get_unicode_kbinput(int kbinput)
 
     switch (uni_digits) {
 	case 1:
-	    /* First digit: This must be zero or one.  Put it in the
-	     * 0x100000's position of the Unicode sequence holder. */
-	    if ('0' <= kbinput && kbinput <= '1')
+	    /* The first digit must be zero or one.  Put it in the
+	     * 0x100000's position of the Unicode sequence holder.
+	     * Otherwise, return the character itself as the result. */
+	    if (kbinput == '0' || kbinput == '1')
 		uni = (kbinput - '0') * 0x100000;
 	    else
-		/* This isn't the first digit of a Unicode sequence.
-		 * Return this character as the result. */
 		retval = kbinput;
 	    break;
 	case 2:
-	    /* Second digit: This must be zero if the first was one, and
-	     * may be any hexadecimal value if the first was zero.  Put
-	     * it in the 0x10000's position of the Unicode sequence
-	     * holder. */
-	    if (uni == 0 || '0' == kbinput)
+	    /* The second digit must be zero if the first was one, but
+	     * may be any hexadecimal value if the first was zero. */
+	    if (kbinput == '0' || uni == 0)
 		retval = add_unicode_digit(kbinput, 0x10000, &uni);
 	    else
-		/* This isn't the second digit of a Unicode sequence.
-		 * Return this character as the result. */
 		retval = kbinput;
 	    break;
 	case 3:
-	    /* Third digit: This may be any hexadecimal value.  Put it
-	     * in the 0x1000's position of the Unicode sequence
-	     * holder. */
+	    /* Later digits may be any hexadecimal value. */
 	    retval = add_unicode_digit(kbinput, 0x1000, &uni);
 	    break;
 	case 4:
-	    /* Fourth digit: This may be any hexadecimal value.  Put it
-	     * in the 0x100's position of the Unicode sequence
-	     * holder. */
 	    retval = add_unicode_digit(kbinput, 0x100, &uni);
 	    break;
 	case 5:
-	    /* Fifth digit: This may be any hexadecimal value.  Put it
-	     * in the 0x10's position of the Unicode sequence holder. */
 	    retval = add_unicode_digit(kbinput, 0x10, &uni);
 	    break;
 	case 6:
-	    /* Sixth digit: This may be any hexadecimal value.  Put it
-	     * in the 0x1's position of the Unicode sequence holder. */
 	    retval = add_unicode_digit(kbinput, 0x1, &uni);
-	    /* If this character is a valid hexadecimal value, then the
-	     * Unicode sequence is complete. */
+	    /* If also the sixth digit was a valid hexadecimal value, then
+	     * the Unicode sequence is complete, so return it. */
 	    if (retval == ERR)
 		retval = uni;
 	    break;
     }
 
-    /* If we have a result, reset the Unicode digit counter and the
-     * Unicode sequence holder. */
-    if (retval != ERR) {
-	uni_digits = 0;
-	uni = 0;
+    /* Show feedback only when editing, not when at a prompt. */
+    if (retval == ERR && win == edit) {
+	char partial[7] = "......";
+
+	/* Construct the partial result, right-padding it with dots. */
+	snprintf(partial, uni_digits + 1, "%06lX", uni);
+	partial[uni_digits] = '.';
+
+	/* TRANSLATORS: This is shown while a six-digit hexadecimal
+	 * Unicode character code (%s) is being typed in. */
+	statusline(HUSH, _("Unicode Input: %s"), partial);
     }
 
 #ifdef DEBUG
-    fprintf(stderr, "get_unicode_kbinput(): kbinput = %d, uni_digits = %d, uni = %ld, retval = %ld\n", kbinput, uni_digits, uni, retval);
+    fprintf(stderr, "get_unicode_kbinput(): kbinput = %d, uni_digits = %d, uni = %ld, retval = %ld\n",
+						kbinput, uni_digits, uni, retval);
 #endif
+
+    /* If we have an end result, reset the Unicode digit counter. */
+    if (retval != ERR)
+	uni_digits = 0;
 
     return retval;
 }
@@ -1370,8 +1377,12 @@ int *get_verbatim_kbinput(WINDOW *win, size_t *kbinput_len)
      * keypad back on if necessary now that we're done. */
     if (ISSET(PRESERVE))
 	enable_flow_control();
-    if (!ISSET(REBIND_KEYPAD))
-	keypad(win, TRUE);
+    /* Use the global window pointers, because a resize may have freed
+     * the data that the win parameter points to. */
+    if (!ISSET(REBIND_KEYPAD)) {
+	keypad(edit, TRUE);
+	keypad(bottomwin, TRUE);
+    }
 
     return retval;
 }
@@ -1388,11 +1399,20 @@ int *parse_verbatim_kbinput(WINDOW *win, size_t *kbinput_len)
     while ((kbinput = get_input(win, 1)) == NULL)
 	;
 
+#ifndef NANO_TINY
+    /* When the window was resized, abort and return nothing. */
+    if (*kbinput == KEY_WINCH) {
+	*kbinput_len = 0;
+	free(kbinput);
+	return NULL;
+    }
+#endif
+
 #ifdef ENABLE_UTF8
     if (using_utf8()) {
 	/* Check whether the first keystroke is a valid hexadecimal
 	 * digit. */
-	long uni = get_unicode_kbinput(*kbinput);
+	long uni = get_unicode_kbinput(win, *kbinput);
 
 	/* If the first keystroke isn't a valid hexadecimal digit, put
 	 * back the first keystroke. */
@@ -1406,15 +1426,11 @@ int *parse_verbatim_kbinput(WINDOW *win, size_t *kbinput_len)
 	    char *uni_mb;
 	    int uni_mb_len, *seq, i;
 
-	    if (win == edit)
-		/* TRANSLATORS: This is displayed during the input of a
-		 * six-digit hexadecimal Unicode character code. */
-		statusbar(_("Unicode Input"));
-
 	    while (uni == ERR) {
+		free(kbinput);
 		while ((kbinput = get_input(win, 1)) == NULL)
 		    ;
-		uni = get_unicode_kbinput(*kbinput);
+		uni = get_unicode_kbinput(win, *kbinput);
 	    }
 
 	    /* Put back the multibyte equivalent of the Unicode
@@ -1620,21 +1636,22 @@ const sc *get_shortcut(int *kbinput)
     sc *s;
 
 #ifdef DEBUG
-    fprintf(stderr, "get_shortcut(): kbinput = %d, meta_key = %s -- ", *kbinput, meta_key ? "TRUE" : "FALSE");
+    fprintf(stderr, "get_shortcut(): kbinput = %d, meta_key = %s -- ",
+				*kbinput, meta_key ? "TRUE" : "FALSE");
 #endif
 
     for (s = sclist; s != NULL; s = s->next) {
 	if ((s->menus & currmenu) && *kbinput == s->seq
 		&& meta_key == (s->type == META)) {
 #ifdef DEBUG
-	    fprintf (stderr, "matched seq \"%s\", and btw meta was %d (menu is %x from %x)\n",
-				s->keystr, meta_key, currmenu, s->menus);
+	    fprintf (stderr, "matched seq '%s'  (menu is %x from %x)\n",
+				s->keystr, currmenu, s->menus);
 #endif
 	    return s;
 	}
     }
 #ifdef DEBUG
-    fprintf (stderr, "matched nothing, btw meta was %d\n", meta_key);
+    fprintf (stderr, "matched nothing\n");
 #endif
 
     return NULL;
@@ -1654,14 +1671,6 @@ void blank_line(WINDOW *win, int y, int x, int n)
 void blank_titlebar(void)
 {
     blank_line(topwin, 0, 0, COLS);
-}
-
-/* If the MORE_SPACE flag isn't set, blank the second line of the top
- * portion of the window. */
-void blank_topbar(void)
-{
-    if (!ISSET(MORE_SPACE))
-	blank_line(topwin, 1, 0, COLS);
 }
 
 /* Blank all the lines of the middle portion of the window, i.e. the
@@ -1714,86 +1723,58 @@ void check_statusblank(void)
 
 /* Convert buf into a string that can be displayed on screen.  The
  * caller wants to display buf starting with column start_col, and
- * extending for at most len columns.  start_col is zero-based.  len is
- * one-based, so len == 0 means you get "" returned.  The returned
+ * extending for at most span columns.  start_col is zero-based.  span
+ * is one-based, so span == 0 means you get "" returned.  The returned
  * string is dynamically allocated, and should be freed.  If dollars is
  * TRUE, the caller might put "$" at the beginning or end of the line if
  * it's too long. */
-char *display_string(const char *buf, size_t start_col, size_t len, bool
-	dollars)
+char *display_string(const char *buf, size_t start_col, size_t span,
+	bool dollars)
 {
     size_t start_index;
 	/* Index in buf of the first character shown. */
     size_t column;
 	/* Screen column that start_index corresponds to. */
-    size_t alloc_len;
-	/* The length of memory allocated for converted. */
     char *converted;
 	/* The string we return. */
     size_t index;
 	/* Current position in converted. */
-    char *buf_mb;
-    int buf_mb_len;
 
     /* If dollars is TRUE, make room for the "$" at the end of the
      * line. */
-    if (dollars && len > 0 && strlenpt(buf) > start_col + len)
-	len--;
+    if (dollars && span > 0 && strlenpt(buf) > start_col + span)
+	span--;
 
-    if (len == 0)
+    if (span == 0)
 	return mallocstrcpy(NULL, "");
-
-    buf_mb = charalloc(mb_cur_max());
 
     start_index = actual_x(buf, start_col);
     column = strnlenpt(buf, start_index);
 
     assert(column <= start_col);
 
-    /* Make sure there's enough room for the initial character, whether
-     * it's a multibyte control character, a non-control multibyte
-     * character, a tab character, or a null terminator.  Rationale:
-     *
-     * multibyte control character followed by a null terminator:
-     *     1 byte ('^') + mb_cur_max() bytes + 1 byte ('\0')
-     * multibyte non-control character followed by a null terminator:
-     *     mb_cur_max() bytes + 1 byte ('\0')
-     * tab character followed by a null terminator:
-     *     mb_cur_max() bytes + (tabsize - 1) bytes + 1 byte ('\0')
-     *
-     * Since tabsize has a minimum value of 1, it can substitute for 1
-     * byte above. */
-    alloc_len = (mb_cur_max() + tabsize + 1) * MAX_BUF_SIZE;
-    converted = charalloc(alloc_len);
+    /* Allocate enough space to hold the entire converted buffer. */
+    converted = charalloc(strlen(buf) * (mb_cur_max() + tabsize) + 1);
 
     index = 0;
+#ifdef USING_OLD_NCURSES
     seen_wide = FALSE;
+#endif
+    buf += start_index;
 
-    if (buf[start_index] != '\0' && buf[start_index] != '\t' &&
+    if (*buf != '\0' && *buf != '\t' &&
 	(column < start_col || (dollars && column > 0))) {
-	/* We don't display all of buf[start_index] since it starts to
+	/* We don't display the complete first character as it starts to
 	 * the left of the screen. */
-	buf_mb_len = parse_mbchar(buf + start_index, buf_mb, NULL);
-
-	if (is_cntrl_mbchar(buf_mb)) {
+	if (is_cntrl_mbchar(buf)) {
 	    if (column < start_col) {
-		char *character = charalloc(mb_cur_max());
-		int charlen, i;
-
-		character = control_mbrep(buf_mb, character, &charlen);
-
-		for (i = 0; i < charlen; i++)
-		    converted[index++] = character[i];
-
-		start_col += mbwidth(character);
-
-		free(character);
-
-		start_index += buf_mb_len;
+		converted[index++] = control_mbrep(buf);
+		start_col++;
+		buf += parse_mbchar(buf, NULL, NULL);
 	    }
 	}
 #ifdef ENABLE_UTF8
-	else if (using_utf8() && mbwidth(buf_mb) == 2) {
+	else if (using_utf8() && mbwidth(buf) == 2) {
 	    if (column >= start_col) {
 		converted[index++] = ' ';
 		start_col++;
@@ -1802,26 +1783,15 @@ char *display_string(const char *buf, size_t start_col, size_t len, bool
 	    converted[index++] = ' ';
 	    start_col++;
 
-	    start_index += buf_mb_len;
+	    buf += parse_mbchar(buf, NULL, NULL);
 	}
 #endif
     }
 
-    while (buf[start_index] != '\0') {
-	buf_mb_len = parse_mbchar(buf + start_index, buf_mb, NULL);
+    while (*buf != '\0') {
+	int charlength, charwidth = 1;
 
-	if (mbwidth(buf + start_index) > 1)
-	    seen_wide = TRUE;
-
-	/* Make sure there's enough room for the next character, whether
-	 * it's a multibyte control character, a non-control multibyte
-	 * character, a tab character, or a null terminator. */
-	if (index + mb_cur_max() + tabsize + 1 >= alloc_len - 1) {
-	    alloc_len += (mb_cur_max() + tabsize + 1) * MAX_BUF_SIZE;
-	    converted = charealloc(converted, alloc_len);
-	}
-
-	if (*buf_mb == ' ') {
+	if (*buf == ' ') {
 	    /* Show a space as a visible character, or as a space. */
 #ifndef NANO_TINY
 	    if (ISSET(WHITESPACE_DISPLAY)) {
@@ -1833,7 +1803,9 @@ char *display_string(const char *buf, size_t start_col, size_t len, bool
 #endif
 		converted[index++] = ' ';
 	    start_col++;
-	} else if (*buf_mb == '\t') {
+	    buf++;
+	    continue;
+	} else if (*buf == '\t') {
 	    /* Show a tab as a visible character, or as as a space. */
 #ifndef NANO_TINY
 	    if (ISSET(WHITESPACE_DISPLAY)) {
@@ -1850,57 +1822,52 @@ char *display_string(const char *buf, size_t start_col, size_t len, bool
 		converted[index++] = ' ';
 		start_col++;
 	    }
-	/* If buf contains a control character, interpret it. */
-	} else if (is_cntrl_mbchar(buf_mb)) {
-	    char *character = charalloc(mb_cur_max());
-	    int charlen, i;
-
-	    converted[index++] = '^';
-	    start_col++;
-
-	    character = control_mbrep(buf_mb, character, &charlen);
-
-	    for (i = 0; i < charlen; i++)
-		converted[index++] = character[i];
-
-	    start_col += mbwidth(character);
-
-	    free(character);
-	/* If buf contains a non-control character, interpret it.  If buf
-	 * contains an invalid multibyte sequence, display it as such. */
-	} else {
-	    char *character = charalloc(mb_cur_max());
-	    int charlen, i;
-
-#ifdef ENABLE_UTF8
-	    /* Make sure an invalid sequence-starter byte is properly
-	     * terminated, so that it doesn't pick up lingering bytes
-	     * of any previous content. */
-	    if (using_utf8() && buf_mb_len == 1)
-		buf_mb[1] = '\0';
-#endif
-	    character = mbrep(buf_mb, character, &charlen);
-
-	    for (i = 0; i < charlen; i++)
-		converted[index++] = character[i];
-
-	    start_col += mbwidth(character);
-
-	    free(character);
+	    buf++;
+	    continue;
 	}
 
-	start_index += buf_mb_len;
+	charlength = length_of_char(buf, &charwidth);
+
+	/* If buf contains a control character, represent it. */
+	if (is_cntrl_mbchar(buf)) {
+	    converted[index++] = '^';
+	    converted[index++] = control_mbrep(buf);
+	    start_col += 2;
+	    buf += charlength;
+	    continue;
+	}
+
+	/* If buf contains a valid non-control character, simply copy it. */
+	if (charlength > 0) {
+	    for (; charlength > 0; charlength--)
+		converted[index++] = *(buf++);
+
+	    start_col += charwidth;
+#ifdef USING_OLD_NCURSES
+	    if (charwidth > 1)
+		seen_wide = TRUE;
+#endif
+	    continue;
+	}
+
+	/* Represent an invalid sequence with the Replacement Character. */
+	converted[index++] = '\xEF';
+	converted[index++] = '\xBF';
+	converted[index++] = '\xBD';
+
+	start_col += 1;
+	buf++;
+
+	/* For invalid codepoints, skip extra bytes. */
+	if (charlength < -1)
+	   buf += charlength + 7;
     }
-
-    free(buf_mb);
-
-    assert(alloc_len >= index + 1);
 
     /* Null-terminate converted. */
     converted[index] = '\0';
 
-    /* Make sure converted takes up no more than len columns. */
-    index = actual_x(converted, len);
+    /* Make sure converted takes up no more than span columns. */
+    index = actual_x(converted, span);
     null_at(&converted, index);
 
     return converted;
@@ -1929,9 +1896,7 @@ void titlebar(const char *path)
 
     assert(path != NULL || openfile->filename != NULL);
 
-    if (interface_color_pair[TITLE_BAR].bright)
-	wattron(topwin, A_BOLD);
-    wattron(topwin, interface_color_pair[TITLE_BAR].pairnum);
+    wattron(topwin, interface_color_pair[TITLE_BAR]);
 
     blank_titlebar();
 
@@ -2018,8 +1983,7 @@ void titlebar(const char *path)
     else if (statelen > 0)
 	mvwaddnstr(topwin, 0, 0, state, actual_x(state, COLS));
 
-    wattroff(topwin, A_BOLD);
-    wattroff(topwin, interface_color_pair[TITLE_BAR].pairnum);
+    wattroff(topwin, interface_color_pair[TITLE_BAR]);
 
     wnoutrefresh(topwin);
     reset_cursor();
@@ -2088,15 +2052,12 @@ void statusline(message_type importance, const char *msg, ...)
     start_x = (COLS - strlenpt(foo) - 4) / 2;
 
     wmove(bottomwin, 0, start_x);
-    if (interface_color_pair[STATUS_BAR].bright)
-	wattron(bottomwin, A_BOLD);
-    wattron(bottomwin, interface_color_pair[STATUS_BAR].pairnum);
+    wattron(bottomwin, interface_color_pair[STATUS_BAR]);
     waddstr(bottomwin, "[ ");
     waddstr(bottomwin, foo);
     free(foo);
     waddstr(bottomwin, " ]");
-    wattroff(bottomwin, A_BOLD);
-    wattroff(bottomwin, interface_color_pair[STATUS_BAR].pairnum);
+    wattroff(bottomwin, interface_color_pair[STATUS_BAR]);
 
     /* Push the message to the screen straightaway. */
     wnoutrefresh(bottomwin);
@@ -2193,23 +2154,17 @@ void onekey(const char *keystroke, const char *desc, int length)
 {
     assert(keystroke != NULL && desc != NULL);
 
-    if (interface_color_pair[KEY_COMBO].bright)
-	wattron(bottomwin, A_BOLD);
-    wattron(bottomwin, interface_color_pair[KEY_COMBO].pairnum);
+    wattron(bottomwin, interface_color_pair[KEY_COMBO]);
     waddnstr(bottomwin, keystroke, actual_x(keystroke, length));
-    wattroff(bottomwin, A_BOLD);
-    wattroff(bottomwin, interface_color_pair[KEY_COMBO].pairnum);
+    wattroff(bottomwin, interface_color_pair[KEY_COMBO]);
 
     length -= strlenpt(keystroke) + 1;
 
     if (length > 0) {
 	waddch(bottomwin, ' ');
-	if (interface_color_pair[FUNCTION_TAG].bright)
-	    wattron(bottomwin, A_BOLD);
-	wattron(bottomwin, interface_color_pair[FUNCTION_TAG].pairnum);
+	wattron(bottomwin, interface_color_pair[FUNCTION_TAG]);
 	waddnstr(bottomwin, desc, actual_x(desc, length));
-	wattroff(bottomwin, A_BOLD);
-	wattroff(bottomwin, interface_color_pair[FUNCTION_TAG].pairnum);
+	wattroff(bottomwin, interface_color_pair[FUNCTION_TAG]);
     }
 }
 
@@ -2273,7 +2228,7 @@ void edit_draw(filestruct *fileptr, const char *converted, int
      * marking highlight on just the pieces that need it. */
     mvwaddstr(edit, line, 0, converted);
 
-#ifndef USE_SLANG
+#ifdef USING_OLD_NCURSES
     /* Tell ncurses to really redraw the line without trying to optimize
      * for what it thinks is already there, because it gets it wrong in
      * the case of a wide character in column zero.  See bug #31743. */
@@ -2304,9 +2259,7 @@ void edit_draw(filestruct *fileptr, const char *converted, int
 	    regmatch_t endmatch;
 		/* Match position for end_regex. */
 
-	    if (varnish->bright)
-		wattron(edit, A_BOLD);
-	    wattron(edit, COLOR_PAIR(varnish->pairnum));
+	    wattron(edit, varnish->attributes);
 	    /* Two notes about regexec().  A return value of zero means
 	     * that there is a match.  Also, rm_eo is the first
 	     * non-matching character after the match. */
@@ -2563,8 +2516,7 @@ void edit_draw(filestruct *fileptr, const char *converted, int
 		}
 	    }
   tail_of_loop:
-	    wattroff(edit, A_BOLD);
-	    wattroff(edit, COLOR_PAIR(varnish->pairnum));
+	    wattroff(edit, varnish->attributes);
 	}
     }
 #endif /* !DISABLE_COLOR */
@@ -3233,10 +3185,8 @@ void do_credits(void)
     nodelay(edit, TRUE);
 
     blank_titlebar();
-    blank_topbar();
     blank_edit();
     blank_statusbar();
-    blank_bottombars();
 
     wrefresh(topwin);
     wrefresh(edit);

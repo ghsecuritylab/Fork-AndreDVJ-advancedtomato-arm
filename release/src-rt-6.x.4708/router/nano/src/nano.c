@@ -21,6 +21,7 @@
  **************************************************************************/
 
 #include "proto.h"
+#include "revision.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -688,11 +689,14 @@ void die_save_file(const char *die_filename
     free(targetname);
 }
 
+#define TOP_ROWS    (ISSET(MORE_SPACE) ? 1 : 2)
+#define BOTTOM_ROWS    (ISSET(NO_HELP) ? 1 : 3)
+
 /* Initialize the three window portions nano uses. */
 void window_init(void)
 {
     /* If the screen height is too small, get out. */
-    editwinrows = LINES - 5 + more_space() + no_help();
+    editwinrows = LINES - TOP_ROWS - BOTTOM_ROWS;
     if (COLS < MIN_EDITOR_COLS || editwinrows < MIN_EDITOR_ROWS)
 	die(_("Window size is too small for nano...\n"));
 
@@ -713,10 +717,9 @@ void window_init(void)
 	delwin(bottomwin);
 
     /* Set up the windows. */
-    topwin = newwin(2 - more_space(), COLS, 0, 0);
-    edit = newwin(editwinrows, COLS, 2 - more_space(), 0);
-    bottomwin = newwin(3 - no_help(), COLS, editwinrows + (2 -
-	more_space()), 0);
+    topwin = newwin(TOP_ROWS, COLS, 0, 0);
+    edit = newwin(editwinrows, COLS, TOP_ROWS, 0);
+    bottomwin = newwin(BOTTOM_ROWS, COLS, TOP_ROWS + editwinrows, 0);
 
     /* Turn the keypad on for the windows, if necessary. */
     if (!ISSET(REBIND_KEYPAD)) {
@@ -859,6 +862,8 @@ void usage(void)
 #ifndef NANO_TINY
     print_opt("-W", "--wordbounds",
 	N_("Detect word boundaries more accurately"));
+    print_opt("-X", "--wordchars",
+	N_("Which other characters are word parts"));
 #endif
 #ifndef DISABLE_COLOR
     if (!ISSET(RESTRICTED))
@@ -918,7 +923,7 @@ void usage(void)
 void version(void)
 {
 #ifdef REVISION
-    printf(" nano from git, commit %s (after %s)\n", REVISION, VERSION);
+    printf(" nano from git, %s\n", REVISION);
 #else
     printf(_(" nano, version %s\n"), VERSION);
 #endif
@@ -1038,21 +1043,6 @@ void version(void)
     printf(" --with-slang");
 #endif
     printf("\n");
-}
-
-/* Return 1 if the MORE_SPACE flag is set, and 0 otherwise.  This is
- * used to calculate the sizes and Y coordinates of the subwindows. */
-int more_space(void)
-{
-    return ISSET(MORE_SPACE) ? 1 : 0;
-}
-
-/* Return 2 if the NO_HELP flag is set, and 0 otherwise.  This is used
- * to calculate the sizes and Y coordinates of the subwindows, because
- * having NO_HELP adds two lines to the edit window. */
-int no_help(void)
-{
-    return ISSET(NO_HELP) ? 2 : 0;
 }
 
 /* Indicate that the current file has no name, in a way that gets the
@@ -1297,10 +1287,9 @@ RETSIGTYPE do_continue(int signal)
 #endif
 
 #ifndef NANO_TINY
-    /* Perhaps the user resized the window while we slept.  Handle it,
-     * and restore the terminal to its previous state and update the
-     * screen in the process. */
-    handle_sigwinch(0);
+    /* Perhaps the user resized the window while we slept.  So act as if,
+     * and restore the terminal to its previous state in the process. */
+    regenerate_screen();
 #else
     /* Restore the terminal to its previous state. */
     terminal_init();
@@ -1553,9 +1542,10 @@ void unbound_key(int code)
     if (func_key)
 	statusline(ALERT, _("Unbound key"));
     else if (meta_key) {
-	if (0x60 < code && code < 0x7B)
-	    code -= 0x20;
-	statusline(ALERT, _("Unbound key: M-%c"), code);
+	if (code == '[')
+	    statusline(ALERT, _("Unbindable key: M-["));
+	else
+	    statusline(ALERT, _("Unbound key: M-%c"), toupper(code));
     } else if (code < 0x20)
 	statusline(ALERT, _("Unbound key: ^%c"), code + 0x40);
     else
@@ -1569,7 +1559,7 @@ int do_input(bool allow_funcs)
 {
     int input;
 	/* The keystroke we read in: a character or a shortcut. */
-    static int *puddle = NULL;
+    static char *puddle = NULL;
 	/* The input buffer for actual characters. */
     static size_t depth = 0;
 	/* The length of the input buffer. */
@@ -1625,9 +1615,9 @@ int do_input(bool allow_funcs)
 	    if (ISSET(VIEW_MODE))
 		print_view_warning();
 	    else {
-		depth++;
-		puddle = (int *)nrealloc(puddle, depth * sizeof(int));
-		puddle[depth - 1] = input;
+		/* Store the byte, and leave room for a terminating zero. */
+		puddle = charealloc(puddle, depth + 2);
+		puddle[depth++] = (char)input;
 	    }
 	}
 
@@ -1644,18 +1634,10 @@ int do_input(bool allow_funcs)
 #endif
 
 	    if (puddle != NULL) {
-		/* Display all the characters in the input buffer at
-		 * once, filtering out control characters. */
-		char *output = charalloc(depth + 1);
-		size_t i;
-
-		for (i = 0; i < depth; i++)
-		    output[i] = (char)puddle[i];
-		output[i] = '\0';
-
-		do_output(output, depth, FALSE);
-
-		free(output);
+		/* Insert all bytes in the input buffer into the edit buffer
+		 * at once, filtering out any low control codes. */
+		puddle[depth] = '\0';
+		do_output(puddle, depth, FALSE);
 
 		/* Empty the input buffer. */
 		free(puddle);
@@ -1841,8 +1823,8 @@ void do_output(char *output, size_t output_len, bool allow_cntrls)
 #endif
 
     while (i < output_len) {
-	/* If control codes are allowed, encode a null as a newline, and
-	 * let a newline character create a whole new line. */
+	/* If control codes are allowed, encode a verbatim null as a newline,
+	 * and let a verbatim ^J create a whole new line. */
 	if (allow_cntrls) {
 	    if (output[i] == '\0')
 		output[i] = '\n';
@@ -2003,6 +1985,7 @@ int main(int argc, char **argv)
 	{"smooth", 0, NULL, 'S'},
 	{"quickblank", 0, NULL, 'U'},
 	{"wordbounds", 0, NULL, 'W'},
+	{"wordchars", 1, NULL, 'X'},
 	{"autoindent", 0, NULL, 'i'},
 	{"cut", 0, NULL, 'k'},
 	{"unix", 0, NULL, 'u'},
@@ -2048,11 +2031,11 @@ int main(int argc, char **argv)
     while ((optchr =
 #ifdef HAVE_GETOPT_LONG
 	getopt_long(argc, argv,
-		"ABC:DEFGHIKLNOPQ:RST:UVWY:abcdefghijklmno:pqr:s:tuvwxz$",
+		"ABC:DEFGHIKLNOPQ:RST:UVWX:Y:abcdefghijklmno:pqr:s:tuvwxz$",
 		long_options, NULL)
 #else
 	getopt(argc, argv,
-		"ABC:DEFGHIKLNOPQ:RST:UVWY:abcdefghijklmno:pqr:s:tuvwxz$")
+		"ABC:DEFGHIKLNOPQ:RST:UVWX:Y:abcdefghijklmno:pqr:s:tuvwxz$")
 #endif
 		) != -1) {
 	switch (optchr) {
@@ -2153,6 +2136,9 @@ int main(int argc, char **argv)
 #ifndef NANO_TINY
 	    case 'W':
 		SET(WORD_BOUNDS);
+		break;
+	    case 'X':
+		word_chars = mallocstrcpy(word_chars, optarg);
 		break;
 #endif
 #ifndef DISABLE_COLOR
@@ -2287,6 +2273,7 @@ int main(int argc, char **argv)
 #endif
 #ifndef NANO_TINY
 	char *backup_dir_cpy = backup_dir;
+	char *word_chars_cpy = word_chars;
 #endif
 #ifndef DISABLE_JUSTIFY
 	char *quotestr_cpy = quotestr;
@@ -2305,6 +2292,7 @@ int main(int argc, char **argv)
 #endif
 #ifndef NANO_TINY
 	backup_dir = NULL;
+	word_chars = NULL;
 #endif
 #ifndef DISABLE_JUSTIFY
 	quotestr = NULL;
@@ -2334,6 +2322,10 @@ int main(int argc, char **argv)
 	if (backup_dir_cpy != NULL) {
 	    free(backup_dir);
 	    backup_dir = backup_dir_cpy;
+	}
+	if (word_chars_cpy != NULL) {
+	    free(word_chars);
+	    word_chars = word_chars_cpy;
 	}
 #endif
 #ifndef DISABLE_JUSTIFY
@@ -2514,25 +2506,32 @@ int main(int argc, char **argv)
 #ifndef DISABLE_COLOR
     set_colorpairs();
 #else
-    interface_color_pair[TITLE_BAR].pairnum = hilite_attribute;
-    interface_color_pair[STATUS_BAR].pairnum = hilite_attribute;
-    interface_color_pair[KEY_COMBO].pairnum = hilite_attribute;
-    interface_color_pair[FUNCTION_TAG].pairnum = A_NORMAL;
-    interface_color_pair[TITLE_BAR].bright = FALSE;
-    interface_color_pair[STATUS_BAR].bright = FALSE;
-    interface_color_pair[KEY_COMBO].bright = FALSE;
-    interface_color_pair[FUNCTION_TAG].bright = FALSE;
+    interface_color_pair[TITLE_BAR] = hilite_attribute;
+    interface_color_pair[STATUS_BAR] = hilite_attribute;
+    interface_color_pair[KEY_COMBO] = hilite_attribute;
+    interface_color_pair[FUNCTION_TAG] = A_NORMAL;
 #endif
 
 #if !defined(NANO_TINY) && defined(HAVE_KEY_DEFINED)
     const char *keyvalue;
-    /* Ask ncurses for the key codes for Control+Left and Control+Right. */
+    /* Ask ncurses for the key codes for Control+Left/Right/Up/Down. */
     keyvalue = tigetstr("kLFT5");
     if (keyvalue != 0 && keyvalue != (char *)-1)
 	controlleft = key_defined(keyvalue);
     keyvalue = tigetstr("kRIT5");
     if (keyvalue != 0 && keyvalue != (char *)-1)
 	controlright = key_defined(keyvalue);
+    keyvalue = tigetstr("kUP5");
+    if (keyvalue != 0 && keyvalue != (char *)-1)
+	controlup = key_defined(keyvalue);
+    keyvalue = tigetstr("kDN5");
+    if (keyvalue != 0 && keyvalue != (char *)-1)
+	controldown = key_defined(keyvalue);
+#endif
+
+#ifndef USE_SLANG
+    /* Tell ncurses to pass the Esc key quickly. */
+    set_escdelay(50);
 #endif
 
 #ifdef DEBUG

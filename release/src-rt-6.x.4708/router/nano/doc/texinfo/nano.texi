@@ -6,8 +6,8 @@
 
 @smallbook
 @set EDITION 0.4
-@set VERSION 2.6.1
-@set UPDATED June 2016
+@set VERSION 2.6.2
+@set UPDATED July 2016
 
 @dircategory Editors
 @direntry
@@ -21,7 +21,7 @@
 @titlepage
 @title @code{nano}
 @subtitle a small and friendly text editor.
-@subtitle version 2.6.1
+@subtitle version 2.6.2
 
 @author Chris Allegretta
 @page
@@ -231,8 +231,14 @@ Show the current version number and exit.
 
 @item -W
 @itemx --wordbounds
-Detect word boundaries more accurately by treating punctuation
+Detect word boundaries differently by treating punctuation
 characters as parts of words.
+
+@item -X "@var{characters}"
+@itemx --wordchars="@var{characters}"
+Specify which other characters (besides the normal alphanumeric ones)
+should be considered as parts of words.  This overrides option
+@option{-W} (@option{--wordbounds}).
 
 @item -Y @var{name}
 @itemx --syntax=@var{name}
@@ -831,8 +837,13 @@ spaces.  They must be single-column characters.  The default pair
 for a UTF-8 locale is @t{"»·"}, and for other locales @t{">."}.
 
 @item set wordbounds
-Detect word boundaries more accurately by treating punctuation
+Detect word boundaries differently by treating punctuation
 characters as part of a word.
+
+@item set wordchars "@var{string}"
+Specify which other characters (besides the normal alphanumeric ones)
+should be considered as parts of words.  This overrides the option
+@code{wordbounds}.
 
 @end table
 
@@ -1090,6 +1101,13 @@ Moves the cursor to the beginning of the current paragraph.
 
 @item endpara
 Moves the cursor to the end of the current paragraph.
+
+@item prevblock
+Moves the cursor to the beginning of the current or preceding block of text.
+(Blocks are separated by one or more blank lines.)
+
+@item nextblock
+Moves the cursor to the beginning of the next block of text.
 
 @item prevpage
 Goes up one screenful.

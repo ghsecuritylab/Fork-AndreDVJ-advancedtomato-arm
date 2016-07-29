@@ -1226,7 +1226,7 @@ void do_insertfile(
 	    {
 		/* Make sure the path to the file specified in answer is
 		 * tilde-expanded. */
-		answer = mallocstrassn(answer, real_dir_from_tilde(answer));
+		answer = free_and_assign(answer, real_dir_from_tilde(answer));
 
 		/* Save the file specified in answer in the current buffer. */
 		open_buffer(answer, TRUE);
@@ -1695,15 +1695,15 @@ int copy_file(FILE *inn, FILE *out)
  *
  * tmp means we are writing a temporary file in a secure fashion.  We
  * use it when spell checking or dumping the file on an error.  If
- * append is APPEND, it means we are appending instead of overwriting.
- * If append is PREPEND, it means we are prepending instead of
+ * method is APPEND, it means we are appending instead of overwriting.
+ * If method is PREPEND, it means we are prepending instead of
  * overwriting.  If nonamechange is TRUE, we don't change the current
- * filename.  nonamechange is ignored if tmp is FALSE, we're appending,
- * or we're prepending.
+ * filename.  nonamechange is irrelevant when appending or prepending,
+ * or when writing a temporary file.
  *
  * Return TRUE on success or FALSE on error. */
-bool write_file(const char *name, FILE *f_open, bool tmp, append_type
-	append, bool nonamechange)
+bool write_file(const char *name, FILE *f_open, bool tmp,
+	kind_of_writing_type method, bool nonamechange)
 {
     bool retval = FALSE;
 	/* Instead of returning in this function, you should always
@@ -1769,7 +1769,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
      * only if the file has not been modified by someone else since nano
      * opened it. */
     if (ISSET(BACKUP_FILE) && !tmp && realexists && openfile->current_stat &&
-		(append != OVERWRITE || openfile->mark_set ||
+		(method != OVERWRITE || openfile->mark_set ||
 		openfile->current_stat->st_mtime == st.st_mtime)) {
 	int backup_fd;
 	FILE *backup_file;
@@ -1948,7 +1948,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     }
 
     /* If we're prepending, copy the file to a temp file. */
-    if (append == PREPEND) {
+    if (method == PREPEND) {
 	int fd_source;
 	FILE *f_source = NULL;
 
@@ -1965,7 +1965,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	tempname = safe_tempfile(&f);
 
 	if (tempname == NULL) {
-	    statusline(HUSH, _("Error writing temp file: %s"),
+	    statusline(ALERT, _("Error writing temp file: %s"),
 			strerror(errno));
 	    goto cleanup_and_exit;
 	}
@@ -1987,7 +1987,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	}
 
 	if (f_source == NULL || copy_file(f_source, f) != 0) {
-	    statusline(HUSH, _("Error writing %s: %s"), tempname,
+	    statusline(ALERT, _("Error writing temp file: %s"),
 			strerror(errno));
 	    unlink(tempname);
 	    goto cleanup_and_exit;
@@ -1997,7 +1997,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     if (f_open == NULL) {
 	/* Now open the file in place.  Use O_EXCL if tmp is TRUE.  This
 	 * is copied from joe, because wiggy says so *shrug*. */
-	fd = open(realname, O_WRONLY | O_CREAT | ((append == APPEND) ?
+	fd = open(realname, O_WRONLY | O_CREAT | ((method == APPEND) ?
 		O_APPEND : (tmp ? O_EXCL : O_TRUNC)), S_IRUSR |
 		S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 
@@ -2006,17 +2006,17 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 
 	/* If we couldn't open the file, give up. */
 	if (fd == -1) {
-	    statusline(HUSH, _("Error writing %s: %s"), realname,
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
 			strerror(errno));
 	    if (tempname != NULL)
 		unlink(tempname);
 	    goto cleanup_and_exit;
 	}
 
-	f = fdopen(fd, (append == APPEND) ? "ab" : "wb");
+	f = fdopen(fd, (method == APPEND) ? "ab" : "wb");
 
 	if (f == NULL) {
-	    statusline(HUSH, _("Error writing %s: %s"), realname,
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
 			strerror(errno));
 	    close(fd);
 	    goto cleanup_and_exit;
@@ -2040,7 +2040,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	unsunder(fileptr->data, data_len);
 
 	if (size < data_len) {
-	    statusline(HUSH, _("Error writing %s: %s"), realname,
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
 			strerror(errno));
 	    fclose(f);
 	    goto cleanup_and_exit;
@@ -2057,7 +2057,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 #ifndef NANO_TINY
 	    if (openfile->fmt == DOS_FILE || openfile->fmt == MAC_FILE) {
 		if (putc('\r', f) == EOF) {
-		    statusline(HUSH, _("Error writing %s: %s"), realname,
+		    statusline(ALERT, _("Error writing %s: %s"), realname,
 				strerror(errno));
 		    fclose(f);
 		    goto cleanup_and_exit;
@@ -2067,7 +2067,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    if (openfile->fmt != MAC_FILE)
 #endif
 		if (putc('\n', f) == EOF) {
-		    statusline(HUSH, _("Error writing %s: %s"), realname,
+		    statusline(ALERT, _("Error writing %s: %s"), realname,
 				strerror(errno));
 		    fclose(f);
 		    goto cleanup_and_exit;
@@ -2079,7 +2079,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
     }
 
     /* If we're prepending, open the temp file, and append it to f. */
-    if (append == PREPEND) {
+    if (method == PREPEND) {
 	int fd_source;
 	FILE *f_source = NULL;
 
@@ -2099,23 +2099,23 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	}
 
 	if (copy_file(f_source, f) == -1) {
-	    statusline(HUSH, _("Error writing %s: %s"), realname,
+	    statusline(ALERT, _("Error writing %s: %s"), realname,
 			strerror(errno));
 	    goto cleanup_and_exit;
 	}
 
 	unlink(tempname);
     } else if (fclose(f) != 0) {
-	statusline(HUSH, _("Error writing %s: %s"), realname,
+	statusline(ALERT, _("Error writing %s: %s"), realname,
 			strerror(errno));
 	goto cleanup_and_exit;
     }
 
-    if (!tmp && append == OVERWRITE) {
+    if (method == OVERWRITE && !tmp) {
 	/* If we must set the filename, and it changed, adjust things. */
 	if (!nonamechange && strcmp(openfile->filename, realname) != 0) {
 #ifndef DISABLE_COLOR
-	    char *syntaxname = openfile->syntax ? openfile->syntax->name : "";
+	    char *oldname = openfile->syntax ? openfile->syntax->name : "";
 	    filestruct *line = openfile->fileage;
 #endif
 	    openfile->filename = mallocstrcpy(openfile->filename, realname);
@@ -2125,19 +2125,17 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 	    color_update();
 	    color_init();
 
+	    char *newname = openfile->syntax ? openfile->syntax->name : "";
+
 	    /* If the syntax changed, discard and recompute the multidata. */
-	    if (openfile->syntax &&
-			strcmp(syntaxname, openfile->syntax->name) != 0) {
+	    if (strcmp(oldname, newname) != 0) {
 		for (; line != NULL; line = line->next) {
 		    free(line->multidata);
 		    line->multidata = NULL;
 		}
 		precalc_multicolorinfo();
+		refresh_needed = TRUE;
 	    }
-
-	    /* If color syntaxes are available and turned on, refresh. */
-	    if (openfile->colorstrings != NULL && !ISSET(NO_COLOR_SYNTAX))
-		edit_refresh();
 #endif
 	}
 
@@ -2166,7 +2164,7 @@ bool write_file(const char *name, FILE *f_open, bool tmp, append_type
 /* Write a marked selection from a file out to disk.  Return TRUE on
  * success or FALSE on error. */
 bool write_marked_file(const char *name, FILE *f_open, bool tmp,
-	append_type append)
+	kind_of_writing_type method)
 {
     bool retval;
     bool old_modified = openfile->modified;
@@ -2190,7 +2188,7 @@ bool write_marked_file(const char *name, FILE *f_open, bool tmp,
 	added_magicline = TRUE;
     }
 
-    retval = write_file(name, f_open, tmp, append, TRUE);
+    retval = write_file(name, f_open, tmp, method, TRUE);
 
     /* If we added a magicline, remove it now. */
     if (added_magicline)
@@ -2216,7 +2214,7 @@ int do_writeout(bool exiting)
 {
     int i;
     bool result = FALSE;
-    append_type append = OVERWRITE;
+    kind_of_writing_type method = OVERWRITE;
     char *given;
 	/* The filename we offer, or what the user typed so far. */
     bool maychange = (openfile->filename[0] == '\0');
@@ -2252,13 +2250,13 @@ int do_writeout(bool exiting)
 	 * it allows reading from or writing to files not specified on
 	 * the command line. */
 	if (openfile->mark_set && !exiting && !ISSET(RESTRICTED))
-	    msg = (append == PREPEND) ? _("Prepend Selection to File") :
-			(append == APPEND) ? _("Append Selection to File") :
+	    msg = (method == PREPEND) ? _("Prepend Selection to File") :
+			(method == APPEND) ? _("Append Selection to File") :
 			_("Write Selection to File");
 	else
 #endif /* !NANO_TINY */
-	    msg = (append == PREPEND) ? _("File Name to Prepend to") :
-			(append == APPEND) ? _("File Name to Append to") :
+	    msg = (method == PREPEND) ? _("File Name to Prepend to") :
+			(method == APPEND) ? _("File Name to Append to") :
 			_("File Name to Write");
 
 	present_path = mallocstrcpy(present_path, "./");
@@ -2334,10 +2332,10 @@ int do_writeout(bool exiting)
 	    } else
 #endif /* !NANO_TINY */
 	    if (func == prepend_void) {
-		append = (append == PREPEND) ? OVERWRITE : PREPEND;
+		method = (method == PREPEND) ? OVERWRITE : PREPEND;
 		continue;
 	    } else if (func == append_void) {
-		append = (append == APPEND) ? OVERWRITE : APPEND;
+		method = (method == APPEND) ? OVERWRITE : APPEND;
 		continue;
 	    } else if (func == do_help_void) {
 		continue;
@@ -2362,7 +2360,7 @@ int do_writeout(bool exiting)
 	    }
 #endif
 
-	    if (append == OVERWRITE) {
+	    if (method == OVERWRITE) {
 		size_t answer_len = strlen(answer);
 		bool name_exists, do_warning;
 		char *full_answer, *full_filename;
@@ -2451,10 +2449,10 @@ int do_writeout(bool exiting)
 	     * writing to files not specified on the command line. */
 #ifndef NANO_TINY
 	    if (openfile->mark_set && !exiting && !ISSET(RESTRICTED))
-		result = write_marked_file(answer, NULL, FALSE, append);
+		result = write_marked_file(answer, NULL, FALSE, method);
 	    else
 #endif
-		result = write_file(answer, NULL, FALSE, append, FALSE);
+		result = write_file(answer, NULL, FALSE, method, FALSE);
 
 	    break;
 	}

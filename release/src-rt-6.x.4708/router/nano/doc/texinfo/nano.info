@@ -190,8 +190,14 @@ File: nano.info,  Node: Command-line Options,  Next: Editor Basics,  Prev: Invok
 
 '-W'
 '--wordbounds'
-     Detect word boundaries more accurately by treating punctuation
+     Detect word boundaries differently by treating punctuation
      characters as parts of words.
+
+'-X "CHARACTERS"'
+'--wordchars="CHARACTERS"'
+     Specify which other characters (besides the normal alphanumeric
+     ones) should be considered as parts of words.  This overrides
+     option '-W' ('--wordbounds').
 
 '-Y NAME'
 '--syntax=NAME'
@@ -815,8 +821,13 @@ The supported settings in a nanorc file are:
      for a UTF-8 locale is "»·", and for other locales ">.".
 
 'set wordbounds'
-     Detect word boundaries more accurately by treating punctuation
+     Detect word boundaries differently by treating punctuation
      characters as part of a word.
+
+'set wordchars "STRING"'
+     Specify which other characters (besides the normal alphanumeric
+     ones) should be considered as parts of words.  This overrides the
+     option 'wordbounds'.
 
 
 File: nano.info,  Node: Syntax Highlighting,  Next: Rebinding Keys,  Prev: Settings,  Up: Nanorc Files
@@ -1069,6 +1080,13 @@ file:
 
 'endpara'
      Moves the cursor to the end of the current paragraph.
+
+'prevblock'
+     Moves the cursor to the beginning of the current or preceding block
+     of text.  (Blocks are separated by one or more blank lines.)
+
+'nextblock'
+     Moves the cursor to the beginning of the next block of text.
 
 'prevpage'
      Goes up one screenful.
@@ -1495,25 +1513,25 @@ Node: Top199
 Node: Introduction556
 Node: Invoking1306
 Node: Command-line Options2099
-Ref: Expert Mode9365
-Node: Editor Basics10327
-Node: Entering Text10610
-Node: Commands11349
-Node: The Cutbuffer12134
-Node: The Mark12812
-Node: Screen Layout13550
-Node: Search and Replace14719
-Node: Using the Mouse15417
-Node: Limitation16033
-Node: Built-in Help16436
-Node: Feature Toggles16827
-Node: Nanorc Files18942
-Node: Settings20374
-Ref: Whitespace27654
-Node: Syntax Highlighting28006
-Node: Rebinding Keys32716
-Node: The File Browser42113
-Node: Pico Compatibility42935
-Node: Building and Configure Options44906
+Ref: Expert Mode9578
+Node: Editor Basics10540
+Node: Entering Text10823
+Node: Commands11562
+Node: The Cutbuffer12347
+Node: The Mark13025
+Node: Screen Layout13763
+Node: Search and Replace14932
+Node: Using the Mouse15630
+Node: Limitation16246
+Node: Built-in Help16649
+Node: Feature Toggles17040
+Node: Nanorc Files19155
+Node: Settings20587
+Ref: Whitespace27867
+Node: Syntax Highlighting28407
+Node: Rebinding Keys33117
+Node: The File Browser42745
+Node: Pico Compatibility43567
+Node: Building and Configure Options45538
 
 End Tag Table

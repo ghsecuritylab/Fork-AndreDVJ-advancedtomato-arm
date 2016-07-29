@@ -58,7 +58,7 @@
 
 /* Macros for flags, indexing each bit in a small array. */
 #define FLAGS(flag) flags[((flag) / (sizeof(unsigned) * 8))]
-#define FLAGMASK(flag) (1 << ((flag) % (sizeof(unsigned) * 8)))
+#define FLAGMASK(flag) ((unsigned)1 << ((flag) % (sizeof(unsigned) * 8)))
 #define SET(flag) FLAGS(flag) |= FLAGMASK(flag)
 #define UNSET(flag) FLAGS(flag) &= ~FLAGMASK(flag)
 #define ISSET(flag) ((FLAGS(flag) & FLAGMASK(flag)) != 0)
@@ -91,6 +91,10 @@
 /* Curses support. */
 #include <curses.h>
 #endif /* CURSES_H */
+
+#if defined(NCURSES_VERSION_MAJOR) && (NCURSES_VERSION_MAJOR < 6)
+#define USING_OLD_NCURSES yes
+#endif
 
 #ifdef ENABLE_NLS
 /* Native language support. */
@@ -173,7 +177,7 @@ typedef enum {
 
 typedef enum {
     OVERWRITE, APPEND, PREPEND
-} append_type;
+} kind_of_writing_type;
 
 typedef enum {
     UPWARD, DOWNWARD
@@ -199,14 +203,6 @@ typedef enum {
 } undo_type;
 
 /* Structure types. */
-typedef struct color_pair {
-    int pairnum;
-	/* The color pair number used for this foreground color and
-	 * background color. */
-    bool bright;
-	/* Is this color A_BOLD? */
-} color_pair;
-
 #ifndef DISABLE_COLOR
 typedef struct colortype {
     short fg;
@@ -218,6 +214,8 @@ typedef struct colortype {
     int pairnum;
 	/* The color pair number used for this foreground color and
 	 * background color. */
+    int attributes;
+	/* Pair number and brightness composed into ready-to-use attributes. */
     int rex_flags;
 	/* The regex compilation flags (with or without REG_ICASE). */
     char *start_regex;
@@ -566,6 +564,8 @@ enum
 /* Codes for "modified" Arrow keys, beyond KEY_MAX of ncurses. */
 #define CONTROL_LEFT 0x401
 #define CONTROL_RIGHT 0x402
+#define CONTROL_UP 0x403
+#define CONTROL_DOWN 0x404
 
 #ifndef NANO_TINY
 /* An imaginary key for when we get a SIGWINCH (window resize). */
@@ -603,11 +603,5 @@ enum
 
 /* The largest size_t number that doesn't have the high bit set. */
 #define HIGHEST_POSITIVE ((~(size_t)0) >> 1)
-
-#ifdef REVISION
-#define BRANDING PACKAGE_VERSION"-git  "REVISION
-#else
-#define BRANDING PACKAGE_STRING
-#endif
 
 #endif /* !NANO_H */

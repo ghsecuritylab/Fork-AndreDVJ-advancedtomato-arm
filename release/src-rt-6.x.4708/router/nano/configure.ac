@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301,
 # USA.
 
-AC_INIT([nano], [2.6.1], [nano-devel@gnu.org], [nano])
+AC_INIT([nano], [2.6.2], [nano-devel@gnu.org], [nano])
 AC_CONFIG_SRCDIR([src/nano.c])
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE
@@ -708,16 +708,16 @@ AM_CONDITIONAL(GROFF_HTML, test x$groff_html_support = xyes)
 AC_CHECK_PROG(haveit, makeinfo, yes, no)
 AM_CONDITIONAL(HAVE_MAKEINFO, test x$haveit = xyes)
 
+# Check whether this is a git repository.
 AC_MSG_CHECKING([whether building from git])
 if test -d .git ; then
     AC_MSG_RESULT([yes])
-    AC_PATH_PROG([GIT], [git])
-    REVISION=`($GIT rev-parse --is-inside-work-tree >/dev/null 2>&1) && ($GIT rev-parse --short HEAD)`
-    AC_SUBST(REVISION)
-    AC_DEFINE_UNQUOTED([REVISION],"${REVISION}","Setting REVISION in config.h.")
+    from_git=yes
 else
     AC_MSG_RESULT([no])
+    from_git=no
 fi
+AM_CONDITIONAL(BUILDING_FROM_GIT, test x$from_git = xyes)
 
 AC_CONFIG_FILES([
 Makefile

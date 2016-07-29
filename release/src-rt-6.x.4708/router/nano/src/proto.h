@@ -39,6 +39,8 @@ extern message_type lastmessage;
 #ifndef NANO_TINY
 extern int controlleft;
 extern int controlright;
+extern int controlup;
+extern int controldown;
 #endif
 
 #ifndef DISABLE_WRAPJUSTIFY
@@ -91,7 +93,10 @@ extern size_t quotelen;
 #endif
 #endif /* !DISABLE_JUSTIFY */
 
+extern char *word_chars;
+
 extern bool nodelay_mode;
+
 extern char *answer;
 
 extern ssize_t tabsize;
@@ -142,7 +147,7 @@ extern int hilite_attribute;
 #ifndef DISABLE_COLOR
 extern char* specified_color_combo[NUMBER_OF_ELEMENTS];
 #endif
-extern color_pair interface_color_pair[NUMBER_OF_ELEMENTS];
+extern int interface_color_pair[NUMBER_OF_ELEMENTS];
 
 extern char *homedir;
 
@@ -183,18 +188,12 @@ bool is_alnum_mbchar(const char *c);
 bool is_blank_mbchar(const char *c);
 bool is_ascii_cntrl_char(int c);
 bool is_cntrl_char(int c);
-#ifdef ENABLE_UTF8
-bool is_cntrl_wchar(wchar_t wc);
-#endif
 bool is_cntrl_mbchar(const char *c);
 bool is_punct_mbchar(const char *c);
 bool is_word_mbchar(const char *c, bool allow_punct);
-char control_rep(char c);
-#ifdef ENABLE_UTF8
-wchar_t control_wrep(wchar_t wc);
-#endif
-char *control_mbrep(const char *c, char *crep, int *crep_len);
-char *mbrep(const char *c, char *crep, int *crep_len);
+char control_rep(const signed char c);
+char control_mbrep(const char *c);
+int length_of_char(const char *c, int *width);
 int mbwidth(const char *c);
 int mb_cur_max(void);
 char *make_mbchar(long chr, int *chr_mb_len);
@@ -320,11 +319,11 @@ int delete_lockfile(const char *lockfilename);
 int write_lockfile(const char *lockfilename, const char *origfilename, bool modified);
 #endif
 int copy_file(FILE *inn, FILE *out);
-bool write_file(const char *name, FILE *f_open, bool tmp, append_type
-	append, bool nonamechange);
+bool write_file(const char *name, FILE *f_open, bool tmp,
+	kind_of_writing_type method, bool nonamechange);
 #ifndef NANO_TINY
 bool write_marked_file(const char *name, FILE *f_open, bool tmp,
-	append_type append);
+	kind_of_writing_type method);
 #endif
 int do_writeout(bool exiting);
 void do_writeout_void(void);
@@ -400,6 +399,8 @@ void do_para_end(bool allow_update);
 void do_para_end_void(void);
 #endif
 #ifndef NANO_TINY
+void do_prev_block(void);
+void do_next_block(void);
 void do_prev_word(bool allow_punct, bool allow_update);
 void do_prev_word_void(void);
 bool do_next_word(bool allow_punct, bool allow_update);
@@ -475,8 +476,6 @@ void print_opt_full(const char *shortflag
 	, const char *desc);
 void usage(void);
 void version(void);
-int more_space(void);
-int no_help(void);
 void no_current_file_name_warning(void);
 void do_exit(void);
 void close_and_go(void);
@@ -515,7 +514,7 @@ int do_statusbar_input(bool *ran_func, bool *finished,
 int do_statusbar_mouse(void);
 #endif
 void do_statusbar_output(int *the_input, size_t input_len,
-	bool filtering, bool *got_enter);
+	bool filtering, bool *got_newline);
 void do_statusbar_home(void);
 void do_statusbar_end(void);
 void do_statusbar_left(void);
@@ -527,7 +526,7 @@ void do_statusbar_cut_text(void);
 void do_statusbar_prev_word(void);
 void do_statusbar_next_word(void);
 #endif
-void do_statusbar_verbatim_input(bool *got_enter);
+void do_statusbar_verbatim_input(bool *got_newline);
 size_t statusbar_xplustabs(void);
 size_t get_statusbar_page_start(size_t start_col, size_t column);
 void reinit_statusbar_x(void);
@@ -650,6 +649,7 @@ void do_tab(void);
 void do_indent(ssize_t cols);
 void do_indent_void(void);
 void do_unindent(void);
+bool white_string(const char *s);
 void do_undo(void);
 void do_redo(void);
 #endif
@@ -734,7 +734,7 @@ void *nmalloc(size_t howmuch);
 void *nrealloc(void *ptr, size_t howmuch);
 char *mallocstrncpy(char *dest, const char *src, size_t n);
 char *mallocstrcpy(char *dest, const char *src);
-char *mallocstrassn(char *dest, char *src);
+char *free_and_assign(char *dest, char *src);
 size_t get_page_start(size_t column);
 size_t xplustabs(void);
 size_t actual_x(const char *s, size_t column);
@@ -773,7 +773,7 @@ int parse_escape_sequence(WINDOW *win, int kbinput);
 int get_byte_kbinput(int kbinput);
 #ifdef ENABLE_UTF8
 long add_unicode_digit(int kbinput, long factor, long *uni);
-long get_unicode_kbinput(int kbinput);
+long get_unicode_kbinput(WINDOW *win, int kbinput);
 #endif
 int get_control_kbinput(int kbinput);
 void unparse_kbinput(char *output, size_t output_len);
@@ -785,13 +785,12 @@ int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts);
 const sc *get_shortcut(int *kbinput);
 void blank_line(WINDOW *win, int y, int x, int n);
 void blank_titlebar(void);
-void blank_topbar(void);
 void blank_edit(void);
 void blank_statusbar(void);
 void blank_bottombars(void);
 void check_statusblank(void);
-char *display_string(const char *buf, size_t start_col, size_t len, bool
-	dollars);
+char *display_string(const char *buf, size_t start_col, size_t span,
+	bool dollars);
 void titlebar(const char *path);
 extern void set_modified(void);
 void statusbar(const char *msg);

@@ -35,12 +35,6 @@
 
 static bool use_utf8 = FALSE;
 	/* Whether we've enabled UTF-8 support. */
-static const wchar_t bad_wchar = 0xFFFD;
-	/* If we get an invalid multibyte sequence, we treat it as
-	 * Unicode FFFD (Replacement Character), unless we're searching
-	 * for a match to it. */
-static const char *const bad_mbchar = "\xEF\xBF\xBD";
-static const int bad_mbchar_len = 3;
 
 /* Enable UTF-8 support. */
 void utf8_init(void)
@@ -110,7 +104,7 @@ bool is_alnum_mbchar(const char *c)
 
 	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
-	    wc = bad_wchar;
+	    return 0;
 	}
 
 	return iswalnum(wc);
@@ -130,7 +124,7 @@ bool is_blank_mbchar(const char *c)
 
 	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
-	    wc = bad_wchar;
+	    return 0;
 	}
 
 	return iswblank(wc);
@@ -150,19 +144,8 @@ bool is_ascii_cntrl_char(int c)
  * handles high-bit control characters. */
 bool is_cntrl_char(int c)
 {
-    return (-128 <= c && c < -96) || (0 <= c && c < 32) ||
-	(127 <= c && c < 160);
+    return ((c & 0x60) == 0 || c == 127);
 }
-
-#ifdef ENABLE_UTF8
-/* This function is equivalent to iscntrl() for wide characters, except
- * in that it also handles wide control characters with their high bits
- * set. */
-bool is_cntrl_wchar(wchar_t wc)
-{
-    return (0 <= wc && wc < 32) || (127 <= wc && wc < 160);
-}
-#endif
 
 /* This function is equivalent to iscntrl() for multibyte characters,
  * except in that it also handles multibyte control characters with
@@ -173,14 +156,8 @@ bool is_cntrl_mbchar(const char *c)
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	wchar_t wc;
-
-	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
-	    mbtowc_reset();
-	    wc = bad_wchar;
-	}
-
-	return is_cntrl_wchar(wc);
+	return ((c[0] & 0xE0) == 0 || c[0] == 127 ||
+		((signed char)c[0] == -62 && (signed char)c[1] < -96));
     } else
 #endif
 	return is_cntrl_char((unsigned char)*c);
@@ -197,7 +174,7 @@ bool is_punct_mbchar(const char *c)
 
 	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
-	    wc = bad_wchar;
+	    return 0;
 	}
 
 	return iswpunct(wc);
@@ -206,103 +183,100 @@ bool is_punct_mbchar(const char *c)
 	return ispunct((unsigned char)*c);
 }
 
-/* Return TRUE for a multibyte character found in a word (currently only
- * an alphanumeric or punctuation character, and only the latter if
- * allow_punct is TRUE) and FALSE otherwise. */
+/* Return TRUE when the given multibyte character c is a word-forming
+ * character (that is: alphanumeric, or specified in wordchars, or
+ * punctuation when allow_punct is TRUE), and FALSE otherwise. */
 bool is_word_mbchar(const char *c, bool allow_punct)
 {
     assert(c != NULL);
 
-    return is_alnum_mbchar(c) || (allow_punct ? is_punct_mbchar(c) :
-	FALSE);
+    if (*c == '\0')
+	return FALSE;
+
+    if (is_alnum_mbchar(c))
+	return TRUE;
+
+    if (word_chars != NULL && *word_chars != '\0') {
+	bool wordforming;
+	char *symbol = charalloc(MB_CUR_MAX + 1);
+	int symlen = parse_mbchar(c, symbol, NULL);
+
+	symbol[symlen] = '\0';
+	wordforming = (strstr(word_chars, symbol) != NULL);
+	free(symbol);
+
+	return wordforming;
+    }
+
+    return (allow_punct && is_punct_mbchar(c));
 }
 
-/* c is a control character.  It displays as ^@, ^?, or ^[ch], where ch
- * is (c + 64).  We return that character. */
-char control_rep(char c)
+/* Return the visible representation of control character c. */
+char control_rep(const signed char c)
 {
     assert(is_cntrl_char(c));
 
-    /* Treat newlines embedded in a line as encoded nulls. */
+    /* An embedded newline is an encoded null. */
     if (c == '\n')
 	return '@';
     else if (c == NANO_CONTROL_8)
 	return '?';
+    else if (c == -97)
+	return '=';
+    else if (c < 0)
+	return c + 224;
     else
 	return c + 64;
 }
 
-#ifdef ENABLE_UTF8
-/* c is a wide control character.  It displays as ^@, ^?, or ^[ch],
- * where ch is (c + 64).  We return that wide character. */
-wchar_t control_wrep(wchar_t wc)
+/* Return the visible representation of multibyte control character c. */
+char control_mbrep(const char *c)
 {
-    assert(is_cntrl_wchar(wc));
-
-    /* Treat newlines embedded in a line as encoded nulls. */
-    if (wc == '\n')
-	return '@';
-    else if (wc == NANO_CONTROL_8)
-	return '?';
-    else
-	return wc + 64;
-}
-#endif
-
-/* c is a multibyte control character.  It displays as ^@, ^?, or ^[ch],
- * where ch is (c + 64).  We return that multibyte character. */
-char *control_mbrep(const char *c, char *crep, int *crep_len)
-{
-    assert(c != NULL && crep != NULL && crep_len != NULL);
+    assert(c != NULL);
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	wchar_t wc;
-
-	IGNORE_CALL_RESULT(mbtowc(&wc, c, MB_CUR_MAX));
-	*crep_len = wctomb(crep, control_wrep(wc));
+	if (0 <= c[0] && c[0] <= 127)
+	    return control_rep(c[0]);
+	else
+	    return control_rep(c[1]);
     } else
 #endif
-    {
-	*crep_len = 1;
-	*crep = control_rep(*c);
-    }
-
-    return crep;
+	return control_rep(*c);
 }
 
-/* c is a multibyte non-control character.  We return that multibyte
- * character.  If crep is an invalid multibyte sequence, it will be
- * replaced with Unicode 0xFFFD (Replacement Character). */
-char *mbrep(const char *c, char *crep, int *crep_len)
+/* Assess how many bytes the given (multibyte) character occupies.  Return -1
+ * if the byte sequence is invalid, and return the number of bytes minus 8
+ * when it encodes an invalid codepoint.  Also, in the second parameter,
+ * return the number of columns that the character occupies. */
+int length_of_char(const char *c, int *width)
 {
-    assert(c != NULL && crep != NULL && crep_len != NULL);
+    assert(c != NULL);
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
 	wchar_t wc;
+	int charlen = mbtowc(&wc, c, MB_CUR_MAX);
 
-	/* Reject invalid Unicode characters. */
-	if (mbtowc(&wc, c, MB_CUR_MAX) < 0 || !is_valid_unicode(wc)) {
+	/* If the sequence is invalid... */
+	if (charlen < 0) {
 	    mbtowc_reset();
-	    *crep_len = bad_mbchar_len;
-	    strncpy(crep, bad_mbchar, *crep_len);
-	} else {
-	    *crep_len = wctomb(crep, wc);
+	    return -1;
+	}
 
-	    if (*crep_len < 0) {
-		wctomb_reset();
-		*crep_len = 0;
-	    }
+	/* If the codepoint is invalid... */
+	if (!is_valid_unicode(wc))
+	    return charlen - 8;
+	else {
+	    *width = wcwidth(wc);
+	    /* If the codepoint is unassigned, assume a width of one. */
+	    if (*width < 0)
+		*width = 1;
+	    return charlen;
 	}
     } else
 #endif
-    {
-	*crep_len = 1;
-	*crep = *c;
-    }
-
-    return crep;
+	return 1;
 }
 
 /* This function is equivalent to wcwidth() for multibyte characters. */
@@ -317,15 +291,13 @@ int mbwidth(const char *c)
 
 	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
 	    mbtowc_reset();
-	    wc = bad_wchar;
+	    return 1;
 	}
 
 	width = wcwidth(wc);
 
-	if (width == -1) {
-	    wc = bad_wchar;
-	    width = wcwidth(wc);
-	}
+	if (width == -1)
+	    return 1;
 
 	return width;
     } else
@@ -667,7 +639,6 @@ char *mbrevstrcasestr(const char *haystack, const char *needle, const
 {
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	bool begin_line = FALSE;
 	size_t rev_start_len, needle_len;
 
 	assert(haystack != NULL && needle != NULL && rev_start != NULL);
@@ -682,22 +653,19 @@ char *mbrevstrcasestr(const char *haystack, const char *needle, const
 
 	rev_start_len = mbstrlen(rev_start);
 
-	while (!begin_line) {
+	while (TRUE) {
 	    if (rev_start_len >= needle_len &&
 			mbstrncasecmp(rev_start, needle, needle_len) == 0 &&
 			mblen(rev_start, MB_CUR_MAX) > 0)
 		return (char *)rev_start;
 
+	    /* If we've reached the head of the haystack, we found nothing. */
 	    if (rev_start == haystack)
-		begin_line = TRUE;
-	    else {
-		rev_start = haystack + move_mbleft(haystack, rev_start -
-			haystack);
-		rev_start_len++;
-	    }
-	}
+		return NULL;
 
-	return NULL;
+	    rev_start = haystack + move_mbleft(haystack, rev_start - haystack);
+	    rev_start_len++;
+	}
     } else
 #endif
 	return revstrcasestr(haystack, needle, rev_start);
@@ -817,11 +785,14 @@ char *revstrpbrk(const char *s, const char *accept, const char
 {
     assert(s != NULL && accept != NULL && rev_start != NULL);
 
-    for (; rev_start >= s; rev_start--) {
-	const char *q = (*rev_start == '\0') ? NULL : strchr(accept,
-		*rev_start);
+    if (*rev_start == '\0') {
+	if (rev_start == s)
+	   return NULL;
+	rev_start--;
+    }
 
-	if (q != NULL)
+    for (; rev_start >= s; rev_start--) {
+	if (strchr(accept, *rev_start) != NULL)
 	    return (char *)rev_start;
     }
 
@@ -837,22 +808,22 @@ char *mbrevstrpbrk(const char *s, const char *accept, const char
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	bool begin_line = FALSE;
-
-	while (!begin_line) {
-	    const char *q = (*rev_start == '\0') ? NULL :
-		mbstrchr(accept, rev_start);
-
-	    if (q != NULL)
-		return (char *)rev_start;
-
+	if (*rev_start == '\0') {
 	    if (rev_start == s)
-		begin_line = TRUE;
-	    else
-		rev_start = s + move_mbleft(s, rev_start - s);
+		return NULL;
+	    rev_start = s + move_mbleft(s, rev_start - s);
 	}
 
-	return NULL;
+	while (TRUE) {
+	    if (mbstrchr(accept, rev_start) != NULL)
+		return (char *)rev_start;
+
+	    /* If we've reached the head of the string, we found nothing. */
+	    if (rev_start == s)
+		return NULL;
+
+	    rev_start = s + move_mbleft(s, rev_start - s);
+	}
     } else
 #endif
 	return revstrpbrk(s, accept, rev_start);

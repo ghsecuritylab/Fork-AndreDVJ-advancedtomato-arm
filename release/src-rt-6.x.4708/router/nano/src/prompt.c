@@ -131,13 +131,6 @@ int do_statusbar_input(bool *ran_func, bool *finished,
 	    else if (s->scfunc == total_refresh) {
 		total_redraw();
 		refresh_func();
-	    } else if (s->scfunc == do_cut_text_void) {
-		/* If we're using restricted mode, the filename
-		 * isn't blank, and we're at the "Write File"
-		 * prompt, disable Cut. */
-		if (!ISSET(RESTRICTED) || openfile->filename[0] == '\0' ||
-			currmenu != MWRITEFILE)
-		    do_statusbar_cut_text();
 	    } else if (s->scfunc == do_left)
 		do_statusbar_left();
 	    else if (s->scfunc == do_right)
@@ -152,40 +145,34 @@ int do_statusbar_input(bool *ran_func, bool *finished,
 		do_statusbar_home();
 	    else if (s->scfunc == do_end)
 		do_statusbar_end();
+	    /* When in restricted mode at the "Write File" prompt and the
+	     * filename isn't blank, disallow any input and deletion. */
+	    else if (ISSET(RESTRICTED) && currmenu == MWRITEFILE &&
+				openfile->filename[0] != '\0' &&
+				(s->scfunc == do_verbatim_input ||
+				s->scfunc == do_cut_text_void ||
+				s->scfunc == do_delete ||
+				s->scfunc == do_backspace))
+		;
 	    else if (s->scfunc == do_verbatim_input) {
-		/* If we're using restricted mode, the filename
-		 * isn't blank, and we're at the "Write File"
-		 * prompt, disable verbatim input. */
-		if (!ISSET(RESTRICTED) || currmenu != MWRITEFILE ||
-			openfile->filename[0] == '\0') {
-		    bool got_enter = FALSE;
-			/* Whether we got the Enter key. */
+		bool got_newline = FALSE;
+			/* Whether we got a verbatim ^J. */
 
-		    do_statusbar_verbatim_input(&got_enter);
+		do_statusbar_verbatim_input(&got_newline);
 
-		    /* If we got the Enter key, remove it from the input
-		     * buffer, set input to the key value for Enter, and
-		     * set finished to TRUE to indicate that we're done. */
-		    if (got_enter) {
-			get_input(NULL, 1);
-			input = sc_seq_or(do_enter, 0);
-			*finished = TRUE;
-		    }
+		/* If we got a verbatim ^J, remove it from the input buffer,
+		 * fake a press of Enter, and indicate that we're done. */
+		if (got_newline) {
+		    get_input(NULL, 1);
+		    input = sc_seq_or(do_enter, 0);
+		    *finished = TRUE;
 		}
+	    } else if (s->scfunc == do_cut_text_void) {
+		do_statusbar_cut_text();
 	    } else if (s->scfunc == do_delete) {
-		/* If we're using restricted mode, the filename
-		 * isn't blank, and we're at the "Write File"
-		 * prompt, disable Delete. */
-		if (!ISSET(RESTRICTED) || openfile->filename[0] == '\0' ||
-			currmenu != MWRITEFILE)
-		    do_statusbar_delete();
+		do_statusbar_delete();
 	    } else if (s->scfunc == do_backspace) {
-		/* If we're using restricted mode, the filename
-		 * isn't blank, and we're at the "Write File"
-		 * prompt, disable Backspace. */
-		if (!ISSET(RESTRICTED) || openfile->filename[0] == '\0' ||
-			currmenu != MWRITEFILE)
-		    do_statusbar_backspace();
+		do_statusbar_backspace();
 	    } else {
 		/* Handle any other shortcut in the current menu, setting
 		 * ran_func to TRUE if we try to run their associated
@@ -236,10 +223,10 @@ int do_statusbar_mouse(void)
 #endif
 
 /* The user typed input_len multibyte characters.  Add them to the
- * statusbar prompt, setting got_enter to TRUE if we get a newline,
+ * statusbar prompt, setting got_newline to TRUE if we got a verbatim ^J,
  * and filtering out ASCII control characters if filtering is TRUE. */
 void do_statusbar_output(int *the_input, size_t input_len,
-	bool filtering, bool *got_enter)
+	bool filtering, bool *got_newline)
 {
     char *output = charalloc(input_len + 1);
     char *char_buf = charalloc(mb_cur_max());
@@ -261,9 +248,9 @@ void do_statusbar_output(int *the_input, size_t input_len,
 		output[i] = '\n';
 	    else if (output[i] == '\n') {
 		/* Put back the rest of the characters for reparsing,
-		 * indicate that we got the Enter key and get out. */
+		 * indicate that we got a ^J and get out. */
 		unparse_kbinput(output + i, input_len - i);
-		*got_enter = TRUE;
+		*got_newline = TRUE;
 		return;
 	    }
 	}
@@ -425,9 +412,9 @@ void do_statusbar_prev_word(void)
 }
 #endif /* !NANO_TINY */
 
-/* Get verbatim input.  Set got_enter to TRUE if we got the Enter key as
+/* Get verbatim input, setting got_newline to TRUE if we get a ^J as
  * part of the verbatim input. */
-void do_statusbar_verbatim_input(bool *got_enter)
+void do_statusbar_verbatim_input(bool *got_newline)
 {
     int *kbinput;
     size_t kbinput_len;
@@ -437,7 +424,7 @@ void do_statusbar_verbatim_input(bool *got_enter)
 
     /* Display all the verbatim characters at once, not filtering out
      * control characters. */
-    do_statusbar_output(kbinput, kbinput_len, FALSE, got_enter);
+    do_statusbar_output(kbinput, kbinput_len, FALSE, got_newline);
 }
 
 /* Return the placewewant associated with statusbar_x, i.e. the
@@ -491,9 +478,7 @@ void update_the_statusbar(void)
     index = strnlenpt(answer, statusbar_x);
     page_start = get_statusbar_page_start(start_col, start_col + index);
 
-    if (interface_color_pair[TITLE_BAR].bright)
-	wattron(bottomwin, A_BOLD);
-    wattron(bottomwin, interface_color_pair[TITLE_BAR].pairnum);
+    wattron(bottomwin, interface_color_pair[TITLE_BAR]);
 
     blank_statusbar();
 
@@ -505,8 +490,7 @@ void update_the_statusbar(void)
     waddstr(bottomwin, expanded);
     free(expanded);
 
-    wattroff(bottomwin, A_BOLD);
-    wattroff(bottomwin, interface_color_pair[TITLE_BAR].pairnum);
+    wattroff(bottomwin, interface_color_pair[TITLE_BAR]);
 
     statusbar_pww = statusbar_xplustabs();
     reset_statusbar_cursor();
@@ -855,15 +839,12 @@ int do_yesno_prompt(bool all, const char *msg)
 	    onekey("^C", _("Cancel"), width);
 	}
 
-	if (interface_color_pair[TITLE_BAR].bright)
-	    wattron(bottomwin, A_BOLD);
-	wattron(bottomwin, interface_color_pair[TITLE_BAR].pairnum);
+	wattron(bottomwin, interface_color_pair[TITLE_BAR]);
 
 	blank_statusbar();
 	mvwaddnstr(bottomwin, 0, 0, msg, actual_x(msg, COLS - 1));
 
-	wattroff(bottomwin, A_BOLD);
-	wattroff(bottomwin, interface_color_pair[TITLE_BAR].pairnum);
+	wattroff(bottomwin, interface_color_pair[TITLE_BAR]);
 
 	/* Refresh edit window and statusbar before getting input. */
 	wnoutrefresh(edit);
