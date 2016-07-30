@@ -12,7 +12,7 @@ No part of this file may be used without permission.
 --><title>Firewall</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,block_wan,block_wan_limit,block_wan_limit_icmp,block_wan_limit_tr,nf_loopback,ne_syncookies,DSCP_fix_enable,multicast_pass,multicast_lan,multicast_lan1,multicast_lan2,multicast_lan3,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,udpxy_enable,udpxy_stats,udpxy_clients,udpxy_port,ne_snat"); %>
+		//	<% nvram("at_update,tomatoanon_answer,block_wan,block_wan_limit,block_wan_limit_icmp,block_wan_limit_tr,nf_loopback,ne_syncookies,DSCP_fix_enable,ipv6_ipsec,multicast_pass,multicast_lan,multicast_lan1,multicast_lan2,multicast_lan3,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,udpxy_enable,udpxy_stats,udpxy_clients,udpxy_port,ne_snat"); %>
 
 		function verifyFields(focused, quiet)
 		{
@@ -62,6 +62,7 @@ No part of this file may be used without permission.
 
 			fom.ne_syncookies.value = E('_f_syncookies').checked ? 1 : 0;
 			fom.DSCP_fix_enable.value = E('_f_DSCP_fix_enable').checked ? 1 : 0;
+			fom.ipv6_ipsec.value = E('_f_ipv6_ipsec').checked ? 1 : 0;
 			fom.multicast_pass.value = E('_f_multicast').checked ? 1 : 0;
 			/* VLAN-BEGIN */
 			fom.multicast_lan.value = E('_f_multicast_lan').checked ? 1 : 0;
@@ -87,6 +88,7 @@ No part of this file may be used without permission.
 		<input type="hidden" name="block_wan_limit_tr">
 		<input type="hidden" name="ne_syncookies">
 		<input type="hidden" name="DSCP_fix_enable">
+		<input type="hidden" name="ipv6_ipsec">
 		<input type="hidden" name="multicast_pass">
 
 		<input type="hidden" name="multicast_lan">
@@ -109,7 +111,8 @@ No part of this file may be used without permission.
 					{ title: 'ICMP', indent: 3, name: 'f_icmp_limit_icmp', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_icmp || 1, 1, 300, 5) },
 					{ title: 'Traceroute', indent: 3, name: 'f_icmp_limit_traceroute', type: 'text', maxlen: 3, size: 3, suffix: ' <small> request per second</small>', value: fixInt(nvram.block_wan_limit_tr || 5, 1, 300, 5) },
 					{ title: 'Enable SYN cookies', name: 'f_syncookies', type: 'checkbox', value: nvram.ne_syncookies != '0' },
-					{ title: 'Enable DSCP Fix', name: 'f_DSCP_fix_enable', type: 'checkbox', value: nvram.DSCP_fix_enable != '0', suffix: ' <small>Fixes Comcast incorrect DSCP</small>' }
+					{ title: 'Enable DSCP Fix', name: 'f_DSCP_fix_enable', type: 'checkbox', value: nvram.DSCP_fix_enable != '0', suffix: ' <small>Fixes Comcast incorrect DSCP</small>' },
+					{ title: 'IPv6 IPSec Passthrough', name: 'f_ipv6_ipsec', type: 'checkbox', value: nvram.ipv6_ipsec != '0' }
 				]);
 			</script>
 		</div>
