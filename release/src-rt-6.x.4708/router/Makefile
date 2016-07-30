@@ -98,7 +98,6 @@ ifneq ($(TCONFIG_USB)$(TCONFIG_NFS),)
 obj-y += e2fsprogs
 endif
 
-obj-y += exfat-nofuse
 obj-$(TCONFIG_TOR) += tor
 obj-$(TCONFIG_DNSCRYPT) += libsodium
 obj-$(TCONFIG_DNSCRYPT) += dnscrypt

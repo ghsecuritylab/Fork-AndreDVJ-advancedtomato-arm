@@ -615,8 +615,6 @@ define BusyboxOptions
 			echo "CONFIG_TUNE2FS=n" >>$(1); \
 			sed -i "/CONFIG_E2LABEL/d" $(1); \
 			echo "CONFIG_E2LABEL=n" >>$(1); \
-			sed -i "/CONFIG_FEATURE_VOLUMEID_EXFAT/d" $(1); \
-			echo "CONFIG_FEATURE_VOLUMEID_EXFAT=y" >>$(1); \
 			if [ "$(CONFIG_LINUX26)" = "y" ]; then \
 				sed -i "/CONFIG_LSUSB/d" $(1); \
 				echo "CONFIG_LSUSB=y" >>$(1); \

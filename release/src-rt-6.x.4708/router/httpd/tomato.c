@@ -1262,7 +1262,6 @@ static const nvset_t nvset_list[] = {
 	{ "usb_fs_ext3",		V_01				},
 	{ "usb_fs_ext4",		V_01				},
 	{ "usb_fs_fat",			V_01				},
-	{ "usb_fs_exfat",		V_01				}, //!oneleft - exfat support
 #ifdef TCONFIG_NTFS
 	{ "usb_fs_ntfs",		V_01				},
 	{ "usb_ntfs_driver",		V_LENGTH(0, 10)			},

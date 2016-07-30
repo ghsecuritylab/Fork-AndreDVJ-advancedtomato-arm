@@ -182,12 +182,6 @@ void start_usb(void)
 				modprobe("vfat");
 			}
 
-			//!oneleft
-			if (nvram_get_int("usb_fs_exfat")) {
-				modprobe("exfat");
-			}
-
-
 #if defined(TCONFIG_UFSDA) || defined(TCONFIG_UFSDN)
 			if (nvram_get_int("usb_fs_ntfs")) {
 				modprobe("ufsd");
@@ -309,7 +303,6 @@ void stop_usb(void)
 #endif
 		modprobe_r("vfat");
 		modprobe_r("fat");
-		modprobe_r("exfat"); //!oneleft
 		modprobe_r("fuse");
 #if defined(TCONFIG_UFSDA) || defined(TCONFIG_UFSDN)
 		modprobe_r("ufsd");

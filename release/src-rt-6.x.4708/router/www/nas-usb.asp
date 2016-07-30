@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 	<style>textarea { width: 100%; }</style>
 	<script type="text/javascript">
 
-		//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_usb3,usb_mmc,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext4,usb_fs_fat,usb_fs_exfat,usb_fs_ntfs,usb_ntfs_driver,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g"); %>
+		//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_usb3,usb_mmc,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext4,usb_fs_fat,usb_fs_ntfs,usb_ntfs_driver,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g"); %>
 		// 	<% usbdevices(); %>
 
 		list = [];
@@ -227,7 +227,6 @@ No part of this file may be used without permission.
 
 			E( '_f_ext4' ).disabled   = b || a;
 			E( '_f_fat' ).disabled    = b || a;
-			E( '_f_exfat' ).disabled  = b || a;
 			/* LINUX26-BEGIN */
 			E( '_f_idle_enable' ).disabled = b || a;
 			E( '_f_usb_3g' ).disabled      = b;
@@ -276,7 +275,6 @@ No part of this file may be used without permission.
 
 			fom.usb_fs_ext4.value  = E( '_f_ext4' ).checked ? 1 : 0;
 			fom.usb_fs_fat.value   = E( '_f_fat' ).checked ? 1 : 0;
-			fom.usb_fs_exfat.value = E( '_f_exfat' ).checked ? 1 : 0;
 			/* NTFS-BEGIN */
 			fom.usb_fs_ntfs.value = E( '_f_ntfs' ).checked ? 1 : 0;
 			/* NTFS-END */
@@ -312,7 +310,6 @@ No part of this file may be used without permission.
 		<input type="hidden" name="usb_printer_bidirect">
 		<input type="hidden" name="usb_fs_ext4">
 		<input type="hidden" name="usb_fs_fat">
-		<input type="hidden" name="usb_fs_exfat">
 		
 		/* NTFS-BEGIN */
 		<input type="hidden" name="usb_fs_ntfs">
@@ -350,8 +347,7 @@ No part of this file may be used without permission.
 		                      /* NTFS-BEGIN */
 		                      { suffix: '&nbsp; NTFS &nbsp;&nbsp;&nbsp;', name: 'f_ntfs', type: 'checkbox', value: nvram.usb_fs_ntfs == 1 },
 		                      /* NTFS-END */
-		                      { suffix: '&nbsp; FAT &nbsp;', name: 'f_fat', type: 'checkbox', value: nvram.usb_fs_fat == 1 },
-		                      { suffix: '&nbsp; exFAT &nbsp;', name: 'f_exfat', type: 'checkbox', value: nvram.usb_fs_exfat == 1 }
+		                      { suffix: '&nbsp; FAT &nbsp;', name: 'f_fat', type: 'checkbox', value: nvram.usb_fs_fat == 1 }
 		                      /* HFS-BEGIN */
 		                      ,{ suffix: '&nbsp; HFS / HFS+ &nbsp;', name: 'f_hfs', type: 'checkbox', value: nvram.usb_fs_hfs == 1 }
 		                      /* HFS-END */
