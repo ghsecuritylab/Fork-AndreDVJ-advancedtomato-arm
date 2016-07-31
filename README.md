@@ -29,9 +29,9 @@ A summary of changes from Shibby so far:
 * Updated other components. See commits for history.
 * Removed wireless antenna options and nvram values, as they're pointless on ARM routers such as R7000/AC68U.
 * Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
-* Added ExFAT filesystem driver, from oneleft
 * Added h5ai feature, from oneleft
 * Added ext4 filesystem driver and e2fsprogs, from nikk gitanes
+* Added CA bundle support (working with curl)
 
 Known issues:
 
@@ -43,7 +43,7 @@ Known issues:
 Some of these changes are functionally pointless, but may offer potential bug and security fixes.
 Firmware size increased around 600K compared to Shibby builds. Should not be an issue to routers with 32MB of flash memory and beyond.
 
-I only have a Netgear R7000 router, (My WNR3500Lv2 died) so I don't have any other unit to test any other build. Build/flash at your own risk.
+I only have a Netgear R7000 router, (My WNR3500Lv2 died, was MIPS anyway) so I don't have any other unit to test any other build. Build/flash at your own risk.
 
 If you see any issues or want to request a specific build, please let me know.
 
