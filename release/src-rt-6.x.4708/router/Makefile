@@ -2666,7 +2666,7 @@ libsodium-clean:
 	@rm -rf libsodium/stamp-h1
 
 dnscrypt/stamp-h1: libsodium
-	cd $(TOP)/dnscrypt/src/libevent-modified && aclocal && autoconf
+	cd $(TOP)/dnscrypt/src/libevent-modified && aclocal && autoreconf
 	cd $(TOP)/dnscrypt && CC=$(CC) STRIP=$(STRIP) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libsodium/src/libsodium/include" \
