@@ -603,49 +603,46 @@ void die(const char *msg, ...)
     vfprintf(stderr, msg, ap);
     va_end(ap);
 
-    /* Save the current file buffer if it's been modified. */
+#ifndef NANO_TINY
+    /* If the current buffer has a lockfile, remove it. */
+    if (ISSET(LOCKING) && openfile->lock_filename)
+	delete_lockfile(openfile->lock_filename);
+#endif
+
+    /* If the current file buffer was modified, save it. */
     if (openfile && openfile->modified) {
-	/* If we've partitioned the filestruct, unpartition it now. */
+	/* If the filestruct is partitioned, unpartition it first. */
 	if (filepart != NULL)
 	    unpartition_filestruct(&filepart);
 
-	die_save_file(openfile->filename
-#ifndef NANO_TINY
-		, openfile->current_stat
-#endif
-		);
+	die_save_file(openfile->filename, openfile->current_stat);
     }
 
 #ifndef DISABLE_MULTIBUFFER
     /* Save all of the other modified file buffers, if any. */
     if (openfile != NULL) {
-	openfilestruct *tmp = openfile;
+	openfilestruct *firstone = openfile;
 
-	while (tmp != openfile->next) {
+	while (openfile->next != firstone) {
 	    openfile = openfile->next;
 
-	    /* Save the current file buffer if it's been modified. */
-	    if (openfile->modified)
-		die_save_file(openfile->filename
 #ifndef NANO_TINY
-			, openfile->current_stat
+	    if (ISSET(LOCKING) && openfile->lock_filename)
+		delete_lockfile(openfile->lock_filename);
 #endif
-			);
+	    if (openfile->modified)
+		die_save_file(openfile->filename, openfile->current_stat);
 	}
     }
 #endif
 
-    /* Get out. */
+    /* Abandon the building. */
     exit(1);
 }
 
 /* Save the current file under the name specified in die_filename, which
  * is modified to be unique if necessary. */
-void die_save_file(const char *die_filename
-#ifndef NANO_TINY
-	, struct stat *die_stat
-#endif
-	)
+void die_save_file(const char *die_filename, struct stat *die_stat)
 {
     char *targetname;
     bool failed = TRUE;
@@ -862,7 +859,7 @@ void usage(void)
 #ifndef NANO_TINY
     print_opt("-W", "--wordbounds",
 	N_("Detect word boundaries more accurately"));
-    print_opt("-X", "--wordchars",
+    print_opt(_("-X <str>"), _("--wordchars=<str>"),
 	N_("Which other characters are word parts"));
 #endif
 #ifndef DISABLE_COLOR
@@ -1539,7 +1536,7 @@ void terminal_init(void)
 /* Say that an unbound key was struck, and if possible which one. */
 void unbound_key(int code)
 {
-    if (func_key)
+    if (!is_byte(code))
 	statusline(ALERT, _("Unbound key"));
     else if (meta_key) {
 	if (code == '[')
@@ -1577,7 +1574,7 @@ int do_input(bool allow_funcs)
 #endif
 
 #ifndef DISABLE_MOUSE
-    if (func_key && input == KEY_MOUSE) {
+    if (input == KEY_MOUSE) {
 	/* We received a mouse click. */
 	if (do_mouse() == 1)
 	    /* The click was on a shortcut -- read in the character
@@ -1599,10 +1596,8 @@ int do_input(bool allow_funcs)
     /* If we got a non-high-bit control key, a meta key sequence, or a
      * function key, and it's not a shortcut or toggle, throw it out. */
     if (!have_shortcut) {
-	if (is_ascii_cntrl_char(input) || meta_key || func_key) {
+	if (is_ascii_cntrl_char(input) || meta_key || !is_byte(input)) {
 	    unbound_key(input);
-	    meta_key = FALSE;
-	    func_key = FALSE;
 	    input = ERR;
 	}
     }
@@ -2486,6 +2481,9 @@ int main(int argc, char **argv)
 
     /* Set up the terminal state. */
     terminal_init();
+
+    /* Check whether we're running on a Linux console. */
+    console = (getenv("DISPLAY") == NULL);
 
 #ifdef DEBUG
     fprintf(stderr, "Main: set up windows\n");

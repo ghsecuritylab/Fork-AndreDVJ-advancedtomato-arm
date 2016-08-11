@@ -470,20 +470,18 @@ void parse_binding(char *ptr, bool dobind)
 	    goto free_copy;
 	}
 
-	newsc->keystr = keycopy;
 	newsc->menus = menu;
-	newsc->type = strtokeytype(newsc->keystr);
-	assign_keyinfo(newsc);
+	assign_keyinfo(newsc, keycopy);
 
-	/* Do not allow rebinding the equivalent of the Escape key. */
-	if (newsc->type == META && newsc->seq == 91) {
+	/* Do not allow rebinding a frequent escape-sequence starter: Esc [. */
+	if (newsc->meta && newsc->keycode == 91) {
 	    rcfile_error(N_("Sorry, keystroke \"%s\" may not be rebound"), newsc->keystr);
 	    free(newsc);
 	    goto free_copy;
 	}
 #ifdef DEBUG
 	fprintf(stderr, "s->keystr = \"%s\"\n", newsc->keystr);
-	fprintf(stderr, "s->seq = \"%d\"\n", newsc->seq);
+	fprintf(stderr, "s->keycode = \"%d\"\n", newsc->keycode);
 #endif
     }
 

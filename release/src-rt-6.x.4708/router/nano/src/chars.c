@@ -93,6 +93,26 @@ void wctomb_reset(void)
     IGNORE_CALL_RESULT(wctomb(NULL, 0));
 }
 
+/* This function is equivalent to isalpha() for multibyte characters. */
+bool is_alpha_mbchar(const char *c)
+{
+    assert(c != NULL);
+
+#ifdef ENABLE_UTF8
+    if (use_utf8) {
+	wchar_t wc;
+
+	if (mbtowc(&wc, c, MB_CUR_MAX) < 0) {
+	    mbtowc_reset();
+	    return 0;
+	}
+
+	return iswalpha(wc);
+    } else
+#endif
+	return isalpha((unsigned char)*c);
+}
+
 /* This function is equivalent to isalnum() for multibyte characters. */
 bool is_alnum_mbchar(const char *c)
 {
@@ -219,7 +239,7 @@ char control_rep(const signed char c)
     /* An embedded newline is an encoded null. */
     if (c == '\n')
 	return '@';
-    else if (c == NANO_CONTROL_8)
+    else if (c == DEL_CODE)
 	return '?';
     else if (c == -97)
 	return '=';
@@ -236,7 +256,7 @@ char control_mbrep(const char *c)
 
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	if (0 <= c[0] && c[0] <= 127)
+	if ((unsigned char)c[0] < 128)
 	    return control_rep(c[0]);
 	else
 	    return control_rep(c[1]);
@@ -490,32 +510,40 @@ int mbstrncasecmp(const char *s1, const char *s2, size_t n)
     if (use_utf8) {
 	wchar_t wc1, wc2;
 
-	if (s1 == s2)
-	    return 0;
-
 	assert(s1 != NULL && s2 != NULL);
 
-	for (; *s1 != '\0' && *s2 != '\0' && n > 0;
-		s1 += move_mbright(s1, 0), s2 += move_mbright(s2, 0), n--) {
+	while (*s1 != '\0' && *s2 != '\0' && n > 0) {
 	    bool bad1 = FALSE, bad2 = FALSE;
 
 	    if (mbtowc(&wc1, s1, MB_CUR_MAX) < 0) {
 		mbtowc_reset();
-		wc1 = (unsigned char)*s1;
 		bad1 = TRUE;
 	    }
 
 	    if (mbtowc(&wc2, s2, MB_CUR_MAX) < 0) {
 		mbtowc_reset();
-		wc2 = (unsigned char)*s2;
 		bad2 = TRUE;
 	    }
 
-	    if (bad1 != bad2 || towlower(wc1) != towlower(wc2))
-		break;
+	    if (bad1 || bad2) {
+		if (*s1 != *s2)
+		    return (unsigned char)*s1 - (unsigned char)*s2;
+
+		if (bad1 != bad2)
+		    return (bad1 ? 1 : -1);
+	    } else {
+		int difference = towlower(wc1) - towlower(wc2);
+
+		if (difference != 0)
+		    return difference;
+	    }
+
+	    s1 += move_mbright(s1, 0);
+	    s2 += move_mbright(s2, 0);
+	    n--;
 	}
 
-	return (n > 0) ? towlower(wc1) - towlower(wc2) : 0;
+	return (n > 0) ? ((unsigned char)*s1 - (unsigned char)*s2) : 0;
     } else
 #endif
 	return strncasecmp(s1, s2, n);
@@ -525,20 +553,20 @@ int mbstrncasecmp(const char *s1, const char *s2, size_t n)
 /* This function is equivalent to strcasestr(). */
 char *nstrcasestr(const char *haystack, const char *needle)
 {
-    size_t haystack_len, needle_len;
+    size_t needle_len;
 
     assert(haystack != NULL && needle != NULL);
 
     if (*needle == '\0')
 	return (char *)haystack;
 
-    haystack_len = strlen(haystack);
     needle_len = strlen(needle);
 
-    for (; *haystack != '\0' && haystack_len >= needle_len; haystack++,
-	haystack_len--) {
+    while (*haystack != '\0') {
 	if (strncasecmp(haystack, needle, needle_len) == 0)
 	    return (char *)haystack;
+
+	haystack++;
     }
 
     return NULL;
@@ -550,21 +578,20 @@ char *mbstrcasestr(const char *haystack, const char *needle)
 {
 #ifdef ENABLE_UTF8
     if (use_utf8) {
-	size_t haystack_len, needle_len;
+	size_t needle_len;
 
 	assert(haystack != NULL && needle != NULL);
 
 	if (*needle == '\0')
 	    return (char *)haystack;
 
-	haystack_len = mbstrlen(haystack);
 	needle_len = mbstrlen(needle);
 
-	for (; *haystack != '\0' && haystack_len >= needle_len;
-		haystack += move_mbright(haystack, 0), haystack_len--) {
-	    if (mbstrncasecmp(haystack, needle, needle_len) == 0 &&
-			mblen(haystack, MB_CUR_MAX) > 0)
+	while (*haystack != '\0') {
+	    if (mbstrncasecmp(haystack, needle, needle_len) == 0)
 		return (char *)haystack;
+
+	    haystack += move_mbright(haystack, 0);
 	}
 
 	return NULL;
@@ -655,8 +682,7 @@ char *mbrevstrcasestr(const char *haystack, const char *needle, const
 
 	while (TRUE) {
 	    if (rev_start_len >= needle_len &&
-			mbstrncasecmp(rev_start, needle, needle_len) == 0 &&
-			mblen(rev_start, MB_CUR_MAX) > 0)
+			mbstrncasecmp(rev_start, needle, needle_len) == 0)
 		return (char *)rev_start;
 
 	    /* If we've reached the head of the haystack, we found nothing. */

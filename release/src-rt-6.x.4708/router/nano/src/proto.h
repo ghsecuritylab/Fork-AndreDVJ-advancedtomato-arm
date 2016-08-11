@@ -30,8 +30,8 @@
 extern volatile sig_atomic_t sigwinch_counter;
 #endif
 
+extern bool console;
 extern bool meta_key;
-extern bool func_key;
 extern bool focusing;
 
 extern message_type lastmessage;
@@ -184,6 +184,7 @@ bool nisblank(int c);
 bool niswblank(wchar_t wc);
 #endif
 bool is_byte(int c);
+bool is_alpha_mbchar(const char *c);
 bool is_alnum_mbchar(const char *c);
 bool is_blank_mbchar(const char *c);
 bool is_ascii_cntrl_char(int c);
@@ -362,8 +363,7 @@ size_t length_of_list(int menu);
 const sc *first_sc_for(int menu, void (*func)(void));
 int sc_seq_or(void (*func)(void), int defaultval);
 functionptrtype func_from_key(int *kbinput);
-key_type strtokeytype(const char *str);
-void assign_keyinfo(sc *s);
+void assign_keyinfo(sc *s, const char *keystring);
 void print_sclist(void);
 void shortcut_init(void);
 #ifndef DISABLE_COLOR
@@ -408,26 +408,12 @@ void do_next_word_void(void);
 #endif
 void do_home(void);
 void do_end(void);
-void do_up(
-#ifndef NANO_TINY
-	bool scroll_only
-#else
-	void
-#endif
-	);
+void do_up(bool scroll_only);
 void do_up_void(void);
-#ifndef NANO_TINY
-void do_scroll_up(void);
-#endif
-void do_down(
-#ifndef NANO_TINY
-	bool scroll_only
-#else
-	void
-#endif
-	);
+void do_down(bool scroll_only);
 void do_down_void(void);
 #ifndef NANO_TINY
+void do_scroll_up(void);
 void do_scroll_down(void);
 #endif
 void do_left(void);
@@ -458,11 +444,7 @@ void say_there_is_no_help(void);
 #endif
 void finish(void);
 void die(const char *msg, ...);
-void die_save_file(const char *die_filename
-#ifndef NANO_TINY
-	, struct stat *die_stat
-#endif
-	);
+void die_save_file(const char *die_filename, struct stat *die_stat);
 void window_init(void);
 #ifndef DISABLE_MOUSE
 void disable_mouse_support(void);
@@ -764,7 +746,7 @@ void dump_filestruct_reverse(void);
 void get_key_buffer(WINDOW *win);
 size_t get_key_buffer_len(void);
 void unget_input(int *input, size_t input_len);
-void unget_kbinput(int kbinput, bool metakey, bool funckey);
+void unget_kbinput(int kbinput, bool metakey);
 int *get_input(WINDOW *win, size_t input_len);
 int get_kbinput(WINDOW *win);
 int parse_kbinput(WINDOW *win);
@@ -778,7 +760,7 @@ long get_unicode_kbinput(WINDOW *win, int kbinput);
 int get_control_kbinput(int kbinput);
 void unparse_kbinput(char *output, size_t output_len);
 int *get_verbatim_kbinput(WINDOW *win, size_t *kbinput_len);
-int *parse_verbatim_kbinput(WINDOW *win, size_t *kbinput_len);
+int *parse_verbatim_kbinput(WINDOW *win, size_t *count);
 #ifndef DISABLE_MOUSE
 int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts);
 #endif
@@ -801,7 +783,7 @@ void reset_cursor(void);
 void edit_draw(filestruct *fileptr, const char *converted, int
 	line, size_t start);
 int update_line(filestruct *fileptr, size_t index);
-bool need_screen_update(size_t pww_save);
+bool need_horizontal_scroll(const size_t old_column, const size_t new_column);
 void edit_scroll(scroll_dir direction, ssize_t nlines);
 void edit_redraw(filestruct *old_current);
 void edit_refresh(void);

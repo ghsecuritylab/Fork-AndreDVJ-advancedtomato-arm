@@ -33,10 +33,10 @@ volatile sig_atomic_t sigwinch_counter = 0;
 	/* Is incremented by the handler whenever a SIGWINCH occurs. */
 #endif
 
+bool console;
+	/* Whether we're running on a Linux VC (TRUE) or under X (FALSE). */
 bool meta_key;
 	/* Whether the current keystroke is a Meta key. */
-bool func_key;
-	/* Whether the current keystroke is an extended keypad value. */
 bool focusing = TRUE;
 	/* Whether an update of the edit window should center the cursor. */
 
@@ -339,12 +339,10 @@ void add_to_sclist(int menus, const char *scstring, void (*func)(void), int togg
     s->toggle = toggle;
     if (toggle)
 	s->ordinal = ++counter;
-    s->keystr = (char *) scstring;
-    s->type = strtokeytype(scstring);
-    assign_keyinfo(s);
+    assign_keyinfo(s, scstring);
 
 #ifdef DEBUG
-    fprintf(stderr, "Setting sequence to %d for shortcut \"%s\" in menus %x\n", s->seq, scstring, s->menus);
+    fprintf(stderr, "Setting keycode to %d for shortcut \"%s\" in menus %x\n", s->keycode, scstring, s->menus);
 #endif
 }
 
@@ -382,8 +380,8 @@ int sc_seq_or(void (*func)(void), int defaultval)
     const sc *s = first_sc_for(currmenu, func);
 
     if (s) {
-	meta_key = (s->type == META);
-	return s->seq;
+	meta_key = s->meta;
+	return s->keycode;
     }
     /* else */
     return defaultval;
@@ -400,71 +398,54 @@ functionptrtype func_from_key(int *kbinput)
 	return NULL;
 }
 
-/* Return the type of command key based on the given string. */
-key_type strtokeytype(const char *str)
+/* Set the string and its corresponding keycode for the given shortcut s. */
+void assign_keyinfo(sc *s, const char *keystring)
 {
-    if (str[0] == '^')
-	return CONTROL;
-    else if (str[0] == 'M')
-	return META;
-    else if (str[0] == 'F')
-	return FKEY;
-    else
-	return RAWINPUT;
-}
+    s->keystr = keystring;
+    s->meta = (keystring[0] == 'M');
 
-/* Assign the info to the shortcut struct.
- * Assumes keystr is already assigned, naturally. */
-void assign_keyinfo(sc *s)
-{
-    if (s->type == CONTROL) {
-	assert(strlen(s->keystr) > 1);
-	s->seq = s->keystr[1] - 64;
-    } else if (s->type == META) {
-	assert(strlen(s->keystr) > 2);
-	s->seq = tolower((int) s->keystr[2]);
-    } else if (s->type == FKEY) {
-	assert(strlen(s->keystr) > 1);
-	s->seq = KEY_F0 + atoi(&s->keystr[1]);
-    } else /* RAWINPUT */
-	s->seq = (int) s->keystr[0];
+    assert(strlen(keystring) > 1 && (!s->meta || strlen(keystring) > 2));
 
-    /* Override some keys which don't bind as easily as we'd like. */
-    if (s->type == CONTROL && (!strcasecmp(&s->keystr[1], "space")))
-	s->seq = 0;
-    else if (s->type == META && (!strcasecmp(&s->keystr[2], "space")))
-	s->seq = (int) ' ';
-    else if (s->type == RAWINPUT) {
-	if (!strcasecmp(s->keystr, "Up"))
-	    s->seq = KEY_UP;
-	else if (!strcasecmp(s->keystr, "Down"))
-	    s->seq = KEY_DOWN;
-	else if (!strcasecmp(s->keystr, "Left"))
-	    s->seq = KEY_LEFT;
-	else if (!strcasecmp(s->keystr, "Right"))
-	    s->seq = KEY_RIGHT;
-	else if (!strcasecmp(s->keystr, "Ins"))
-	    s->seq = KEY_IC;
-	else if (!strcasecmp(s->keystr, "Del"))
-	    s->seq = KEY_DC;
-	else if (!strcasecmp(s->keystr, "Bsp"))
-	    s->seq = KEY_BACKSPACE;
-	/* The Tab and Enter keys don't actually produce special codes
-	 * but the exact integer values of ^I and ^M.  Rebinding the
-	 * latter therefore also rebinds Tab and Enter. */
-	else if (!strcasecmp(s->keystr, "Tab"))
-	    s->seq = NANO_CONTROL_I;
-	else if (!strcasecmp(s->keystr, "Enter"))
-	    s->seq = KEY_ENTER;
-	else if (!strcasecmp(s->keystr, "PgUp"))
-	    s->seq = KEY_PPAGE;
-	else if (!strcasecmp(s->keystr, "PgDn"))
-	    s->seq = KEY_NPAGE;
-	else if (!strcasecmp(s->keystr, "Home"))
-	    s->seq = KEY_HOME;
-	else if (!strcasecmp(s->keystr, "End"))
-	    s->seq = KEY_END;
-    }
+    if (keystring[0] == '^') {
+	s->keycode = keystring[1] - 64;
+	if (strcasecmp(keystring, "^Space") == 0)
+	    s->keycode = 0;
+    } else if (s->meta) {
+	s->keycode = tolower((int)keystring[2]);
+	if (strcasecmp(keystring, "M-Space") == 0)
+	    s->keycode = (int)' ';
+    } else if (keystring[0] == 'F')
+	s->keycode = KEY_F0 + atoi(&keystring[1]);
+    /* Catch the strings that don't bind as easily as we'd like. */
+    else if (!strcasecmp(keystring, "Up"))
+	s->keycode = KEY_UP;
+    else if (!strcasecmp(keystring, "Down"))
+	s->keycode = KEY_DOWN;
+    else if (!strcasecmp(keystring, "Left"))
+	s->keycode = KEY_LEFT;
+    else if (!strcasecmp(keystring, "Right"))
+	s->keycode = KEY_RIGHT;
+    else if (!strcasecmp(keystring, "Ins"))
+	s->keycode = KEY_IC;
+    else if (!strcasecmp(keystring, "Del"))
+	s->keycode = KEY_DC;
+    else if (!strcasecmp(keystring, "Bsp"))
+	s->keycode = KEY_BACKSPACE;
+    /* The Tab and Enter keys don't actually produce special codes
+     * but the exact integer values of ^I and ^M.  Rebinding the
+     * latter therefore also rebinds Tab and Enter. */
+    else if (!strcasecmp(keystring, "Tab"))
+	s->keycode = TAB_CODE;
+    else if (!strcasecmp(keystring, "Enter"))
+	s->keycode = KEY_ENTER;
+    else if (!strcasecmp(keystring, "PgUp"))
+	s->keycode = KEY_PPAGE;
+    else if (!strcasecmp(keystring, "PgDn"))
+	s->keycode = KEY_NPAGE;
+    else if (!strcasecmp(keystring, "Home"))
+	s->keycode = KEY_HOME;
+    else if (!strcasecmp(keystring, "End"))
+	s->keycode = KEY_END;
 }
 
 #ifdef DEBUG
@@ -1380,6 +1361,7 @@ sc *strtosc(const char *input)
     sc *s;
 
     s = (sc *)nmalloc(sizeof(sc));
+    s->toggle = 0;
 
 #ifndef DISABLE_HELP
     if (!strcasecmp(input, "help"))

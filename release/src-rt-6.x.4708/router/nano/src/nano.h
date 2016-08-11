@@ -188,10 +188,6 @@ typedef enum {
 } update_type;
 
 typedef enum {
-    CONTROL, META, FKEY, RAWINPUT
-}  key_type;
-
-typedef enum {
     ADD, DEL, BACK, CUT, CUT_EOF, REPLACE,
 #ifndef DISABLE_WRAPPING
     SPLIT_BEGIN, SPLIT_END,
@@ -397,6 +393,8 @@ typedef struct openfilestruct {
 	/* The file's y-coordinate position. */
     bool modified;
 	/* Whether the file has been modified. */
+    struct stat *current_stat;
+	/* The file's current stat information. */
 #ifndef NANO_TINY
     bool mark_set;
 	/* Whether the mark is on in this file. */
@@ -406,8 +404,6 @@ typedef struct openfilestruct {
 	/* The file's mark's x-coordinate position, if any. */
     file_format fmt;
 	/* The file's format. */
-    struct stat *current_stat;
-	/* The file's current stat information. */
     undo *undotop;
 	/* The top of the undo list. */
     undo *current_undo;
@@ -439,12 +435,12 @@ typedef struct rcoption {
 #endif
 
 typedef struct sc {
-    char *keystr;
-	/* The shortcut key for a function, ASCII version. */
-    key_type type;
-	/* What kind of command key it is, for convenience later. */
-    int seq;
-	/* The actual sequence to check once the type is determined. */
+    const char *keystr;
+	/* The string that describes a keystroke, like "^C" or "M-R". */
+    bool meta;
+	/* Whether this is a Meta keystroke. */
+    int keycode;
+	/* The integer that, together with meta, identifies the keystroke. */
     int menus;
 	/* Which menus this applies to. */
     void (*scfunc)(void);
@@ -554,12 +550,10 @@ enum
 #define MMOST  (MMAIN|MWHEREIS|MREPLACE|MREPLACEWITH|MGOTOLINE|MWRITEFILE|MINSERTFILE|\
 		MEXTCMD|MBROWSER|MWHEREISFILE|MGOTODIR|MSPELL|MLINTER)
 
-/* Control key sequences.  Changing these would be very, very bad. */
-#define NANO_CONTROL_SPACE 0
-#define NANO_CONTROL_I 9
-#define NANO_CONTROL_3 27
-#define NANO_CONTROL_7 31
-#define NANO_CONTROL_8 127
+/* Basic control codes. */
+#define TAB_CODE  0x09
+#define ESC_CODE  0x1B
+#define DEL_CODE  0x7F
 
 /* Codes for "modified" Arrow keys, beyond KEY_MAX of ncurses. */
 #define CONTROL_LEFT 0x401

@@ -368,7 +368,7 @@ void do_next_word_void(void)
  * if we are. */
 void do_home(void)
 {
-    size_t pww_save = openfile->placewewant;
+    size_t was_column = xplustabs();
 
 #ifndef NANO_TINY
     if (ISSET(SMART_HOME)) {
@@ -385,32 +385,28 @@ void do_home(void)
 
     openfile->placewewant = xplustabs();
 
-    if (need_screen_update(pww_save))
+    if (need_horizontal_scroll(was_column, openfile->placewewant))
 	update_line(openfile->current, openfile->current_x);
 }
 
 /* Move to the end of the current line. */
 void do_end(void)
 {
-    size_t pww_save = openfile->placewewant;
+    size_t was_column = xplustabs();
 
     openfile->current_x = strlen(openfile->current->data);
     openfile->placewewant = xplustabs();
 
-    if (need_screen_update(pww_save))
+    if (need_horizontal_scroll(was_column, openfile->placewewant))
 	update_line(openfile->current, openfile->current_x);
 }
 
 /* If scroll_only is FALSE, move up one line.  If scroll_only is TRUE,
  * scroll up one line without scrolling the cursor. */
-void do_up(
-#ifndef NANO_TINY
-	bool scroll_only
-#else
-	void
-#endif
-	)
+void do_up(bool scroll_only)
 {
+    size_t was_column = xplustabs();
+
     /* If we're at the top of the file, or if scroll_only is TRUE and
      * the top of the file is onscreen, get out. */
     if (openfile->current == openfile->fileage
@@ -443,47 +439,32 @@ void do_up(
 #endif
 		editwinrows / 2 + 1);
 
-    /* If we're not on the first line of the edit window, and the target
-     * column is beyond the screen or the mark is on, redraw the prior
-     * and current lines. */
-    if (openfile->current_y > 0 && need_screen_update(0)) {
-	update_line(openfile->current->next, 0);
-	update_line(openfile->current, openfile->current_x);
+    /* If the lines weren't already redrawn, see if they need to be. */
+    if (openfile->current_y > 0) {
+	/* Redraw the prior line if it was horizontally scrolled. */
+	if (need_horizontal_scroll(was_column, 0))
+	    update_line(openfile->current->next, 0);
+	/* Redraw the current line if it needs to be horizontally scrolled. */
+	if (need_horizontal_scroll(0, xplustabs()))
+	    update_line(openfile->current, openfile->current_x);
     }
 }
 
 /* Move up one line. */
 void do_up_void(void)
 {
-    do_up(
-#ifndef NANO_TINY
-	FALSE
-#endif
-	);
+    do_up(FALSE);
 }
-
-#ifndef NANO_TINY
-/* Scroll up one line without scrolling the cursor. */
-void do_scroll_up(void)
-{
-    do_up(TRUE);
-}
-#endif
 
 /* If scroll_only is FALSE, move down one line.  If scroll_only is TRUE,
  * scroll down one line without scrolling the cursor. */
-void do_down(
-#ifndef NANO_TINY
-	bool scroll_only
-#else
-	void
-#endif
-	)
+void do_down(bool scroll_only)
 {
 #ifndef NANO_TINY
     int amount = 0, enough;
     filestruct *topline;
 #endif
+    size_t was_column = xplustabs();
 
     /* If we're at the bottom of the file, get out. */
     if (openfile->current == openfile->filebot)
@@ -543,26 +524,30 @@ void do_down(
 	}
     }
 
-    /* If we're not on the last line of the edit window, and the target
-     * column is beyond the screen or the mark is on, redraw the prior
-     * and current lines. */
-    if (openfile->current_y < editwinrows - 1 && need_screen_update(0)) {
-	update_line(openfile->current->prev, 0);
-	update_line(openfile->current, openfile->current_x);
+    /* If the lines weren't already redrawn, see if they need to be. */
+    if (openfile->current_y < editwinrows - 1) {
+	/* Redraw the prior line if it was horizontally scrolled. */
+	if (need_horizontal_scroll(was_column, 0))
+	    update_line(openfile->current->prev, 0);
+	/* Redraw the current line if it needs to be horizontally scrolled. */
+	if (need_horizontal_scroll(0, xplustabs()))
+	    update_line(openfile->current, openfile->current_x);
     }
 }
 
 /* Move down one line. */
 void do_down_void(void)
 {
-    do_down(
-#ifndef NANO_TINY
-	FALSE
-#endif
-	);
+    do_down(FALSE);
 }
 
 #ifndef NANO_TINY
+/* Scroll up one line without scrolling the cursor. */
+void do_scroll_up(void)
+{
+    do_up(TRUE);
+}
+
 /* Scroll down one line without scrolling the cursor. */
 void do_scroll_down(void)
 {
@@ -573,7 +558,7 @@ void do_scroll_down(void)
 /* Move left one character. */
 void do_left(void)
 {
-    size_t pww_save = openfile->placewewant;
+    size_t was_column = xplustabs();
 
     if (openfile->current_x > 0)
 	openfile->current_x = move_mbleft(openfile->current->data,
@@ -585,14 +570,14 @@ void do_left(void)
 
     openfile->placewewant = xplustabs();
 
-    if (need_screen_update(pww_save))
+    if (need_horizontal_scroll(was_column, openfile->placewewant))
 	update_line(openfile->current, openfile->current_x);
 }
 
 /* Move right one character. */
 void do_right(void)
 {
-    size_t pww_save = openfile->placewewant;
+    size_t was_column = xplustabs();
 
     assert(openfile->current_x <= strlen(openfile->current->data));
 
@@ -600,12 +585,16 @@ void do_right(void)
 	openfile->current_x = move_mbright(openfile->current->data,
 						openfile->current_x);
     else if (openfile->current != openfile->filebot) {
-	do_down_void();
 	openfile->current_x = 0;
+	openfile->placewewant = 0;
+	if (need_horizontal_scroll(was_column, 0))
+	    update_line(openfile->current, 0);
+	do_down_void();
+	return;
     }
 
     openfile->placewewant = xplustabs();
 
-    if (need_screen_update(pww_save))
+    if (need_horizontal_scroll(was_column, openfile->placewewant))
 	update_line(openfile->current, openfile->current_x);
 }

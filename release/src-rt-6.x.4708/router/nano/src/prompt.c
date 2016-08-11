@@ -66,14 +66,11 @@ int do_statusbar_input(bool *ran_func, bool *finished,
 #ifndef DISABLE_MOUSE
     /* If we got a mouse click and it was on a shortcut, read in the
      * shortcut character. */
-    if (func_key && input == KEY_MOUSE) {
+    if (input == KEY_MOUSE) {
 	if (do_statusbar_mouse() == 1)
 	    input = get_kbinput(bottomwin);
-	else {
-	    meta_key = FALSE;
-	    func_key = FALSE;
+	else
 	    input = ERR;
-	}
     }
 #endif
 
@@ -87,23 +84,19 @@ int do_statusbar_input(bool *ran_func, bool *finished,
     /* If we got a non-high-bit control key, a meta key sequence, or a
      * function key, and it's not a shortcut or toggle, throw it out. */
     if (!have_shortcut) {
-	if (is_ascii_cntrl_char(input) || meta_key || func_key) {
+	if (is_ascii_cntrl_char(input) || meta_key || !is_byte(input)) {
 	    beep();
-	    meta_key = FALSE;
-	    func_key = FALSE;
 	    input = ERR;
 	}
     }
 
-    /* If we got a character, and it isn't a shortcut or toggle,
-     * it's a normal text character.  Display the warning if we're
-     * in view mode, or add the character to the input buffer if
-     * we're not. */
+    /* If the keystroke isn't a shortcut nor a toggle, it's a normal text
+     * character: add the it to the input buffer, when allowed. */
     if (input != ERR && !have_shortcut) {
-	/* If we're using restricted mode, the filename isn't blank,
-	 * and we're at the "Write File" prompt, disable text input. */
-	if (!ISSET(RESTRICTED) || openfile->filename[0] == '\0' ||
-		currmenu != MWRITEFILE) {
+	/* Only accept input when not in restricted mode, or when not at
+	 * the "Write File" prompt, or when there is no filename yet. */
+	if (!ISSET(RESTRICTED) || currmenu != MWRITEFILE ||
+			openfile->filename[0] == '\0') {
 	    kbinput_len++;
 	    kbinput = (int *)nrealloc(kbinput, kbinput_len * sizeof(int));
 	    kbinput[kbinput_len - 1] = input;
@@ -591,7 +584,7 @@ functionptrtype get_prompt_string(int *actual, bool allow_tabs,
 	if (func == do_tab) {
 #ifndef DISABLE_HISTORIES
 	    if (history_list != NULL) {
-		if (last_kbinput != sc_seq_or(do_tab, NANO_CONTROL_I))
+		if (last_kbinput != sc_seq_or(do_tab, TAB_CODE))
 		    complete_len = strlen(answer);
 
 		if (complete_len > 0) {
