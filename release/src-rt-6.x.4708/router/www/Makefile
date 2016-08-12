@@ -11,6 +11,7 @@ install:
 	mkdir -p $(INSTALLDIR)/www			
 	mkdir -p $(INSTALLDIR)/www/js
 	mkdir -p $(INSTALLDIR)/www/css
+	mkdir -p $(INSTALLDIR)/www/css/schemes
 
 # Copy h5ai files
 	cp -r _h5ai $(INSTALLDIR)/www
