@@ -29,6 +29,11 @@ install:
 		sed '/^\/\*\s*$$/,/\*\//! { s/\s\+/ /g; s/^\s\+//; s/\s\+$$//; /^$$/d }' < $$F > $(INSTALLDIR)/www/$$F; \
 	done
 
+# Copy CSS scheme files to the installdir and squish files by trimming whitespace
+	for F in $(wildcard css/schemes/*.css *.css); do \
+		sed '/^\/\*\s*$$/,/\*\//! { s/\s\+/ /g; s/^\s\+//; s/\s\+$$//; /^$$/d }' < $$F > $(INSTALLDIR)/www/$$F; \
+	done
+
 # Copy asp files to the installdir	
 # remove "debug.js" references, convert color.css, remove comments
 # in between REMOVE-BEGIN and REMOVE-END, and compress whitespace
