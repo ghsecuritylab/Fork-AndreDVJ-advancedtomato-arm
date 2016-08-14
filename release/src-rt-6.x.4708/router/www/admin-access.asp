@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript" src="js/interfaces.js"></script>
 	<script type="text/javascript">
-' 		// <% nvram("at_nav,at_nav_action,at_nav_state,http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_wl_filter,web_css,web_dir,ttb_css,sshd_eas,sshd_pass,sshd_remote,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit,sshd_motd,http_username,http_root"); %>
+		// <% nvram("at_nav,at_nav_action,at_nav_state,http_enable,https_enable,http_lanport,https_lanport,remote_management,remote_mgt_https,web_wl_filter,web_css,web_dir,ttb_css,sshd_eas,sshd_pass,sshd_remote,telnetd_eas,http_wanport,sshd_authkeys,sshd_port,sshd_rport,sshd_forwarding,telnetd_port,rmgt_sip,https_crt_cn,https_crt_save,lan_ipaddr,ne_shlimit,sshd_motd,http_username,http_root"); %>
 		changed = 0;
 		tdup = parseInt("<% psup('telnetd'); %>");
 		sdup = parseInt("<% psup('dropbear'); %>");
@@ -239,12 +239,13 @@ No part of this file may be used without permission.
 						{ title: 'Port', indent: 2, name: 'http_wanport', type: 'text', maxlen: 5, size: 7, value:  fixPort(nvram.http_wanport, 8080) },
 						{ title: 'Allow Wireless Access', name: 'f_http_wireless', type: 'checkbox', value:  nvram.web_wl_filter == 0 },
 						{ title: '<h5>User Interface Settings</h5>' },
-						{ title: 'Interface Theme', name: 'web_css', type: 'select',
+						{ title: 'Interface Theme', name: 'web_css', type: 'select', help: 'With AdvancedTomato you get very few built in skins, others are available on AdvancedTomato Themes Directory. This way we can save space on router for more important functions.',
 							options: [['tomato','Default'],
 							['css/schemes/green-scheme','Green Color Scheme'],
 							['css/schemes/red-scheme','Red Color Scheme'],
 							['css/schemes/torquoise-scheme','Torquoise Color Scheme'],
-							['ext/custom','Custom (ext/custom.css)']], value: nvram.web_css },
+							['ext/custom','Custom (ext/custom.css)'],
+							['online', 'On-line from ATTD']], value: nvram.web_css },
 						{ title    : 'Navigation Reveal', name: 'at_nav_action', type: 'select', help: 'This option allows you to change the method you use navigation menu (on the left side).',
 							options: [ [ 'click', 'Mouse Click' ], ['hover', 'Mouse Over'] ], value: nvram.at_nav_action },
 						{ title: 'Default Navigation State', name: 'at_nav_state', type: 'select', help: 'You can always toggle navigation style by clicking an icon right to logo, but doing so won\'t change default state.',
