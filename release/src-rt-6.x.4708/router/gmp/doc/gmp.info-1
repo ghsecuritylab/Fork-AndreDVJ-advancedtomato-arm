@@ -2,9 +2,9 @@ This is ../../gmp/doc/gmp.info, produced by makeinfo version 4.8 from
 ../../gmp/doc/gmp.texi.
 
    This manual describes how to install and use the GNU multiple
-precision arithmetic library, version 6.1.0.
+precision arithmetic library, version 6.1.1.
 
-   Copyright 1991, 1993-2015 Free Software Foundation, Inc.
+   Copyright 1991, 1993-2016 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this
 document under the terms of the GNU Free Documentation License, Version
@@ -26,9 +26,9 @@ GNU MP
 ******
 
    This manual describes how to install and use the GNU multiple
-precision arithmetic library, version 6.1.0.
+precision arithmetic library, version 6.1.1.
 
-   Copyright 1991, 1993-2015 Free Software Foundation, Inc.
+   Copyright 1991, 1993-2016 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this
 document under the terms of the GNU Free Documentation License, Version
@@ -233,7 +233,7 @@ Build Directory
      directory.  For example
 
           cd /my/build/dir
-          /my/sources/gmp-6.1.0/configure
+          /my/sources/gmp-6.1.1/configure
 
      Not all `make' programs have the necessary features (`VPATH') to
      support this.  In particular, SunOS and Slowaris `make' have bugs
@@ -1513,7 +1513,7 @@ File: gmp.info,  Node: Useful Macros and Constants,  Next: Compatibility with ol
 
  -- Global Constant: const char * const gmp_version
      The GMP version number, as a null-terminated string, in the form
-     "i.j.k".  This release is "6.1.0".  Note that the format "i.j" was
+     "i.j.k".  This release is "6.1.1".  Note that the format "i.j" was
      used, before version 4.3.0, when k was zero.
 
  -- Macro: __GMP_CC
@@ -1829,7 +1829,7 @@ Source File Paths
      path to the source directory.
 
           cd /my/build/dir
-          /my/source/dir/gmp-6.1.0/configure
+          /my/source/dir/gmp-6.1.1/configure
 
      This works via `VPATH', and might require GNU `make'.  Alternately
      it might be possible to change the `.c.lo' rules appropriately.
@@ -3008,7 +3008,7 @@ random number functions.
      the binary representation.  Useful for testing functions and
      algorithms, since this kind of random numbers have proven to be
      more likely to trigger corner-case bugs.  The random number will
-     be in the range 0 to 2^N-1, inclusive.
+     be in the range 2^N-1 to 2^N-1, inclusive.
 
      The variable STATE must be initialized by calling one of the
      `gmp_randinit' functions (*Note Random State Initialization::)
@@ -3267,7 +3267,7 @@ rational numbers.  These functions start with the prefix `mpq_'.
    Rational numbers are stored in objects of type `mpq_t'.
 
    All rational arithmetic functions assume operands have a canonical
-form, and canonicalize their result.  The canonical from means that the
+form, and canonicalize their result.  The canonical form means that the
 denominator and the numerator have no common factors, and that the
 denominator is positive.  Zero has the unique representation 0/1.
 
