@@ -1,4 +1,4 @@
-/* h5ai v0.28.1 - https://larsjung.de/h5ai/ */
+/* h5ai v0.29.0 - https://larsjung.de/h5ai/ */
 {
     "ar":               ["*.tar.bz2", "*.crx"],
     "ar-apk":           ["*.apk"],
@@ -19,6 +19,7 @@
     "img-jpg":          ["*.jpg", "*.jpeg"],
     "img-png":          ["*.png"],
     "img-raw":          ["*.cr2", "*.nef"],
+    "img-svg":          ["*.svg"],
     "img-tiff":         ["*.tiff"],
     "txt":              ["*.text", "*.txt"],
     "txt-build":        ["*.pom", "build.xml", "pom.xml"],
@@ -42,9 +43,9 @@
     "txt-rb":           ["*.rb"],
     "txt-rss":          ["*.rss"],
     "txt-rtf":          ["*.rtf"],
+    "txt-rust":         ["*.rs", "*.rlib"],
     "txt-script":       ["*.conf", "*.bsh", "*.csh", "*.ini", "*.ksh", "*.sh", "*.shar", "*.tcl", "*.zsh"],
     "txt-source":       [],
-    "txt-svg":          ["*.svg"],
     "txt-tex":          ["*.tex"],
     "txt-vcal":         ["*.vcal"],
     "txt-xml":          ["*.xml"],
