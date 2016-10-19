@@ -2418,6 +2418,7 @@ transmission-clean:
 transmission-install: transmission
 	$(MAKE) -C transmission DESTDIR=$(INSTALLDIR)/transmission install-strip
 	@rm -rf $(INSTALLDIR)/transmission/usr/share/man
+	@rm -rf $(INSTALLDIR)/transmission/usr/share/transmission/web/LICENSE
 	@rm -rf $(INSTALLDIR)/transmission/usr/bin/transmission-cli
 	@rm -rf $(INSTALLDIR)/transmission/usr/bin/transmission-show
 	@rm -rf $(INSTALLDIR)/transmission/usr/bin/transmission-edit

@@ -16,6 +16,13 @@ install:
 # Copy h5ai files
 	cp -r _h5ai $(INSTALLDIR)/www
 
+# Delete README/CHANGELOG h5ai files
+	rm -f $(INSTALLDIR)/www/_h5ai/*.md
+	rm -f $(INSTALLDIR)/www/_h5ai/private/cache/*.md
+	rm -f $(INSTALLDIR)/www/_h5ai/public/cache/*.md
+	rm -f $(INSTALLDIR)/www/_h5ai/public/ext/*.md
+	rm -f $(INSTALLDIR)/www/_h5ai/public/images/themes/*.md
+
 # Copy files we don't want to modify to new install directory
 	cp *.ico *.html *.php robots.txt tux.png $(INSTALLDIR)/www
 
