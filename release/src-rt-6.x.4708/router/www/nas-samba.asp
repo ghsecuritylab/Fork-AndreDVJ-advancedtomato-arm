@@ -7,7 +7,7 @@ No part of this file may be used without permission.
 --><title>File Sharing</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,smbd_enable,smbd_user,smbd_passwd,smbd_wgroup,smbd_cpage,smbd_custom,smbd_master,smbd_wins,smbd_shares,smbd_autoshare,wan_wins"); %>
+		//	<% nvram("at_update,tomatoanon_answer,smbd_enable,smbd_user,smbd_passwd,smbd_wgroup,smbd_cpage,smbd_ifnames,smbd_custom,smbd_master,smbd_wins,smbd_shares,smbd_autoshare,wan_wins"); %>
 
 		var ssg = new TomatoGrid();
 
@@ -119,11 +119,13 @@ No part of this file may be used without permission.
 
 			E('_smbd_wgroup').disabled = (a == 0);
 			E('_smbd_cpage').disabled = (a == 0);
+			E('_smbd_ifnames').disabled = (a == 0);
 			E('_smbd_custom').disabled = (a == 0);
 			E('_smbd_autoshare').disabled = (a == 0);
 			E('_f_smbd_master').disabled = (a == 0);
 			E('_f_smbd_wins').disabled = (a == 0 || (nvram.wan_wins != '' && nvram.wan_wins != '0.0.0.0'));
 
+			if (a != 0 && !v_length('_smbd_ifnames', quiet, 0, 50)) return 0;
 			if (a != 0 && !v_length('_smbd_custom', quiet, 0, 2048)) return 0;
 
 			if (a == 2) {
@@ -160,6 +162,26 @@ No part of this file may be used without permission.
 
 			form.submit(fom, 1);
 		}
+
+		function init()
+		{
+			var c;
+			if (((c = cookie.get('nas_samba_notes_vis')) != null) && (c == '1')) {
+				toggleVisibility("notes");
+			}
+		}
+
+		function toggleVisibility(whichone) {
+			if(E('sesdiv' + whichone).style.display=='') {
+			E('sesdiv' + whichone).style.display='none';
+			E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+			cookie.set('nas_samba_' + whichone + '_vis', 0);
+		} else {
+			E('sesdiv' + whichone).style.display='';
+			E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+			cookie.set('nas_samba_' + whichone + '_vis', 1);
+		}
+		}
 	</script>
 
 	<form id="_fom" method="post" action="tomato.cgi">
@@ -192,6 +214,9 @@ No part of this file may be used without permission.
 						],
 						suffix: ' <small> (start cmd.exe and type chcp to see the current code page)</small>',
 						value: nvram.smbd_cpage },
+					{ title: 'Network Interfaces', name: 'smbd_ifnames', type: 'text', maxlen: 50, size: 32,
+						suffix: ' <small> (space-delimited)</small>',
+						value: nvram.smbd_ifnames },
 					{ title: 'Samba Custom Configuration', name: 'smbd_custom', type: 'textarea', value: nvram.smbd_custom, style: 'width: 100%; height: 80px;' },
 					{ title: 'Auto-share all USB Partitions', name: 'smbd_autoshare', type: 'select',
 						options: [['0', 'Disabled'],['1', 'Read Only'],['2', 'Read / Write'],['3', 'Hidden Read / Write']],
@@ -209,6 +234,20 @@ No part of this file may be used without permission.
 			<div class="content">
 				<table class="line-table" id="ss-grid"></table><br />
 				<small>When no shares are specified and auto-sharing is disabled, <i>/mnt</i> directory is shared in Read Only mode.</small>
+			</div>
+		</div>
+
+		<div class="box">
+			<div class="heading">Notes <small><i><a href="javascript:toggleVisibility("notes");"><span id="sesdivnotesshowhide">(Click here to show)</span></a></i></small></div>
+			<div class="section" id="sesdivnotes" style="display:none">
+				<ul>
+				<li><b>Network Interfaces</b> - Space-delimited list of router interface names Samba will bind to.
+				<ul>
+				<li>If empty, <i>interfaces = <% nv("lan_ifname"); %></i> will be used instead.</li>
+				<li>The <i>bind interfaces only = yes</i> directive is always set.</li>
+				<li>Refer to the <a href="https://www.samba.org/samba/docs/man/manpages-3/smb.conf.5.html">Samba documentation</a> for details.</li>
+				</ul></li>
+				</ul>
 			</div>
 		</div>
 
