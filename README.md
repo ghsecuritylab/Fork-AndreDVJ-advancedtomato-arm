@@ -5,43 +5,8 @@ Forked off from Jacky's AdvancedTomato-ARM (which is a fork of Tomato-ARM by Shi
 This is my personal fork, of the firmware I am currently running in my router, where I attempt to fix issues, make small adjustments, update open-source components if possible, and cherry-pick fixes from others.
 This repository, while I try to keep aligned to Shibby's as much as possible, it has diverted already as some components are newer versions.
 
-## WARNING: Highly experimental at the moment. See changes below.
-
-A summary of changes from Shibby so far:
-
-* Updated Linux Broadcom BCM47XX 10/100/1000 Mbps Ethernet Controller
-* Kernel: tcp_cubic patches
-* Tweaks on ~/router/Makefile to parallelize/speed up build as much as possible
-* Tweaks on ~/router/Makefile to help with compilation failures
-* Tweaks on stop_transmission.sh script
-* Updated entware.sh script
-* wanuptime code is slightly different, though functionality is the same
-* Updated miniupnpd
-* Updated gmp / nettle
-* Updated dnscrypt
-* Updated libevent
-* Updated libusb (to a somewhat not that old version)
-* Updated dropbear
-* Updated NTFS-3G driver
-* Updated dnsmasq
-* Updated nano
-* Updated OpenVPN
-* Updated other components. See commits for history.
-* Removed wireless antenna options and nvram values, as they're pointless on ARM routers such as R7000/AC68U.
-* Other cherry-picked tweaks and fixes from many other repositories. See commits for history.
-* Added h5ai feature, from oneleft
-* Added ext4 filesystem driver and e2fsprogs, from nikk gitanes
-* Added CA bundle support (working with curl)
-
-Known issues:
-
-* Restoring BWM/IPT graphs from backup does not work. Investigating relationship between GUI and rstats/cstats.
-* A report of R6300v2 crashing (Actually bootloop) when USB drive is plugged in. However no details of which filesystem, driver, port, etc. was provided.
-
--------------------------------------------------------------------------------
-
-Some of these changes are functionally pointless, but may offer potential bug and security fixes.
-Firmware size increased around 600K compared to Shibby builds. Should not be an issue to routers with 32MB of flash memory and beyond.
+Some of the changes are functionally pointless, but may offer potential bug and security fixes.
+Firmware size increased around 700K compared to Shibby builds. Should not be an issue to routers with or more than 32MB of flash memory.
 
 I only have a Netgear R7000 router, (My WNR3500Lv2 died, was MIPS anyway) so I don't have any other unit to test any other build. Build/flash at your own risk.
 
