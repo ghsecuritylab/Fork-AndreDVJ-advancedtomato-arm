@@ -174,11 +174,11 @@ No part of this file may be used without permission.
 		function toggleVisibility(whichone) {
 			if(E('sesdiv' + whichone).style.display=='') {
 			E('sesdiv' + whichone).style.display='none';
-			E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to show)';
+			E('sesdiv' + whichone + 'showhide').innerHTML='<i class="icon-chevron-up"></i>';
 			cookie.set('nas_samba_' + whichone + '_vis', 0);
 		} else {
 			E('sesdiv' + whichone).style.display='';
-			E('sesdiv' + whichone + 'showhide').innerHTML='(Click here to hide)';
+			E('sesdiv' + whichone + 'showhide').innerHTML='<i class="icon-chevron-down"></i>';
 			cookie.set('nas_samba_' + whichone + '_vis', 1);
 		}
 		}
@@ -238,14 +238,14 @@ No part of this file may be used without permission.
 		</div>
 
 		<div class="box">
-			<div class="heading">Notes <small><i><a href="javascript:toggleVisibility("notes");"><span id="sesdivnotesshowhide">(Click here to show)</span></a></i></small></div>
+			<div class="heading">Notes <a class="pull-right" data-toggle="tooltip" title="Hide/Show Notes" href="javascript:toggleVisibility('notes');"><span id="sesdivnotesshowhide"><i class="icon-chevron-up"></i></span></a></div>
 			<div class="section" id="sesdivnotes" style="display:none">
 				<ul>
 				<li><b>Network Interfaces</b> - Space-delimited list of router interface names Samba will bind to.
 				<ul>
-				<li>If empty, <i>interfaces = <% nv("lan_ifname"); %></i> will be used instead.</li>
-				<li>The <i>bind interfaces only = yes</i> directive is always set.</li>
-				<li>Refer to the <a href="https://www.samba.org/samba/docs/man/manpages-3/smb.conf.5.html">Samba documentation</a> for details.</li>
+					<li>If empty, <i>interfaces = <% nv("lan_ifname"); %></i> will be used instead.</li>
+					<li>The <i>bind interfaces only = yes</i> directive is always set.</li>
+					<li>Refer to the <a href="https://www.samba.org/samba/docs/man/manpages-3/smb.conf.5.html">Samba documentation</a> for details.</li>
 				</ul></li>
 				</ul>
 			</div>
