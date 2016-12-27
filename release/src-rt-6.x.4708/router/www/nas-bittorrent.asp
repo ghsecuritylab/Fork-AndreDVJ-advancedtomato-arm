@@ -409,7 +409,7 @@ No part of this file may be used without permission.
 						{ name: 'bt_log_path', type: 'text', maxlen: 80, size: 60, value: nvram.bt_log_path, suffix: ' /transmission.log' }
 					] },
 					null,
-					{ title: '<a href="https://trac.transmissionbt.com/wiki/EditConfigFiles" target="_new">Transmission</a><br>Custom configuration', name: 'bt_custom', type: 'textarea', value: nvram.bt_custom }
+					{ title: '<a href="https://trac.transmissionbt.com/wiki/EditConfigFiles" target="_new">Transmission</a><br>Custom configuration', name: 'bt_custom', type: 'textarea', value: nvram.bt_custom, style: 'width: 100%; height: 80px;'  }
 				]);
 			</script>
 		</div>
