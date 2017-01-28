@@ -80,7 +80,7 @@
 					- APCUPSD integration and GUI (implemented by @arrmo)<br>
 					<!-- UPS-END -->
 					<!-- DNSCRYPT-BEGIN -->
-					- DNScrypt-proxy 1.6.1 integration and GUI<br>
+					- DNScrypt-proxy 1.9.4 integration and GUI<br>
 					<!-- DNSCRYPT-END -->
 					<!-- TOR-BEGIN -->
 					- TOR Project integration and GUI<br>
