@@ -1465,7 +1465,7 @@ dropbear/config.h:
 # Media libraries
 
 sqlite/stamp-h1:
-	cd sqlite && \
+	cd sqlite autoreconf && \
 	CC=$(CC) CFLAGS="-Os $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 		LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections" \
 		$(CONFIGURE) --prefix=/usr --enable-shared --enable-static \
@@ -2668,7 +2668,7 @@ libsodium-clean:
 
 dnscrypt/stamp-h1: libsodium
 	cd $(TOP)/dnscrypt/src/libevent-modified && aclocal && autoreconf
-	cd $(TOP)/dnscrypt && CC=$(CC) STRIP=$(STRIP) \
+	cd $(TOP)/dnscrypt && autoreconf && CC=$(CC) STRIP=$(STRIP) \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libsodium/src/libsodium/include" \
 	LDFLAGS="-ffunction-sections -fdata-sections -Wl,--gc-sections -L$(TOP)/libsodium/src/libsodium/.libs" \
