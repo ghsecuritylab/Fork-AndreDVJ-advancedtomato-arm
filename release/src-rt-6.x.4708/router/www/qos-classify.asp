@@ -407,7 +407,7 @@ No part of this file may be used without permission.
 		<input type="hidden" name="qos_orules">
 
 		<div class="box">
-			<div class="heading">QOS Classification Rules</div>
+			<div class="heading">QoS Classification Rules</div>
 			<div class="content">
 				<table class="line-table" id="qg"></table>
 			</div>

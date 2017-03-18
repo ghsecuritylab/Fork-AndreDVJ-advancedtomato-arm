@@ -201,7 +201,7 @@ No part of this file may be used without permission.
 
 		grid.setup = function() {
 			this.init('grid', 'sort');
-			this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'UL Rate', 'DL Rate']);
+			this.headerSet(['Protocol', 'Source', 'S Port', 'Destination', 'D Port', 'UL Rate', 'DL Rate']);
 		}
 
 		var ref = new TomatoRefresh('/update.cgi', '', 0, 'qos_ctrate');
@@ -458,7 +458,7 @@ No part of this file may be used without permission.
 	</script>
 
 	<div class="box" id="qos-transfer-rates">
-		<div class="heading">QOS Transfer Rates <span id="numtotalconn"></span></div>
+		<div class="heading">QoS Transfer Rates <span id="numtotalconn"></span></div>
 		<div class="content">
 			<h4>Filters <a href="javascript:toggleVisibility('filters');"><span id="sesdivfiltersshowhide"><i class="icon-chevron-up"></i></span></a></h4>
 			<div class="section" id="sesdivfilters" style="display:none"></div>

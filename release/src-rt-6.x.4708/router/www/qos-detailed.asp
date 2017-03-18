@@ -154,7 +154,7 @@ No part of this file may be used without permission.
 			var r;
 
 			switch (col) {
-				case 0:		// Proto
+				case 0:		// Protocol
 				case 2:		// S port
 				case 4:		// D port
 				case 6:		// Rule #
@@ -241,7 +241,7 @@ No part of this file may be used without permission.
 
 		grid.setup = function() {
 			this.init('grid', 'sort');
-			this.headerSet(['Proto', 'Source', 'S Port', 'Destination', 'D Port', 'Class', 'Rule', 'Bytes Out', 'Bytes In']);
+			this.headerSet(['Protocol', 'Source', 'S Port', 'Destination', 'D Port', 'Class', 'Rule', 'Bytes Out', 'Bytes In']);
 		}
 
 		var ref = new TomatoRefresh('/update.cgi', '', 0, 'qos_detailed');
@@ -422,7 +422,7 @@ No part of this file may be used without permission.
 				toggleVisibility("filters");
 			}
 
-			if (viewClass != -1) $('#qos-details .heading').html('QOS Details: ' + abc[viewClass] + ' <span id=\'numtotalconn\'></span>');
+			if (viewClass != -1) $('#qos-details .heading').html('QoS Details: ' + abc[viewClass] + ' <span id=\'numtotalconn\'></span>');
 
 			E('_f_shortcuts').checked = (((c = cookie.get('qos_detailed_shortcuts')) != null) && (c == '1'));
 
@@ -495,7 +495,7 @@ No part of this file may be used without permission.
 	</script>
 
 	<div class="box" id="qos-details">
-		<div class="heading">QOS Details <span id="numtotalconn"></span></div>
+		<div class="heading">QoS Details <span id="numtotalconn"></span></div>
 		<div class="content">
 			<h4>Filters <a href="javascript:toggleVisibility('filters');"><span id="sesdivfiltersshowhide"><i class="icon-chevron-up"></i></span></a></h4>
 			<div id="sesdivfilters" style="display:none"></div>

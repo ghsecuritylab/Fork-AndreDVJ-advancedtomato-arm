@@ -20,7 +20,7 @@ No part of this file may be used without permission.
 
 			switch (col) {
 				case 0:	// on
-				case 1:	// proto
+				case 1:	// protocol
 				case 4:	// ports
 					r = cmpInt(da[col], db[col]);
 					break;
@@ -78,7 +78,7 @@ No part of this file may be used without permission.
 				{ type: 'text', maxlen: 140, class : 'input-medium' },
 				{ type: 'text', maxlen: 16, class : 'input-small' },
 				{ type: 'text', maxlen: 32 }]);
-			this.headerSet(['On', 'Proto', 'Src Address', 'Dest Address', 'Dest Ports', 'Description']);
+			this.headerSet(['On', 'Protocol', 'Src Address', 'Dest Address', 'Dest Ports', 'Description']);
 			var nv = nvram.ipv6_portforward.split('>');
 			for (var i = 0; i < nv.length; ++i) {
 				var r;

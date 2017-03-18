@@ -178,7 +178,7 @@ No part of this file may be used without permission.
 		<input type="hidden" name="ne_vegas">
 
 		<div class="box" data-box="qos-basic-set">
-			<div class="heading">Basic QOS Settings</div>
+			<div class="heading">Basic QoS Settings</div>
 			<div class="content qos-settings"></div>
 			<script type="text/javascript">
 
@@ -196,7 +196,7 @@ No part of this file may be used without permission.
 						{ suffix: ' RST &nbsp;', name: 'f_qos_rst', type: 'checkbox', value: nvram.qos_rst == '1' }
 					] },
 					{ title: 'Prioritize ICMP', name: 'f_qos_icmp', type: 'checkbox', value: nvram.qos_icmp == '1' },
-					{ title: 'No Ingress QOS for UDP', name: 'f_qos_udp', type: 'checkbox', value: nvram.qos_udp == '1' },
+					{ title: 'No Ingress QoS for UDP', name: 'f_qos_udp', type: 'checkbox', value: nvram.qos_udp == '1' },
 					{ title: 'Reset class when changing settings', name: 'f_qos_reset', type: 'checkbox', value: nvram.qos_reset == '1' },
 					{ title: 'Default class', name: 'qos_default', type: 'select', options: classList, value: nvram.qos_default },
 					/* REMOVE-BEGIN
@@ -281,7 +281,7 @@ No part of this file may be used without permission.
 		</div>
 
 		<div class="box" data-box="qos-class-n">
-			<div class="heading">QOS Class Names</div>
+			<div class="heading">QoS Class Names</div>
 			<div class="content classnames" style="display:none"></div>
 			<script type="text/javascript">
 
