@@ -24,7 +24,7 @@ install:
 	rm -f $(INSTALLDIR)/www/_h5ai/public/images/themes/*.md
 
 # Copy files we don't want to modify to new install directory
-	cp *.ico *.html *.php robots.txt tux.png $(INSTALLDIR)/www
+	cp *.ico *.html *.php robots.txt $(INSTALLDIR)/www
 
 # Copy JS files to the installdir and squish files by trimming whitespace
 	for F in $(wildcard js/*.js js/*.jsx *.js *.jsx); do \
