@@ -2018,7 +2018,7 @@ No part of this file may be used without permission.
 						{ title: 'Load Balance Weight', name: 'wan' + u + '_weight', type: 'text', maxlen: 3, size: 8, value: nvram[ 'wan' + u + '_weight' ], suffix: ' <i>(Failover: 0; Load balancing: 1 - 256)</i>' },
 						{ title: 'PIN Code', name: 'wan' + u + '_modem_pin', type: 'text', maxlen: 6, size: 8, value: nvram[ 'wan' + u + '_modem_pin' ], suffix: ' <i>Advised to turn off PIN Code</i>' },
 						{ title: 'Modem init string', name: 'wan' + u + '_modem_init', type: 'text', maxlen: 25, size: 32, value: nvram[ 'wan' + u + '_modem_init' ] },
-						{ title: 'APN', name: 'wan' + u + '_modem_apn', type: 'text', maxlen: 25, size: 32, value: nvram[ 'wan' + u + '_modem_apn' ] },
+						{ title: 'APN', name: 'wan' + u + '_modem_apn', type: 'text', maxlen: 25, size: 32, suffix: ' <small>(if empty, AT+CGDCONT will not be sent)</small>', value: nvram[ 'wan' + u + '_modem_apn' ] },
 						{ title    : 'Network Type',
 							name   : 'wan' + u + '_modem_speed',
 							type   : 'select',
