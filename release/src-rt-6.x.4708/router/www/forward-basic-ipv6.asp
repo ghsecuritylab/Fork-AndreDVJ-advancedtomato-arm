@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>Basic IPv6 Forwarding</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,ipv6_portforward"); %>
+		//	<% nvram("ipv6_portforward"); %>
 
 		var fog = new TomatoGrid();
 

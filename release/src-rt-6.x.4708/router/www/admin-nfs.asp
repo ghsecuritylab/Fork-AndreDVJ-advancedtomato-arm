@@ -7,7 +7,7 @@ No part of this file may be used without permission.
 --><title>NFS Server</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,nfs_enable,nfs_exports"); %>
+		//	<% nvram("nfs_enable,nfs_exports"); %>
 
 		var access = [['rw', 'Read/Write'], ['ro', 'Read only']];
 		var sync = [['sync', 'Yes'], ['async', 'No']];

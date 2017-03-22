@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript">
 
-		//	<% nvram("at_update,tomatoanon_answer,et0macaddr,t_features,t_model_name"); %>
+		//	<% nvram("et0macaddr,t_features,t_model_name"); %>
 		//	<% nvstat(); %>
 
 		function backupNameChanged() {

@@ -4,7 +4,7 @@
 	<script type="text/javascript">
 
 		ipp = '<% lipp(); %>.';
-		//<% nvram('at_update,tomatoanon_answer,lan_ifname,wl_ifname,wl_mode,wl_radio'); %>
+		//<% nvram('lan_ifname,wl_ifname,wl_mode,wl_radio'); %>
 		//<% devlist(); %>
 
 		list = [];

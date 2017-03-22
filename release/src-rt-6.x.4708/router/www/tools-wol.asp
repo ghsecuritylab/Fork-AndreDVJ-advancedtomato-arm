@@ -10,7 +10,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript">
 		//	<% arplist(); %>
-		//	<% nvram('at_update,tomatoanon_answer,dhcpd_static,lan_ifname'); %>
+		//	<% nvram('dhcpd_static,lan_ifname'); %>
 
 		var wg = new TomatoGrid();
 		wg.setup = function() {

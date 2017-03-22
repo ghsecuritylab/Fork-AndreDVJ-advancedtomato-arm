@@ -21,7 +21,7 @@ No part of this file may be used without permission.
 	<script type="text/javascript" src="js/protocols.js"></script>
 	<script type="text/javascript" src="js/interfaces.js"></script>
 	<script type="text/javascript">
-		//	<% nvram('at_update,tomatoanon_answer,qos_enable,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask,t_hidelr'); %>
+		//	<% nvram('qos_enable,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask,t_hidelr'); %>
 
 		var filterip = [];
 		var filteripe = [];

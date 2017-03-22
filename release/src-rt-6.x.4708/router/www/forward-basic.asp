@@ -7,7 +7,7 @@ For use with Tomato Firmware only.
 No part of this file may be used without permission.
 --><title>Basic Forwarding</title>
 <content><script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,portforward"); %>
+		//	<% nvram("portforward"); %>
 
 		var lipp = '<% lipp(); %>.';
 

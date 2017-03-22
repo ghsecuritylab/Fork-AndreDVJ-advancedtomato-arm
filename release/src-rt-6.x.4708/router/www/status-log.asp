@@ -1,7 +1,7 @@
 <title>Router Logs</title>
 <content>
 <script type="text/javascript">
-	//<% nvram("at_update,tomatoanon_answer,log_file"); %>
+	//<% nvram("log_file"); %>
 
 	function find()
 	{

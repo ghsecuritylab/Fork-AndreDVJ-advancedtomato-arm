@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>Miscellaneous</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,t_features,wait_time,wan_speed,clkfreq,jumbo_frame_enable,jumbo_frame_size,ctf_disable"); %>
+		//	<% nvram("t_features,wait_time,wan_speed,clkfreq,jumbo_frame_enable,jumbo_frame_size,ctf_disable"); %>
 
 		et1000 = features('1000et');
 

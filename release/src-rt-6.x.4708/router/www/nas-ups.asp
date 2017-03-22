@@ -5,7 +5,7 @@ No part of this file may be used without permission.
 --><title>UPS Monitor</title>
 <content>
 	<script type="text/javascript">
-		//      <% nvram("at_update,tomatoanon_answer"); %>
+		//      <% nvram(""); %>
 
 		function init() {
 			clientSideInclude('ups-status', '/ext/cgi-bin/tomatoups.cgi');

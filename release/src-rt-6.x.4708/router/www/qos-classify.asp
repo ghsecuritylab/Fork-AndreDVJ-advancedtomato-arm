@@ -41,7 +41,7 @@ No part of this file may be used without permission.
 	</style>
 	<script type="text/javascript" src="js/protocols.js"></script>
 	<script type="text/javascript">
-		//    <% nvram("at_update,tomatoanon_answer,qos_classnames,qos_enable,qos_orules"); %>
+		//    <% nvram("qos_classnames,qos_enable,qos_orules"); %>
 
 		var abc = nvram.qos_classnames.split(' '); // Toastman - configurable class names
 

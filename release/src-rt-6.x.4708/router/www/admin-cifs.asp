@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript">
 
-		//	<% nvram("at_update,tomatoanon_answer,cifs1,cifs2"); %>
+		//	<% nvram("cifs1,cifs2"); %>
 
 		function verifyFields(focused, quiet)
 		{

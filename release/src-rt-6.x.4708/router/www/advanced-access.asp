@@ -9,7 +9,7 @@ LAN Access admin module by Augusto Bott
 <content>
 	<script type="text/javascript" src="js/wireless.jsx?_http_id=<% nv(http_id); %>"></script>
 	<script type="text/javascript">
-		//<% nvram ("at_update,tomatoanon_answer,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,lan_access");%>
+		//<% nvram ("lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,lan_access");%>
 
 		var MAX_BRIDGE_ID = 3;
 

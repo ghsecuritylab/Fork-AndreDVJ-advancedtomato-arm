@@ -26,7 +26,7 @@ No part of this file may be used without permission.
 		}
 	</style>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,trigforward"); %>
+		//	<% nvram("trigforward"); %>
 
 		var tg = new TomatoGrid();
 

@@ -22,7 +22,7 @@ No part of this file may be used without permission.
 		}
 	</style>
 	<script type="text/javascript">
-		//	<% nvram('at_update,tomatoanon_answer'); %>	// http_id
+		//	<% nvram(''); %>	// http_id
 		//	<% nvramseq("rrules", "rrule%d", 0, 99); %>
 
 		var dowNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

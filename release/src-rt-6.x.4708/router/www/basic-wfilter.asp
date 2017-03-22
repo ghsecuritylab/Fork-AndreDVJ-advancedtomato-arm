@@ -13,7 +13,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript" src="js/wireless.jsx?_http_id=<% nv(http_id); %>"></script>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,wl_macmode,wl_maclist,macnames"); %>
+		//	<% nvram("wl_macmode,wl_maclist,macnames"); %>
 
 		var smg = new TomatoGrid();
 

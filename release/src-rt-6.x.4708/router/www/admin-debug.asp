@@ -10,7 +10,7 @@ No part of this file may be used without permission.
 	<style>table.fields-table tr td:first-child { width: 40%; }</style>
 	<script type="text/javascript">
 
-		//	<% nvram("at_update,tomatoanon_answer,debug_nocommit,debug_cprintf,debug_cprintf_file,console_loglevel,t_cafree,t_hidelr,debug_ddns,debug_norestart"); %>
+		//	<% nvram("debug_nocommit,debug_cprintf,debug_cprintf_file,console_loglevel,t_cafree,t_hidelr,debug_ddns,debug_norestart"); %>
 
 		function nvramCommit()
 		{

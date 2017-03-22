@@ -24,7 +24,7 @@
 
 			var wl_ifaces = {};
 			var routerName = '[<% ident(); %>] ';
-			//<% nvram("at_nav,at_nav_action,at_nav_state,at_update,tomatoanon_answer"); %>
+			//<% nvram("at_nav,at_nav_action,at_nav_state"); %>
 			//<% anonupdate(); %>
 
 			// AdvancedTomato related object

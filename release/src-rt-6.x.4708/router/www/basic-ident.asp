@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>Router Identification</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,router_name,wan_hostname,wan_domain"); %>
+		//	<% nvram("router_name,wan_hostname,wan_domain"); %>
 
 		function verifyFields(focused, quiet)
 		{

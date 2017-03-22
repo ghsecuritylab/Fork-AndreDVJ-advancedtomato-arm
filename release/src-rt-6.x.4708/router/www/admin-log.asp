@@ -13,7 +13,7 @@ No part of this file may be used without permission.
 			min-width: 250px;
 		}
 	</style><script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,log_remote,log_remoteip,log_remoteport,log_file,log_file_custom,log_file_path,log_limit,log_in,log_out,log_mark,log_events,log_wm,log_wmtype,log_wmip,log_wmdmax,log_wmsmax,log_file_size,log_file_keep,webmon_bkp,webmon_dir,webmon_shrink"); %>
+		//	<% nvram("log_remote,log_remoteip,log_remoteport,log_file,log_file_custom,log_file_path,log_limit,log_in,log_out,log_mark,log_events,log_wm,log_wmtype,log_wmip,log_wmdmax,log_wmsmax,log_file_size,log_file_keep,webmon_bkp,webmon_dir,webmon_shrink"); %>
 
 		function verifyFields(focused, quiet)
 		{

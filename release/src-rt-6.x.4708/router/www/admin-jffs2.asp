@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>JFFS</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("at_update,tomatoanon_answer,jffs2_on,jffs2_exec,t_fix1"); %>
+		//	<% nvram("jffs2_on,jffs2_exec,t_fix1"); %>
 
 		fmtwait = (nvram.t_fix1 == 'RT-N16' ? 120 : 60);
 

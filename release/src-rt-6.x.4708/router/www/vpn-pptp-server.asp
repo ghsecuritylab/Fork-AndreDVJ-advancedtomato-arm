@@ -11,7 +11,7 @@ No part of this file may be used without permission.
 --><title>PPTP Server Configuration</title>
 <content>
 	<script type="text/javascript">
-		//    <% nvram("at_update,tomatoanon_answer,lan_ipaddr,lan_netmask,pptpd_enable,pptpd_remoteip,pptpd_forcemppe,pptpd_broadcast,pptpd_users,pptpd_dns1,pptpd_dns2,pptpd_wins1,pptpd_wins2,pptpd_mtu,pptpd_mru,pptpd_custom,pptpd_ipup_script,pptpd_ipdown_script"); %>
+		//    <% nvram("lan_ipaddr,lan_netmask,pptpd_enable,pptpd_remoteip,pptpd_forcemppe,pptpd_broadcast,pptpd_users,pptpd_dns1,pptpd_dns2,pptpd_wins1,pptpd_wins2,pptpd_mtu,pptpd_mru,pptpd_custom,pptpd_ipup_script,pptpd_ipdown_script"); %>
 
 		if (nvram.pptpd_remoteip == '') nvram.pptpd_remoteip = '172.19.0.1-6';
 		if (nvram.pptpd_forcemppe == '') nvram.pptpd_forcemppe = '1';
