@@ -830,7 +830,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "tomatoanon_answer",		"0"				, 0 },
 	{ "tomatoanon_cru",		"6"				, 0 },
 	{ "tomatoanon_id",		""				, 0 },
-	{ "tomatoanon_notify",		"1"				, 0 },
+	{ "tomatoanon_notify",		"1"				, 0 }, // Not used on AT GUI.
 
 #ifdef TCONFIG_USB
 // nas-usb - !!TB
