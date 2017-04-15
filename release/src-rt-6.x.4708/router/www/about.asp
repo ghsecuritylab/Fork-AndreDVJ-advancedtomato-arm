@@ -95,7 +95,7 @@
 					- Webmon Backup Script
 				</p>
 				Copyright (C) 2011-2013 Michał Rupental<br>
-				<a href='http://openlinksys.info' target='_new'>http://openlinksys.info</a><br>
+				<a href='https://openlinksys.info' target='_new'>https://openlinksys.info</a><br>
 			</div>
 		</div>
 
