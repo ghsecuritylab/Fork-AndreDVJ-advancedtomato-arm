@@ -72,6 +72,9 @@ No part of this file may be used without permission.
 		<div class="content">
 			<span id="ups-data"></span>
 		</div>
+		<div class="content">
+			<a href="#nas-usb.asp">Configure</a>
+		</div>
 	</div>
 
 	<script type="text/javascript">init();</script>
