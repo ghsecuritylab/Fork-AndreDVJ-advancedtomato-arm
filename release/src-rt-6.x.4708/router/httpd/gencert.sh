@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Unix epoch
-SECS=1483228799
-
 cd /etc
 
 cp -L openssl.cnf openssl.config
@@ -43,7 +40,7 @@ I=$(($I + 1))
 # create the key
 openssl genrsa -out key.pem 2048 -config /etc/openssl.config
 # create certificate request and sign it
-openssl req -new -x509 -key key.pem -sha256 -out cert.pem -setstartsecs $SECS -days 3653 -config /etc/openssl.config
+openssl req -new -x509 -key key.pem -sha256 -out cert.pem -days 3653 -config /etc/openssl.config
 
 # server.pem for WebDav SSL
 cat key.pem cert.pem > server.pem
