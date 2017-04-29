@@ -234,6 +234,7 @@ int do_led(int which, int mode)
 #endif
 #ifdef CONFIG_BCM7
 	static int ac3200[]     = { 255, 255,   255,  255,  255,   14,  255,   255, 255,  255};
+	static int r8000[]      = {  13, 255,   255,  255,  255,  -14,  255,   -18, -17,   12};
 #endif
 
 //                                 WLAN  DIAG  WHITE AMBER  DMZ   AOSS BRIDG   USB2 USB3   5G
@@ -515,6 +516,14 @@ int do_led(int which, int mode)
 #ifdef CONFIG_BCM7
 	case MODEL_RTAC3200:
 		b = ac3200[which];
+		break;
+	case MODEL_R8000:
+		if (which == LED_DIAG) {
+			// power led gpio: -3 - orange, -2 - white
+			b = (mode) ? 2 : 3;
+			c = (mode) ? 3 : 2;
+		} else
+			b = r8000[which];
 		break;
 #endif
 /*
