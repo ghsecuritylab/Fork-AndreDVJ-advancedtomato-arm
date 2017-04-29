@@ -1192,6 +1192,17 @@ No part of this file may be used without permission.
 					vis['_wan'+u+'_modem_band'] = 0;
 				}
 
+				var op = E('_wan'+u+'_modem_speed').getElementsByTagName('option');
+				if (nvram.modem_type == "qmi_wwan" && vis['_wan'+u+'_modem_speed']) {
+					for (var i = 0; i < op.length; ++i) {
+						(op[i].value == '030201' || op[i].value == '0302' || op[i].value == '02') ? op[i].disabled = true : op[i].disabled = false;
+					}
+				} else {
+					for (var i = 0; i < op.length; ++i) {
+						op[i].disabled = false;
+					}
+				}
+
 				if(wanproto[uidx-1] != 'disabled' && uidx <= curr_mwan_num) {
 					vis._lan_gateway = 0;
 					vis._f_dns_1 = 0;
