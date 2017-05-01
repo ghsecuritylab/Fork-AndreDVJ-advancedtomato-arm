@@ -624,6 +624,10 @@ void restart_wl(void)
 			if (nvram_match("wl2_radio", "0"))
 				xstart( "gpio", "enable" , "16" );
 		}
+		if (nvram_match("wl0_radio", "1") || nvram_match("wl1_radio", "1"))
+			led(LED_AOSS, LED_ON);
+		else
+			led(LED_AOSS, LED_OFF);
 	}
 
 	if (get_model() == MODEL_WS880) {
@@ -763,6 +767,10 @@ void start_wl(void)
 			if (nvram_match("wl2_radio", "0"))
 				xstart( "gpio", "enable" , "16" );
 		}
+		if (nvram_match("wl0_radio", "1") || nvram_match("wl1_radio", "1"))
+			led(LED_AOSS, LED_ON);
+		else
+			led(LED_AOSS, LED_OFF);
 	}
 }
 
