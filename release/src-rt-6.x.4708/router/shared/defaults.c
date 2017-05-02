@@ -933,6 +933,9 @@ struct nvram_tuple router_defaults[] = {
 #ifdef TCONFIG_HFS
 	{ "usb_fs_hfs",			"0"				, 0 }, //!Victek
 #endif
+#ifdef TCONFIG_UPS
+	{ "usb_apcupsd",		"0"				, 0 },
+#endif
 	{ "usb_automount",		"1"				, 0 },
 #if 0
 	{ "usb_bdflush",		"30 500 0 0 100 100 60 0 0"	, 0 },
@@ -1000,6 +1003,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "ms_dirs",			"/mnt<"				, 0 },
 	{ "ms_port",			"0"				, 0 },
 	{ "ms_dbdir",			""				, 0 },
+	{ "ms_ifname",			"br0"				, 0 },
 	{ "ms_tivo",			"0"				, 0 },
 	{ "ms_stdlna",			"0"				, 0 },
 	{ "ms_sas",			"0"				, 0 },

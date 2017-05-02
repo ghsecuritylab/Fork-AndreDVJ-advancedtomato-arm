@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 	<style>textarea { width: 100%; }</style>
 	<script type="text/javascript">
 
-		//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_usb3,usb_mmc,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext4,usb_fs_fat,usb_fs_exfat,usb_fs_ntfs,usb_ntfs_driver,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g"); %>
+		//	<% nvram("usb_enable,usb_uhci,usb_ohci,usb_usb2,usb_usb3,usb_mmc,usb_storage,usb_printer,usb_printer_bidirect,usb_automount,usb_fs_ext4,usb_fs_fat,usb_fs_exfat,usb_fs_ntfs,usb_ntfs_driver,usb_fs_hfs,script_usbmount,script_usbumount,script_usbhotplug,idle_enable,usb_3g,usb_apcupsd"); %>
 		//	<% usbdevices(); %>
 
 		list = [];
@@ -232,6 +232,9 @@ No part of this file may be used without permission.
 			E( '_f_idle_enable' ).disabled = b || a;
 			E( '_f_usb_3g' ).disabled      = b;
 			/* LINUX26-END */
+			/* UPS-BEGIN */
+			E('_f_usb_apcupsd').disabled = b;
+			/* UPS-END */
 			/* NTFS-BEGIN */
 			E( '_f_ntfs' ).disabled          = b || a;
 			E( '_usb_ntfs_driver' ).disabled = b || a;
@@ -288,6 +291,9 @@ No part of this file may be used without permission.
 			fom.idle_enable.value = E( '_f_idle_enable' ).checked ? 1 : 0;
 			fom.usb_3g.value      = E( '_f_usb_3g' ).checked ? 1 : 0;
 			/* LINUX26-END */
+			/* UPS-BEGIN */
+			fom.usb_apcupsd.value = E('_f_usb_apcupsd').checked ? 1 : 0;
+			/* UPS-END */
 
 			form.submit( fom, 1 );
 		}
@@ -325,6 +331,9 @@ No part of this file may be used without permission.
 		<input type="hidden" name="idle_enable">
 		<input type="hidden" name="usb_3g">
 		/* LINUX26-END */
+		/* UPS-BEGIN */
+		<input type='hidden' name='usb_apcupsd'>
+		/* UPS-END */
 
 		<div class="box" data-box="usb-supp">
 			<div class="heading">USB Support</div>
@@ -385,6 +394,9 @@ No part of this file may be used without permission.
 		                      suffix: ' <small>Before disconnecting 3G Modem from USB port, remember to uncheck box. If modem used usbserial module, you have to reboot router before unplugging modem.</small>', value: nvram.usb_3g == 1 },
 		                  null,
 		                  /* LINUX26-END */
+		                  /* UPS-BEGIN */
+		                  { title: 'Run APCUPSD Deamon', name: 'f_usb_apcupsd', type: 'checkbox', suffix: ' <small>Required by UPS Monitor (APC Uninterruptible Power Supply)</small>', value: nvram.usb_apcupsd == 1 },
+		                  /* UPS-END */
 		                  { title: 'Hotplug script<br><small>(called when any USB device is attached or removed)</small>', name: 'script_usbhotplug', type: 'textarea', value: nvram.script_usbhotplug },
 		                  null,
 		                  { text: '<small>Some of the changes will take effect only after a restart.</small>' }
