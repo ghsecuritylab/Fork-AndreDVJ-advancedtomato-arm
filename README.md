@@ -8,7 +8,7 @@ This repository, while I try to keep aligned to Shibby's as much as possible, it
 Some of the changes are functionally pointless, but may offer potential bug and security fixes.
 Firmware size increased around 1MB compared to Shibby AIO builds. Should not be an issue to routers with or more than 32MB of flash memory.
 
-I only have a Netgear R7000 router, (My WNR3500Lv2 died, was MIPS anyway) so I don't have any other unit to test any other build. Build/flash at your own risk.
+I only have ARM routers: Netgear R7000 and R8000 (My WNR3500Lv2 died, was MIPS anyway), so I'm unable to test or attempt to provide specific support to another router.
 
 If you see any issues or want to request a specific build, please let me know.
 
