@@ -1558,6 +1558,8 @@ LAN Access admin module by Augusto Bott
 	<button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel <i class="icon-cancel"></i></button>
 	<span id="footer-msg" class="alert alert-warning" style="visibility: hidden;"></span>
 
+	</form>
+
 	<script type="text/javascript">
 		init();
 		for (var uidx = 0; uidx < wl_ifaces.length; ++uidx) {

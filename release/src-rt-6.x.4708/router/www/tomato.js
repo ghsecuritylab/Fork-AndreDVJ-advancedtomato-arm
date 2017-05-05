@@ -2797,17 +2797,25 @@ function logout(){
 
 // -----------------------------------------------------------------------------
 // jQuery function to create forms on the fly
-(function ($) { $.fn.forms = function(data, settings) { $(this).append(createFormFields(data, settings)); } })(jQuery);
-function createFormFields (data, settings) {
+(function( $ ) { $.fn.forms = function( data, settings ) { $( this ).append( createFormFields( data, settings ) ); }})( jQuery );
 
-	var id, id1, common, output, form = '';
-	var s = $.extend({
+/**
+ * Form fields function that handles generating nice and easy html content
+ * @param data
+ * @param settings
+ * @returns {string}
+ */
+function createFormFields( data, settings ) {
 
-		// Defaults
-		'align': 'left',
-		'grid': ['col-sm-3', 'col-sm-9']
+	// Some vars
+	var id, id1, common, output, form = '', multiornot;
 
-
+	// Set settings
+	var s = $.extend(
+		{
+			// Defaults
+			'align': 'left',
+			'grid' : [ 'col-sm-3', 'col-sm-9' ]
 		}, settings);
 
 

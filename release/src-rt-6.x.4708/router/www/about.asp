@@ -56,7 +56,7 @@
 				</form>
 				<p>
 					<!-- BBT-BEGIN -->
-					- Transmission 2.92 integration<br>
+					- Transmission integration<br>
 					<!-- BBT-END -->
 					<!-- BT-BEGIN -->
 					- GUI for Transmission<br>
@@ -79,7 +79,7 @@
 					- APCUPSD integration and GUI (implemented by @arrmo)<br>
 					<!-- UPS-END -->
 					<!-- DNSCRYPT-BEGIN -->
-					- DNScrypt-proxy 1.9.4 integration and GUI<br>
+					- DNScrypt-proxy integration and GUI<br>
 					<!-- DNSCRYPT-END -->
 					<!-- TOR-BEGIN -->
 					- TOR Project integration and GUI<br>
