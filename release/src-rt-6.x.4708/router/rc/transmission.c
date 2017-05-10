@@ -86,7 +86,7 @@ void start_bittorrent(void)
     fprintf( fp, "\"incomplete-dir-enabled\": \"%s\", \n", pe );
     fprintf( fp, "\"incomplete-dir\": \"%s/.incomplete\", \n", nvram_safe_get( "bt_dir" ) );
     fprintf( fp, "\"watch-dir\": \"%s\", \n", nvram_safe_get( "bt_dir" ) );
-    fprintf( fp, "\"watch-dir-enabled\": \"%s\", \n", pf );
+    fprintf( fp, "\"watch-dir-enabled\": %s, \n", pf );
     fprintf( fp, "\"peer-limit-global\": %s, \n", nvram_safe_get( "bt_peer_limit_global" ) );
     fprintf( fp, "\"peer-limit-per-torrent\": %s, \n", nvram_safe_get( "bt_peer_limit_per_torrent" ) );
     fprintf( fp, "\"upload-slots-per-torrent\": %s, \n", nvram_safe_get( "bt_ul_slot_per_torrent" ) );
@@ -105,12 +105,13 @@ void start_bittorrent(void)
     fprintf( fp, "\"seed-queue-enabled\": %s, \n", pu );
     fprintf( fp, "\"seed-queue-size\": %s, \n", nvram_safe_get( "bt_ul_queue_size" ) );
     fprintf( fp, "\"message-level\": %s, \n", nvram_safe_get( "bt_message" ) );
-    fprintf( fp, "%s, \n", nvram_safe_get("bt_custom"));
+    fprintf( fp, "%s%s", nvram_safe_get("bt_custom"), strcmp(nvram_safe_get("bt_custom"),"") ? ", \n" : "" );
     fprintf( fp, "\"rpc-authentication-required\": %s \n", pl );
     fprintf( fp, "}\n");
 
     fclose( fp );
     chmod( "/tmp/settings.json", 0644 );
+    //eval("sed","-i","'s/,,\\s/, /g'","/tmp/settings.json");
 
 //start file
     if( !( fp = fopen( "/tmp/start_transmission.sh", "w" ) ) )
@@ -132,6 +133,9 @@ void start_bittorrent(void)
     fprintf( fp, "if [ ! -d \"%s/.settings\" ]; then\n", pk );
     fprintf( fp, "mkdir %s/.settings\n", pk );
     fprintf( fp, "fi\n");
+    // backward options compatibility (worked only with trailing comma before)
+    // TBD: need better regex, trim triple commas, be safe for passwords etc
+    fprintf( fp, "sed -i 's/,,\\s/, /g' /tmp/settings.json\n", pk);
     fprintf( fp, "mv /tmp/settings.json %s/.settings\n", pk );
 
     fprintf( fp, "rm %s/.settings/blocklists/*\n", pk );
@@ -154,7 +158,7 @@ void start_bittorrent(void)
     } else {
     fprintf( fp, "%s/transmission-daemon -g %s/.settings\n", pn, pk );
     }
-    fprintf( fp, "logger \"Transmission daemon successfully started\" \n");
+    fprintf( fp, "logger \"Transmission daemon started\" \n");
     fprintf( fp, "sleep 2\n" );
 
 
