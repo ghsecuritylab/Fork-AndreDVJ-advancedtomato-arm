@@ -823,7 +823,10 @@ void start_wan_if(int mode, char *prefix)
 	sprintf(wanconn_file, "/var/lib/misc/%s.connecting", prefix);
 	f_write(wanconn_file, NULL, 0, 0, 0);
 
-	if (!foreach_wif(1, &p, is_sta)) {
+	// this returns ethX to pointer in case there is any STA interface (for example on secondary WAN)
+	// so primary WAN will be setup with wrong interface in case there is any STA exist
+	// if (!foreach_wif(1, &p, is_sta)) {
+	if ((!foreach_wif(1, &p, is_sta)) || (nvram_match(strcat_r(prefix, "_sta", tmp), ""))) {
 		p = nvram_safe_get(strcat_r(prefix, "_ifnameX", tmp)); //"wan_ifnameX"
 		if (sscanf(p, "vlan%d", &vid) == 1) {
 			vlan0tag = nvram_get_int("vlan0tag");
@@ -833,19 +836,21 @@ void start_wan_if(int mode, char *prefix)
 			snprintf(buf, sizeof(buf), "vlan%d", vid_map);
 			p = buf;
 		}
+		// set wan mac but not for wireless client
+		if(!strcmp(prefix,"wan")) {
+			mwanlog(LOG_DEBUG, "!!! set_mac(%s,wan_mac,1)", p);
+			set_mac(p, "wan_mac", 1);
+		} else {
+			mwanlog(LOG_DEBUG, "!!! set_mac(%s,%s_mac,%d)", p, prefix, wan_unit + 15);
+			set_mac(p, strcat_r(prefix, "_mac", tmp), wan_unit + 15);
+		}
 	}
 
 	// shibby fix wireless client
-	if (nvram_invmatch(strcat_r(prefix, "_sta", tmp), "")) { //wireless client as wan
+	/* if (nvram_invmatch(strcat_r(prefix, "_sta", tmp), "")) { //wireless client as wan
 		w = nvram_safe_get(strcat_r(prefix, "_sta", tmp));
 		p = nvram_safe_get(strcat_r(w, "_ifname", tmp));
-	}
-
-	if(!strcmp(prefix,"wan")) {
-		set_mac(p, "wan_mac", 1);
-	} else {
-		set_mac(p, strcat_r(prefix, "_mac", tmp), wan_unit + 15);
-	}
+	}*/
 
 	nvram_set(strcat_r(prefix, "_ifname", tmp), p);  //"wan_ifname"
 	nvram_set(strcat_r(prefix, "_ifnames", tmp), p); //"wan_ifnames"
