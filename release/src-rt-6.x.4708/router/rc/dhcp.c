@@ -207,9 +207,10 @@ static int bound(char *ifname, int renew, char *prefix)
 	ifconfig(ifname, IFUP, nvram_safe_get(strcat_r(prefix, "_ipaddr", tmp)), netmask);
 
 	if (wan_proto != WP_DHCP && wan_proto != WP_LTE) {
-		char *gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp));
 
-		preset_wan(ifname, gw, netmask, prefix);
+		char *gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp));
+		if ((*gw != 0) && (strcmp(gw, "0.0.0.0") != 0))
+			preset_wan(ifname, gw, netmask, prefix);
 
 		/* clear dns from the resolv.conf */
 		nvram_set(strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
