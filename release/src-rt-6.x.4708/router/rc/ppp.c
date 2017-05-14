@@ -177,6 +177,11 @@ int ipdown_main(int argc, char **argv)
 				nvram_safe_get(strcat_r(prefix, "_gateway", tmp)), "255.255.255.255"); // fixed routing problem in Israel by kanki
 		}
 
+		if (proto == WP_PPTP) {
+			route_del(nvram_safe_get(strcat_r(prefix, "_ifname", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_pptp_server_ip", tmp)),
+				nvram_safe_get(strcat_r(prefix, "_gateway", tmp)), "255.255.255.255");
+		}
+
 		// Restore the default gateway for WAN interface
 		nvram_set(strcat_r(prefix, "_gateway_get", tmp), nvram_safe_get(strcat_r(prefix, "_gateway", tmp)));
 
