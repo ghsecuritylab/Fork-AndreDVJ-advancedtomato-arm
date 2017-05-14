@@ -217,7 +217,7 @@ static int bound(char *ifname, int renew, char *prefix)
 
 		switch (wan_proto) {
 		case WP_PPTP:
-			start_pptp(BOOT,prefix);
+			start_pptp(prefix);
 			break;
 		case WP_L2TP:
 			start_l2tp(prefix);

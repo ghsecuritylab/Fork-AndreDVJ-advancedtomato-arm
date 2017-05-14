@@ -390,7 +390,7 @@ inline void stop_pptp(char *prefix)
 	stop_ppp(prefix);
 }
 
-void start_pptp(int mode, char *prefix)
+void start_pptp(char *prefix)
 {
 
 	TRACE_PT("begin\n");
@@ -963,8 +963,8 @@ void start_wan_if(int mode, char *prefix)
 
 			switch (wan_proto) {
 			case WP_PPTP:
-				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_pptp (%d, %s) ...", mode, prefix);
-				start_pptp(mode, prefix);
+				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_pptp (%s) ...", prefix);
+				start_pptp(prefix);
 				break;
 			case WP_L2TP:
 				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_l2tp (%s) ...", prefix);
