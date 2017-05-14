@@ -653,6 +653,7 @@ void start_l2tp(char *prefix)
 
 	TRACE_PT("begin\n");
 
+	if (!using_dhcpc(prefix)) stop_dhcpc(prefix);	// as for PPTP
 	stop_l2tp(prefix);
 
 	if (config_l2tp() != 0)	// generate L2TP daemon config
@@ -672,8 +673,8 @@ void start_l2tp(char *prefix)
 		eval("listen", nvram_safe_get("lan_ifname"), prefix);
 	}
 	else {
-		force_to_dial(prefix);	// connect request
-		start_redial(prefix);
+		force_to_dial(prefix);	/* do connect */
+		//start_redial(prefix); /* not required here */
 	}
 
 	TRACE_PT("end\n");
