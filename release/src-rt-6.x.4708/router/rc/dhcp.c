@@ -155,7 +155,7 @@ static int bound(char *ifname, int renew, char *prefix)
 	char *netmask, *dns;
 	int wan_proto = get_wanx_proto(prefix);
 
-	mwanlog(LOG_INFO, "dhcpc_bound, interface=%s, wan_prefix=%s, renew=%d, proto=%d", ifname, prefix, renew, wan_proto);
+	mwanlog(LOG_DEBUG, "dhcpc_bound, interface=%s, wan_prefix=%s, renew=%d, proto=%d", ifname, prefix, renew, wan_proto);
 
 	dns = nvram_safe_get(strcat_r(prefix, "_get_dns", tmp));
 	nvram_set(strcat_r(prefix, "_routes1", tmp), "");
@@ -214,6 +214,7 @@ static int bound(char *ifname, int renew, char *prefix)
 
 		/* clear dns from the resolv.conf */
 		nvram_set(strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
+		mwanlog(LOG_DEBUG, "dhcpc_bound, clear dns from the resolv.conf: nvram_set(%s, \"%s\")", strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
 
 		switch (wan_proto) {
 		case WP_PPTP:
@@ -241,7 +242,7 @@ static int renew(char *ifname, char *prefix)
 
 	TRACE_PT("begin\n");
 
-	mwanlog(LOG_INFO, "dhcpc_renew, interface=%s, wan_prefix=%s", ifname, prefix);
+	mwanlog(LOG_DEBUG, "dhcpc_renew, interface=%s, wan_prefix=%s", ifname, prefix);
 
 	char renew_file[256];
 	memset(renew_file, 0, 256);
@@ -322,7 +323,7 @@ int dhcpc_event_main(int argc, char **argv)
 
 	if (!wait_action_idle(10)) return 1;
 
-	mwanlog(LOG_INFO, "dhcpc_event_main, interface=%s, wan_prefix=%s, argc=%d, argv=%s", ifname, prefix, argc, argv[1]);
+	mwanlog(LOG_DEBUG, "dhcpc_event_main, interface=%s, wan_prefix=%s, argc=%d, argv=%s", ifname, prefix, argc, argv[1]);
 
 	if ((argc == 2) && (ifname = getenv("interface")) != NULL) {
 		TRACE_PT("event=%s\n", argv[1]);
@@ -346,7 +347,7 @@ int dhcpc_release_main(int argc, char **argv)
 		strcpy(prefix, argv[1]); } 
 	else{
 		strcpy(prefix, "wan"); }
-	mwanlog(LOG_INFO, "dhcpc_release_main, argc=%d, wan_prefix=%s", argc, prefix);
+	mwanlog(LOG_DEBUG, "dhcpc_release_main, argc=%d, wan_prefix=%s", argc, prefix);
 
 	TRACE_PT("begin\n");
 #ifdef TCONFIG_MULTIWAN
@@ -385,7 +386,8 @@ int dhcpc_renew_main(int argc, char **argv)
 		strcpy(prefix, argv[1]); } 
 	else{
 		strcpy(prefix, "wan"); }
-	mwanlog(LOG_INFO, "dhcpc_renew_main, argc=%d, wan_prefix=%s", argc, prefix);
+
+	mwanlog(LOG_DEBUG, "dhcpc_renew_main, argc=%d, wan_prefix=%s", argc, prefix);
 
 	TRACE_PT("begin\n");
 
