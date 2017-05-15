@@ -212,15 +212,26 @@ static int bound(char *ifname, int renew, char *prefix)
 			preset_wan(ifname, gw, netmask, prefix);
 
 		/* clear dns from the resolv.conf */
+		mwanlog(LOG_DEBUG, "!!! bound, clear dns from the resolv.conf: nvram_set(%s,%s)", strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
 		nvram_set(strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
-		mwanlog(LOG_DEBUG, "dhcpc_bound, clear dns from the resolv.conf: nvram_set(%s, \"%s\")", strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
 
 		switch (wan_proto) {
 		case WP_PPTP:
+			mwanlog(LOG_DEBUG, "!!! bound, start_pptp(%s)", prefix);
 			start_pptp(prefix);
 			break;
 		case WP_L2TP:
+			mwanlog(LOG_DEBUG, "!!! bound, start_l2tp(%s)", prefix);
 			start_l2tp(prefix);
+			break;
+		case WP_PPPOE:
+			mwanlog(LOG_DEBUG, "!!! bound, start_pppoe(%s)", prefix);
+			if(!strcmp(prefix,"wan")) start_pppoe(PPPOEWAN, prefix);
+			if(!strcmp(prefix,"wan2")) start_pppoe(PPPOEWAN2, prefix);
+#ifdef TCONFIG_MULTIWAN
+			if(!strcmp(prefix,"wan3")) start_pppoe(PPPOEWAN3, prefix);
+			if(!strcmp(prefix,"wan4")) start_pppoe(PPPOEWAN4, prefix);
+#endif
 			break;
 		}
 	}
