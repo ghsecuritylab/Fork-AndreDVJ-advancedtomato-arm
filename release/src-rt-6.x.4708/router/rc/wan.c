@@ -447,24 +447,25 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 	if (proto == WP_PPTP) {
 		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_pptp_server_ip", tmp)), &(ipaddr.s_addr))) {
 			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
-			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_pptp_server_ip, add route to %s...", prefix, saddr);
 			route_add(ifname, 0, saddr, gw, "255.255.255.255");
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_pptp_server_ip, add route to %s...", prefix, saddr);
 		}
 	}
 	if (proto == WP_L2TP) {
 		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_l2tp_server_ip", tmp)), &(ipaddr.s_addr))) {
 			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
-			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_l2tp_server_ip, add route to %s...", prefix, saddr);
 			route_add(ifname, 0, saddr, gw, "255.255.255.255");
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_l2tp_server_ip, add route to %s...", prefix, saddr);
 		}
 	}
-
+/* really neded here? i dunno whats wrong but if called from dhcp-event bound, it breaks on this call not reaching start_pptp / start_l2tp...
 	if(!strcmp(prefix,"wan")){
 		dns_to_resolv();
 		start_dnsmasq();
 		sleep(1);
 		start_firewall();
 	}
+*/
 }
 
 // -----------------------------------------------------------------------------
