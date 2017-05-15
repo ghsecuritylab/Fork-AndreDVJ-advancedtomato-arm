@@ -152,7 +152,7 @@ static int bound(char *ifname, int renew, char *prefix)
 	sprintf(renew_file, "/var/lib/misc/%s_dhcpc.renewing", prefix);
 	unlink(renew_file);
 
-	char *netmask, *dns;
+	char *netmask, *dns, *gw;
 	int wan_proto = get_wanx_proto(prefix);
 
 	mwanlog(LOG_DEBUG, "dhcpc_bound, interface=%s, wan_prefix=%s, renew=%d, proto=%d", ifname, prefix, renew, wan_proto);
@@ -208,8 +208,7 @@ static int bound(char *ifname, int renew, char *prefix)
 
 	if (wan_proto != WP_DHCP && wan_proto != WP_LTE) {
 
-		char *gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp));
-		if ((*gw != 0) && (strcmp(gw, "0.0.0.0") != 0))
+		if ((gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp))) && (*gw) && (strcmp(gw, "0.0.0.0") != 0))
 			preset_wan(ifname, gw, netmask, prefix);
 
 		/* clear dns from the resolv.conf */
