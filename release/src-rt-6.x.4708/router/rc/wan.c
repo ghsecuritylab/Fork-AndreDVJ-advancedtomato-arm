@@ -461,10 +461,8 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 	if(!strcmp(prefix,"wan")){
 		dns_to_resolv();
 		start_dnsmasq();
-/* really neded here? i dunno whats wrong but if called from dhcp-event bound, it breaks on this call not reaching start_pptp / start_l2tp...
 		sleep(1);
 		start_firewall();
-*/
 	}
 }
 
