@@ -56,7 +56,7 @@
 				</form>
 				<p>
 					<!-- BBT-BEGIN -->
-					- Transmission 2.92 integration<br>
+					- Transmission integration<br>
 					<!-- BBT-END -->
 					<!-- BT-BEGIN -->
 					- GUI for Transmission<br>
@@ -79,7 +79,7 @@
 					- APCUPSD integration and GUI (implemented by @arrmo)<br>
 					<!-- UPS-END -->
 					<!-- DNSCRYPT-BEGIN -->
-					- DNScrypt-proxy 1.9.4 integration and GUI<br>
+					- DNScrypt-proxy integration and GUI<br>
 					<!-- DNSCRYPT-END -->
 					<!-- TOR-BEGIN -->
 					- TOR Project integration and GUI<br>
@@ -249,7 +249,7 @@
 			</p>
 
 			<p>
-				Built on <% build_time(); %> by Jacky, <a href='https://advancedtomato.com/' target='_new'>https://advancedtomato.com/</a>
+				Built on <% build_time(); %> . Advanced Tomato GUI developed by Jacky, <a href='https://advancedtomato.com/' target='_new'>https://advancedtomato.com/</a>
 				<br /><b>Thanks to everyone who risked their routers, tested, reported bugs, made suggestions and contributed to this project. ^ _ ^</b>
 			</p>
 

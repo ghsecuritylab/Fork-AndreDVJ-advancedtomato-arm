@@ -185,7 +185,7 @@ static int config_pppd(int wan_proto, int num, char *prefix) //static int config
 		fprintf(fp,
 			"persist\n"
 			"holdoff %d\n",
-			demand ? 30 : (nvram_get_int(strcat_r(prefix, "ppp_redialperiod", tmp)) ? : 30)); //"ppp_redialperiod"
+			demand ? 30 : (nvram_get_int(strcat_r(prefix, "_ppp_redialperiod", tmp)) ? : 30)); //"ppp_redialperiod"
 	}
 
 	switch (wan_proto) {
@@ -281,7 +281,7 @@ static int config_pppd(int wan_proto, int num, char *prefix) //static int config
 			}
 
 			// detect 3G Modem
-			xstart("switch3g", prefix);
+			eval("switch3g", prefix);
 		}
 		break;
 #endif
@@ -343,7 +343,7 @@ static void stop_ppp(char *prefix)
 	killall_tk("ipv6-up");
 	killall_tk("ipv6-down");
 #endif
-	killall_tk("xl2tpd");
+	//killall_tk("xl2tpd"); /* xl2tpd may be used by other WANs, moved to stop_l2tp */
 	//kill(nvram_get_int(strcat_r(prefix, "_pppd_pid", tmp)),1); 
 	killall_tk((char *)pppd_name);
 	killall_tk("listen");
@@ -390,7 +390,7 @@ inline void stop_pptp(char *prefix)
 	stop_ppp(prefix);
 }
 
-void start_pptp(int mode, char *prefix)
+void start_pptp(char *prefix)
 {
 
 	TRACE_PT("begin\n");
@@ -411,13 +411,17 @@ void start_pptp(int mode, char *prefix)
 void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 {
 	int i;
+	int proto;
 	char tmp[100];
+	struct in_addr ipaddr;
+	char saddr[INET_ADDRSTRLEN];
 
 	/* Delete all default routes */
 	route_del(ifname, 0, NULL, NULL, NULL);
 
 	/* try adding a route to gateway first */
 	route_add(ifname, 0, gw, NULL, "255.255.255.255");
+	mwanlog(LOG_DEBUG, "!!! preset_wan: route_add(%s,0,%s,NULL,255.255.255.255)",ifname, gw);
 
 	/* Set default route to gateway if specified */
 	i = 5;
@@ -432,6 +436,27 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 	foreach(word, nvram_safe_get(strcat_r(prefix, "_get_dns", tmp)), next) {  //"wan_get_dns"
 		if ((inet_addr(word) & mask) != (inet_addr(nvram_safe_get(strcat_r(prefix, "_ipaddr", tmp))) & mask))  //"wan_ipaddr"
 			route_add(ifname, 0, word, gw, "255.255.255.255");
+	}
+	/* Add routes to PPTP/L2TP servers for load-balanced WAN setups will work.
+	   Without it, if there is other WAN active, xl2tpd / pptp tries to connect
+	   to l2tp/pptp server not via WAN's gateway, but setup route via existing
+	   Internet connection (other WAN gw or default) so never reached server.
+           NB! l2/pptp_server_ip can be hostname also, so route will not be added */
+
+	proto = get_wanx_proto(prefix);
+	if (proto == WP_PPTP) {
+		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_pptp_server_ip", tmp)), &(ipaddr.s_addr))) {
+			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
+			route_add(ifname, 0, saddr, gw, "255.255.255.255");
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_pptp_server_ip, add route to %s via %s", prefix, saddr, gw);
+		}
+	}
+	if (proto == WP_L2TP) {
+		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_l2tp_server_ip", tmp)), &(ipaddr.s_addr))) {
+			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
+			route_add(ifname, 0, saddr, gw, "255.255.255.255");
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_l2tp_server_ip, add route to %s via %s", prefix, saddr, gw);
+		}
 	}
 	if(!strcmp(prefix,"wan")){
 		dns_to_resolv();
@@ -643,7 +668,17 @@ static int config_l2tp(void) { // shared xl2tpd.conf for all WAN
 
 inline void stop_l2tp(char *prefix)
 {
-	stop_ppp(prefix);
+	char l2tp_file[64];
+	char dconnects[64];
+
+	memset(l2tp_file, 0, 64);
+	sprintf(l2tp_file, "/var/run/l2tp-control");
+	memset(dconnects, 0, 64);
+	sprintf(dconnects, "d %s", prefix);
+	f_write_string(l2tp_file, dconnects, 0, 0); // disconnect current session
+	stop_ppp(prefix); /* unlink ppp files in /tmp/ppp (used by mwan.c) */
+	/* stop l2tp daemon */
+	killall_tk("xl2tpd");
 }
 
 void start_l2tp(char *prefix)
@@ -653,6 +688,7 @@ void start_l2tp(char *prefix)
 
 	TRACE_PT("begin\n");
 
+	if (!using_dhcpc(prefix)) stop_dhcpc(prefix);	// as for PPTP
 	stop_l2tp(prefix);
 
 	if (config_l2tp() != 0)	// generate L2TP daemon config
@@ -669,11 +705,11 @@ void start_l2tp(char *prefix)
 	eval("xl2tpd", "-c", "/etc/xl2tpd.conf");
 
 	if (demand) {
-		eval("listen", nvram_safe_get("lan_ifname"), prefix);
+		eval("listen", nvram_safe_get("lan_ifname"), prefix); /* not sure it even works */
 	}
 	else {
-		force_to_dial(prefix);	// connect request
-		start_redial(prefix);
+		force_to_dial(prefix);	/* force connect via l2tp-control */
+		//start_redial(prefix);	/* not required here */
 	}
 
 	TRACE_PT("end\n");
@@ -695,7 +731,7 @@ char *wan_gateway(char *prefix)
 // trigger connect on demand
 void force_to_dial(char *prefix)
 {
-	char l2tp_file[256];
+	char l2tp_file[64];
 //	char tmp[64];
 	char connects[64];
 
@@ -704,8 +740,9 @@ void force_to_dial(char *prefix)
 	sleep(1);
 	switch (get_wanx_proto(prefix)) {
 	case WP_L2TP:
-		memset(l2tp_file, 0, 256);
+		memset(l2tp_file, 0, 64);
 		sprintf(l2tp_file, "/var/run/l2tp-control");
+		memset(connects, 0, 64);
 //		sprintf(connects, "c %s", nvram_safe_get(strcat_r(prefix, "_l2tp_server_name", tmp)));	// connect control command
 		sprintf(connects, "c %s", prefix);
 		mwanlog(LOG_DEBUG, "force_to_dial, L2TP connect string = %s", connects);
@@ -756,10 +793,10 @@ static void _do_wan_routes(char *ifname, char *nvname, int metric, int add)
 
 		if (gateway && *gateway) {
 			if (add) {
-				mwanlog(LOG_DEBUG, "MultiWAN: route_add(ifname=%s, metric=%d, ipaddr=%s, gateway=%s, netmask=%s)", ifname, metric, ipaddr, gateway, netmask);
+				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_add(%s,%d,%s,%s,%s)", ifname, metric, ipaddr, gateway, netmask);
 				route_add(ifname, metric, ipaddr, gateway, netmask);
 			} else {
-				mwanlog(LOG_DEBUG, "MultiWAN: route_del(ifname=%s, metric=%d, ipaddr=%s, gateway=%s, netmask=%s)", ifname, metric, ipaddr, gateway, netmask);
+				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_del(%s,%d,%s,%s,%s)", ifname, metric, ipaddr, gateway, netmask);
 				route_del(ifname, metric, ipaddr, gateway, netmask);
 			}
 		}
@@ -823,7 +860,10 @@ void start_wan_if(int mode, char *prefix)
 	sprintf(wanconn_file, "/var/lib/misc/%s.connecting", prefix);
 	f_write(wanconn_file, NULL, 0, 0, 0);
 
-	if (!foreach_wif(1, &p, is_sta)) {
+	// this returns ethX to pointer in case there is any STA interface (for example on secondary WAN)
+	// so primary WAN will be setup with wrong interface in case there is any STA exist
+	// if (!foreach_wif(1, &p, is_sta)) {
+	if ((!foreach_wif(1, &p, is_sta)) || (nvram_match(strcat_r(prefix, "_sta", tmp), ""))) {
 		p = nvram_safe_get(strcat_r(prefix, "_ifnameX", tmp)); //"wan_ifnameX"
 		if (sscanf(p, "vlan%d", &vid) == 1) {
 			vlan0tag = nvram_get_int("vlan0tag");
@@ -833,19 +873,21 @@ void start_wan_if(int mode, char *prefix)
 			snprintf(buf, sizeof(buf), "vlan%d", vid_map);
 			p = buf;
 		}
+		// set wan mac but not for wireless client
+		if(!strcmp(prefix,"wan")) {
+			mwanlog(LOG_DEBUG, "!!! set_mac(%s,wan_mac,1)", p);
+			set_mac(p, "wan_mac", 1);
+		} else {
+			mwanlog(LOG_DEBUG, "!!! set_mac(%s,%s_mac,%d)", p, prefix, wan_unit + 15);
+			set_mac(p, strcat_r(prefix, "_mac", tmp), wan_unit + 15);
+		}
 	}
 
 	// shibby fix wireless client
-	if (nvram_invmatch(strcat_r(prefix, "_sta", tmp), "")) { //wireless client as wan
+	/* if (nvram_invmatch(strcat_r(prefix, "_sta", tmp), "")) { //wireless client as wan
 		w = nvram_safe_get(strcat_r(prefix, "_sta", tmp));
 		p = nvram_safe_get(strcat_r(w, "_ifname", tmp));
-	}
-
-	if(!strcmp(prefix,"wan")) {
-		set_mac(p, "wan_mac", 1);
-	} else {
-		set_mac(p, strcat_r(prefix, "_mac", tmp), wan_unit + 15);
-	}
+	}*/
 
 	nvram_set(strcat_r(prefix, "_ifname", tmp), p);  //"wan_ifname"
 	nvram_set(strcat_r(prefix, "_ifnames", tmp), p); //"wan_ifnames"
@@ -924,7 +966,7 @@ void start_wan_if(int mode, char *prefix)
 	switch (wan_proto) {
 	case WP_PPPOE:
 	case WP_PPP3G:
-		if (wan_proto = WP_PPPOE && using_dhcpc(prefix)) { // PPPoE with DHCP MAN
+		if (wan_proto == WP_PPPOE && using_dhcpc(prefix)) { // PPPoE with DHCP MAN
 			stop_dhcpc(prefix);
 			mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_dhcpc(%s) for PPPoE ...", prefix);
 			start_dhcpc(prefix);
@@ -958,8 +1000,8 @@ void start_wan_if(int mode, char *prefix)
 
 			switch (wan_proto) {
 			case WP_PPTP:
-				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_pptp (%d, %s) ...", mode, prefix);
-				start_pptp(mode, prefix);
+				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_pptp (%s) ...", prefix);
+				start_pptp(prefix);
 				break;
 			case WP_L2TP:
 				mwanlog(LOG_DEBUG, "MultiWAN: start_wan_if: start_l2tp (%s) ...", prefix);
@@ -1143,6 +1185,7 @@ void start_wan_done(char *wan_ifname, char *prefix)
 			if (proto == WP_PPTP || proto == WP_L2TP) {
 				// delete gateway route as it's no longer needed
 				route_del(wan_ifname, 0, gw, "0.0.0.0", "255.255.255.255");
+				mwanlog(LOG_DEBUG, "!!! start_wan_done: route_del(%s,0,%s,0.0.0.0,255.255.255.255)", wan_ifname, gw);
 			}
 		}
 
@@ -1162,12 +1205,16 @@ void start_wan_done(char *wan_ifname, char *prefix)
 #endif
 		if (proto == WP_PPTP || proto == WP_L2TP) {
 			route_del(nvram_safe_get(strcat_r(prefix, "_iface", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_gateway_get", tmp)), NULL, "255.255.255.255"); //"wan_iface","wan_gateway_get"
+			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_del(%s,0,%s,NULL,255.255.255.255)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_gateway_get", tmp)));
 			route_add(nvram_safe_get(strcat_r(prefix, "_iface", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_ppp_get_ip", tmp)), NULL, "255.255.255.255"); //"wan_iface","ppp_get_ip"
+			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_add(%s,0,%s,NULL,255.255.255.255)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_ppp_get_ip", tmp)));
 		}
+/* moved to preset_wan()
 		if (proto == WP_L2TP) {
 			route_add(nvram_safe_get(strcat_r(prefix, "_ifname", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_l2tp_server_ip", tmp)), nvram_safe_get(strcat_r(prefix, "_gateway", tmp)), "255.255.255.255"); // fixed routing problem in Israel by kanki
 			// "wan_ifname","l2tp_server_ip","wan_getaway"
 		}
+*/
 	}
 
 	dns_to_resolv();

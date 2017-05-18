@@ -377,7 +377,8 @@
 
 		function displayVersion()
 		{
-			E('version').innerHTML = "<small>Tinc (" + escapeText(cmdresult).replace('<br>', '').replace('&nbsp;','') + ")</small>";
+			cmdresult = cmdresult.replace( 'Must be connected to a terminal.', '' );
+			E( 'version' ).innerHTML = "<small>(" + cmdresult.replace( /\s+/g, '' ) + ")</small>";
 			cmdresult = '';
 		}
 

@@ -265,7 +265,7 @@ void mwan_state_files(void)
 
 		sprintf(tmp, "/tmp/state_%s", prefix);
 		if ( !(f = fopen(tmp, "r"))) {
-			// if file does not exist then we create him will value "1"
+			// if file does not exist then we create him with value "1"
 			f = fopen(tmp, "w+");
 			fprintf(f, "1\n");
 			fclose(f);

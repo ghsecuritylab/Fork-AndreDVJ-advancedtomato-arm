@@ -152,10 +152,10 @@ static int bound(char *ifname, int renew, char *prefix)
 	sprintf(renew_file, "/var/lib/misc/%s_dhcpc.renewing", prefix);
 	unlink(renew_file);
 
-	char *netmask, *dns;
+	char *netmask, *dns, *gw;
 	int wan_proto = get_wanx_proto(prefix);
 
-	mwanlog(LOG_INFO, "dhcpc_bound, interface=%s, wan_prefix=%s, renew=%d, proto=%d", ifname, prefix, renew, wan_proto);
+	mwanlog(LOG_DEBUG, "dhcpc_bound, interface=%s, wan_prefix=%s, renew=%d, proto=%d", ifname, prefix, renew, wan_proto);
 
 	dns = nvram_safe_get(strcat_r(prefix, "_get_dns", tmp));
 	nvram_set(strcat_r(prefix, "_routes1", tmp), "");
@@ -207,19 +207,31 @@ static int bound(char *ifname, int renew, char *prefix)
 	ifconfig(ifname, IFUP, nvram_safe_get(strcat_r(prefix, "_ipaddr", tmp)), netmask);
 
 	if (wan_proto != WP_DHCP && wan_proto != WP_LTE) {
-		char *gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp));
 
-		preset_wan(ifname, gw, netmask, prefix);
+		if ((gw = nvram_safe_get(strcat_r(prefix, "_gateway", tmp))) && (*gw) && (strcmp(gw, "0.0.0.0") != 0))
+			preset_wan(ifname, gw, netmask, prefix);
 
 		/* clear dns from the resolv.conf */
+		mwanlog(LOG_DEBUG, "!!! bound, clear dns from the resolv.conf: nvram_set(%s,%s)", strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
 		nvram_set(strcat_r(prefix, "_get_dns", tmp), renew ? dns : "");
 
 		switch (wan_proto) {
 		case WP_PPTP:
-			start_pptp(BOOT,prefix);
+			mwanlog(LOG_DEBUG, "!!! bound, start_pptp(%s)", prefix);
+			start_pptp(prefix);
 			break;
 		case WP_L2TP:
+			mwanlog(LOG_DEBUG, "!!! bound, start_l2tp(%s)", prefix);
 			start_l2tp(prefix);
+			break;
+		case WP_PPPOE:
+			mwanlog(LOG_DEBUG, "!!! bound, start_pppoe(%s)", prefix);
+			if(!strcmp(prefix,"wan")) start_pppoe(PPPOEWAN, prefix);
+			if(!strcmp(prefix,"wan2")) start_pppoe(PPPOEWAN2, prefix);
+#ifdef TCONFIG_MULTIWAN
+			if(!strcmp(prefix,"wan3")) start_pppoe(PPPOEWAN3, prefix);
+			if(!strcmp(prefix,"wan4")) start_pppoe(PPPOEWAN4, prefix);
+#endif
 			break;
 		}
 	}
@@ -240,7 +252,7 @@ static int renew(char *ifname, char *prefix)
 
 	TRACE_PT("begin\n");
 
-	mwanlog(LOG_INFO, "dhcpc_renew, interface=%s, wan_prefix=%s", ifname, prefix);
+	mwanlog(LOG_DEBUG, "dhcpc_renew, interface=%s, wan_prefix=%s", ifname, prefix);
 
 	char renew_file[256];
 	memset(renew_file, 0, 256);
@@ -321,7 +333,7 @@ int dhcpc_event_main(int argc, char **argv)
 
 	if (!wait_action_idle(10)) return 1;
 
-	mwanlog(LOG_INFO, "dhcpc_event_main, interface=%s, wan_prefix=%s, argc=%d, argv=%s", ifname, prefix, argc, argv[1]);
+	mwanlog(LOG_DEBUG, "dhcpc_event_main, interface=%s, wan_prefix=%s, argc=%d, argv=%s", ifname, prefix, argc, argv[1]);
 
 	if ((argc == 2) && (ifname = getenv("interface")) != NULL) {
 		TRACE_PT("event=%s\n", argv[1]);
@@ -345,7 +357,7 @@ int dhcpc_release_main(int argc, char **argv)
 		strcpy(prefix, argv[1]); } 
 	else{
 		strcpy(prefix, "wan"); }
-	mwanlog(LOG_INFO, "dhcpc_release_main, argc=%d, wan_prefix=%s", argc, prefix);
+	mwanlog(LOG_DEBUG, "dhcpc_release_main, argc=%d, wan_prefix=%s", argc, prefix);
 
 	TRACE_PT("begin\n");
 #ifdef TCONFIG_MULTIWAN
@@ -384,7 +396,8 @@ int dhcpc_renew_main(int argc, char **argv)
 		strcpy(prefix, argv[1]); } 
 	else{
 		strcpy(prefix, "wan"); }
-	mwanlog(LOG_INFO, "dhcpc_renew_main, argc=%d, wan_prefix=%s", argc, prefix);
+
+	mwanlog(LOG_DEBUG, "dhcpc_renew_main, argc=%d, wan_prefix=%s", argc, prefix);
 
 	TRACE_PT("begin\n");
 

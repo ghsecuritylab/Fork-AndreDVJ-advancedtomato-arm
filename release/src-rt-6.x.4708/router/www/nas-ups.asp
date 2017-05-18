@@ -5,9 +5,16 @@ No part of this file may be used without permission.
 --><title>UPS Monitor</title>
 <content>
 	<script type="text/javascript">
-		//      <% nvram(""); %>
+		//      <% nvram("usb_apcupsd"); %>
 
 		function init() {
+			var ids=['ups-status','ups-data'];
+			for (i = 0; i < ids.length; ++i) {
+				if (nvram.usb_apcupsd == 1) {
+					E(ids[i]).style.display = 'block';
+				//	E(ids[i]+'-section').style.display = 'block';
+				}
+			}
 			clientSideInclude('ups-status', '/ext/cgi-bin/tomatoups.cgi');
 			clientSideInclude('ups-data', '/ext/cgi-bin/tomatodata.cgi');
 		}
@@ -61,19 +68,19 @@ No part of this file may be used without permission.
 
 	<input type="hidden" name="_nextpage" value="/#nas-ups.asp">
 	<div class="box">
-		<div class="heading">APC UPS Status</div>
+		<div class="heading" id="ups-status-section" style="display:block">APC UPS Status</div>
 		<div class="content">
-			<span id="ups-status"></span>
+			<span id="ups-status" style="display:none"></span>
 		</div>
 	</div>
 
 	<div class="box">
-		<div class="heading">UPS Response</div>
+		<div class="heading" id="ups-data-section" style="display:block">UPS Response</div>
 		<div class="content">
-			<span id="ups-data"></span>
+			<span id="ups-data" style="display:none"></span>
 		</div>
 		<div class="content">
-			<a href="#nas-usb.asp">Configure</a>
+			<a href="#nas-usb.asp" class="btn btn-danger ajaxload">Configure <i class="icon-tools"></i></a>
 		</div>
 	</div>
 

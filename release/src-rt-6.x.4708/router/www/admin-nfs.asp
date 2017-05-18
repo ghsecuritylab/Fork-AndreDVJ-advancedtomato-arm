@@ -38,7 +38,7 @@ No part of this file may be used without permission.
 			f[2].selectedIndex = 0;
 			f[3].selectedIndex = 0;
 			f[4].selectedIndex = 1;
-			f[5].value = 'no_root_squash';
+			f[5].value = 'no_root_squash,insecure';
 		}
 		nfsg.setup = function()
 		{
