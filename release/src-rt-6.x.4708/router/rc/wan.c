@@ -448,14 +448,14 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_pptp_server_ip", tmp)), &(ipaddr.s_addr))) {
 			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
 			route_add(ifname, 0, saddr, gw, "255.255.255.255");
-			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_pptp_server_ip, add route to %s...", prefix, saddr);
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_pptp_server_ip, add route to %s via %s", prefix, saddr, gw);
 		}
 	}
 	if (proto == WP_L2TP) {
 		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_l2tp_server_ip", tmp)), &(ipaddr.s_addr))) {
 			inet_ntop(AF_INET, &(ipaddr.s_addr), saddr, INET_ADDRSTRLEN);
 			route_add(ifname, 0, saddr, gw, "255.255.255.255");
-			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_l2tp_server_ip, add route to %s...", prefix, saddr);
+			mwanlog(LOG_DEBUG, "!!! preset_wan: got %s_l2tp_server_ip, add route to %s via %s", prefix, saddr, gw);
 		}
 	}
 	if(!strcmp(prefix,"wan")){
@@ -782,10 +782,10 @@ static void _do_wan_routes(char *ifname, char *nvname, int metric, int add)
 
 		if (gateway && *gateway) {
 			if (add) {
-				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_add(ifname=%s, metric=%d, ipaddr=%s, gateway=%s, netmask=%s)", ifname, metric, ipaddr, gateway, netmask);
+				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_add(%s,%d,%s,%s,%s)", ifname, metric, ipaddr, gateway, netmask);
 				route_add(ifname, metric, ipaddr, gateway, netmask);
 			} else {
-				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_del(ifname=%s, metric=%d, ipaddr=%s, gateway=%s, netmask=%s)", ifname, metric, ipaddr, gateway, netmask);
+				mwanlog(LOG_DEBUG, "!!! _do_wan_routes: route_del(%s,%d,%s,%s,%s)", ifname, metric, ipaddr, gateway, netmask);
 				route_del(ifname, metric, ipaddr, gateway, netmask);
 			}
 		}
@@ -1194,9 +1194,9 @@ void start_wan_done(char *wan_ifname, char *prefix)
 #endif
 		if (proto == WP_PPTP || proto == WP_L2TP) {
 			route_del(nvram_safe_get(strcat_r(prefix, "_iface", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_gateway_get", tmp)), NULL, "255.255.255.255"); //"wan_iface","wan_gateway_get"
-			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_del(%s,0,%s,NULL,%s)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_gateway_get", tmp)));
+			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_del(%s,0,%s,NULL,255.255.255.255)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_gateway_get", tmp)));
 			route_add(nvram_safe_get(strcat_r(prefix, "_iface", tmp)), 0, nvram_safe_get(strcat_r(prefix, "_ppp_get_ip", tmp)), NULL, "255.255.255.255"); //"wan_iface","ppp_get_ip"
-			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_add(%s,0,%s,NULL,%s)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_ppp_get_ip", tmp)));
+			mwanlog(LOG_DEBUG, "!!! start_wan_done, route_add(%s,0,%s,NULL,255.255.255.255)", nvram_safe_get(strcat_r(prefix, "_iface", tmp)), nvram_safe_get(strcat_r(prefix, "_ppp_get_ip", tmp)));
 		}
 /* moved to preset_wan()
 		if (proto == WP_L2TP) {
