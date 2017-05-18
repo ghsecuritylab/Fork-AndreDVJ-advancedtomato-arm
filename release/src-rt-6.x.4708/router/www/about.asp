@@ -249,7 +249,7 @@
 			</p>
 
 			<p>
-				Built on <% build_time(); %> by Jacky, <a href='https://advancedtomato.com/' target='_new'>https://advancedtomato.com/</a>
+				Built on <% build_time(); %> . Advanced Tomato GUI developed by Jacky, <a href='https://advancedtomato.com/' target='_new'>https://advancedtomato.com/</a>
 				<br /><b>Thanks to everyone who risked their routers, tested, reported bugs, made suggestions and contributed to this project. ^ _ ^</b>
 			</p>
 
