@@ -343,7 +343,7 @@ static void stop_ppp(char *prefix)
 	killall_tk("ipv6-up");
 	killall_tk("ipv6-down");
 #endif
-	killall_tk("xl2tpd");
+	//killall_tk("xl2tpd"); /* xl2tpd may be used by other WANs, moved to stop_l2tp */
 	//kill(nvram_get_int(strcat_r(prefix, "_pppd_pid", tmp)),1); 
 	killall_tk((char *)pppd_name);
 	killall_tk("listen");
@@ -668,7 +668,17 @@ static int config_l2tp(void) { // shared xl2tpd.conf for all WAN
 
 inline void stop_l2tp(char *prefix)
 {
-	stop_ppp(prefix);
+	char l2tp_file[64];
+	char dconnects[64];
+
+	memset(l2tp_file, 0, 64);
+	sprintf(l2tp_file, "/var/run/l2tp-control");
+	memset(dconnects, 0, 64);
+	sprintf(dconnects, "d %s", prefix);
+	f_write_string(l2tp_file, dconnects, 0, 0); // disconnect current session
+	stop_ppp(prefix); /* unlink ppp files in /tmp/ppp (used by mwan.c) */
+	/* stop l2tp daemon */
+	killall_tk("xl2tpd");
 }
 
 void start_l2tp(char *prefix)
@@ -695,11 +705,11 @@ void start_l2tp(char *prefix)
 	eval("xl2tpd", "-c", "/etc/xl2tpd.conf");
 
 	if (demand) {
-		eval("listen", nvram_safe_get("lan_ifname"), prefix);
+		eval("listen", nvram_safe_get("lan_ifname"), prefix); /* not sure it even works */
 	}
 	else {
-		force_to_dial(prefix);	/* do connect */
-		//start_redial(prefix); /* not required here */
+		force_to_dial(prefix);	/* force connect via l2tp-control */
+		//start_redial(prefix);	/* not required here */
 	}
 
 	TRACE_PT("end\n");
@@ -721,7 +731,7 @@ char *wan_gateway(char *prefix)
 // trigger connect on demand
 void force_to_dial(char *prefix)
 {
-	char l2tp_file[256];
+	char l2tp_file[64];
 //	char tmp[64];
 	char connects[64];
 
@@ -730,8 +740,9 @@ void force_to_dial(char *prefix)
 	sleep(1);
 	switch (get_wanx_proto(prefix)) {
 	case WP_L2TP:
-		memset(l2tp_file, 0, 256);
+		memset(l2tp_file, 0, 64);
 		sprintf(l2tp_file, "/var/run/l2tp-control");
+		memset(connects, 0, 64);
 //		sprintf(connects, "c %s", nvram_safe_get(strcat_r(prefix, "_l2tp_server_name", tmp)));	// connect control command
 		sprintf(connects, "c %s", prefix);
 		mwanlog(LOG_DEBUG, "force_to_dial, L2TP connect string = %s", connects);
