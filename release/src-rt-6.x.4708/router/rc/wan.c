@@ -408,6 +408,7 @@ void start_pptp(char *prefix)
 
 // -----------------------------------------------------------------------------
 
+// Used by PPTP/L2TP mainly to setup host routes to DNS and access server
 void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 {
 	int i;
@@ -442,7 +443,6 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 	   to l2tp/pptp server not via WAN's gateway, but setup route via existing
 	   Internet connection (other WAN gw or default) so never reached server.
            NB! l2/pptp_server_ip can be hostname also, so route will not be added */
-
 	proto = get_wanx_proto(prefix);
 	if (proto == WP_PPTP) {
 		if (inet_pton(AF_INET, nvram_safe_get(strcat_r(prefix, "_pptp_server_ip", tmp)), &(ipaddr.s_addr))) {
@@ -462,7 +462,9 @@ void preset_wan(char *ifname, char *gw, char *netmask, char *prefix)
 		dns_to_resolv();
 		start_dnsmasq();
 		sleep(1);
+/*	issue with call from dhcp.c bound (it didn't do start_ppxxx on startup) on primary WAN! so disabled here
 		start_firewall();
+*/
 	}
 }
 
