@@ -136,12 +136,12 @@ No part of this file may be used without permission.
 			}
 
 			if( this.checkRate(f[1].value)) {
-				ferror.set(f[1], 'DLRate must between 1 and 99999', quiet);
+				ferror.set(f[1], 'DLRate must between 1 and 99999999', quiet);
 				ok = 0;
 			}
 
 			if( this.checkRate(f[2].value)) {
-				ferror.set(f[2], 'DLCeil must between 1 and 99999', quiet);
+				ferror.set(f[2], 'DLCeil must between 1 and 99999999', quiet);
 				ok = 0;
 			}
 
@@ -151,12 +151,12 @@ No part of this file may be used without permission.
 			}
 
 			if( this.checkRate(f[3].value)) {
-				ferror.set(f[3], 'ULRate must between 1 and 99999', quiet);
+				ferror.set(f[3], 'ULRate must between 1 and 99999999', quiet);
 				ok = 0;
 			}
 
 			if( this.checkRate(f[4].value)) {
-				ferror.set(f[4], 'ULCeil must between 1 and 99999', quiet);
+				ferror.set(f[4], 'ULCeil must between 1 and 99999999', quiet);
 				ok = 0;
 			}
 
