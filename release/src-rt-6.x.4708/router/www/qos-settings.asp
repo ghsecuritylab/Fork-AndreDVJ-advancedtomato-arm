@@ -66,7 +66,7 @@ No part of this file may be used without permission.
 		{
 			var i, e, b, f;
 
-			if (!v_range('_qos_obw', quiet, 10, 999999)) return 0;
+			if (!v_range('_qos_obw', quiet, 10, 9999999)) return 0;
 			for (i = 0; i < 10; ++i)
 			{
 				if (!verifyClassCeilingAndRate(
@@ -79,7 +79,7 @@ No part of this file may be used without permission.
 				}
 			}
 
-			if (!v_range('_qos_ibw', quiet, 10, 999999)) return 0;
+			if (!v_range('_qos_ibw', quiet, 10, 9999999)) return 0;
 			for (i = 0; i < 10; ++i)
 			{
 				if (!verifyClassCeilingAndRate(
