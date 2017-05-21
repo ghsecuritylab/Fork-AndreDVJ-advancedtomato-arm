@@ -232,7 +232,7 @@ No part of this file may be used without permission.
 
 				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx){
 					var u = (uidx >1) ? uidx : '';
-					f.push({ title: 'WAN '+uidx+'<br>Max Bandwidth Limit', name: 'wan'+u+'_qos_obw', type: 'text', maxlen: 12, size: 8, suffix: ' <small>kbit/s </small>', value: nvram['wan'+u+'_qos_obw'] });
+					f.push({ title: 'WAN '+uidx+'<br>Max Bandwidth Limit', name: 'wan'+u+'_qos_obw', type: 'text', maxlen: 7, size: 8, suffix: ' <small>kbit/s </small>', value: nvram['wan'+u+'_qos_obw'] });
 				}
 
 				j = 0;
@@ -259,7 +259,7 @@ No part of this file may be used without permission.
 
 				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx){
 					var u = (uidx >1) ? uidx : '';
-					f.push({ title: 'WAN '+uidx+'<br>Max Bandwidth Limit', name: 'wan'+u+'_qos_ibw', type: 'text', maxlen: 12, size: 8, suffix: ' <small>kbit/s </small>', value: nvram['wan'+u+'_qos_ibw'] });
+					f.push({ title: 'WAN '+uidx+'<br>Max Bandwidth Limit', name: 'wan'+u+'_qos_ibw', type: 'text', maxlen: 7, size: 8, suffix: ' <small>kbit/s </small>', value: nvram['wan'+u+'_qos_ibw'] });
 				}
 
 				for (i = 0; i < 10; ++i)
