@@ -944,17 +944,19 @@ start_scanner()
 	if (setpriority(PRIO_PROCESS, 0, 15) == -1)
 		DPRINTF(E_WARN, L_INOTIFY,  "Failed to reduce scanner thread priority\n");
 
-	begin_scan();
-
 	setlocale(LC_COLLATE, "");
 
 	av_register_all();
 	av_log_set_level(AV_LOG_PANIC);
+
 	if( rescan_db )
 	{
 		start_rescan();
 		return;
 	}
+
+	begin_scan(); // Tomato
+
 	_notify_start();
 	for( media_path = media_dirs; media_path != NULL; media_path = media_path->next )
 	{
@@ -980,7 +982,7 @@ start_scanner()
 	}
 	_notify_stop();
 
-	end_scan();
+	end_scan(); // Tomato
 
 	/* Create this index after scanning, so it doesn't slow down the scanning process.
 	 * This index is very useful for large libraries used with an XBox360 (or any

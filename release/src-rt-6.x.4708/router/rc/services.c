@@ -2259,8 +2259,12 @@ static void start_media_server(void)
 
 	if (nvram_get_int("ms_enable") != 0) {
 		if ((!once) && (nvram_get_int("ms_rescan") == 0)) {
-			// no forced rescan
-			argv[3] = NULL;
+			if (nvram_get_int("ms_sas") == 1)
+				// do rescan
+				argv[3] = "-r";
+			else
+				// no rebuild
+				argv[3] = NULL;
 		}
 		nvram_unset("ms_rescan");
 
