@@ -2245,7 +2245,7 @@ static void start_media_server(void)
 	FILE *f;
 	int port, pid, https;
 	char *dbdir;
-	char *argv[] = { MEDIA_SERVER_APP, "-f", "/etc/"MEDIA_SERVER_APP".conf", "-R", NULL };
+	char *argv[] = { MEDIA_SERVER_APP, "-f", "/etc/"MEDIA_SERVER_APP".conf", "-r", NULL };
 	static int once = 1;
 	char *msi;
 
@@ -2253,19 +2253,17 @@ static void start_media_server(void)
 		start_service("media");
 		return;
 	}
-
 	if (nvram_get_int("ms_sas") == 0)
 		once = 0;
 
 	if (nvram_get_int("ms_enable") != 0) {
 		if ((!once) && (nvram_get_int("ms_rescan") == 0)) {
-			if (nvram_get_int("ms_sas") == 1)
-				// do rescan
-				argv[3] = "-r";
-			else
-				// no rebuild
-				argv[3] = NULL;
+			// no rescan
+			argv[3] = NULL;
 		}
+		else if (nvram_get_int("ms_rescan") == 1)
+			// forced rebuild
+			argv[3] = "-R";
 		nvram_unset("ms_rescan");
 
 		if (f_exists("/etc/"MEDIA_SERVER_APP".alt")) {
