@@ -956,8 +956,7 @@ start_scanner()
 	}
 
 	begin_scan(); // Tomato
-
-	_notify_start();
+	//_notify_start();
 	for( media_path = media_dirs; media_path != NULL; media_path = media_path->next )
 	{
 		int64_t id;
@@ -980,8 +979,7 @@ start_scanner()
 		ScanDirectory(media_path->path, parent, media_path->types);
 		sql_exec(db, "INSERT into SETTINGS values (%Q, %Q)", "media_dir", media_path->path);
 	}
-	_notify_stop();
-
+	//_notify_stop();
 	end_scan(); // Tomato
 
 	/* Create this index after scanning, so it doesn't slow down the scanning process.
