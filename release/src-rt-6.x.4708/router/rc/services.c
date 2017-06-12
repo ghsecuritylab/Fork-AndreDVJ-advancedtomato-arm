@@ -1454,25 +1454,44 @@ static pid_t pid_igmp = -1;
 void start_igmp_proxy(void)
 {
 	FILE *fp;
+	char wan_prefix[] = "wanXX";
+	int wan_unit, mwan_num, count = 0;
+
+	mwan_num = nvram_get_int("mwan_num");
+	if (mwan_num < 1 || mwan_num > MWAN_MAX) {
+		mwan_num = 1;
+	}
 
 	pid_igmp = -1;
 	if (nvram_match("multicast_pass", "1")) {
-		if (get_wan_proto() == WP_DISABLED)
-			return;
 
+//		if (get_wan_proto() == WP_DISABLED)
+//			return;
 		if (f_exists("/etc/igmp.alt")) {
 			eval("igmpproxy", "/etc/igmp.alt");
 		}
 		else if ((fp = fopen("/etc/igmp.conf", "w")) != NULL) {
-			fprintf(fp,
-				"quickleave\n"
-				"phyint %s upstream\n"
-				"\taltnet %s\n",
-//				"phyint %s downstream ratelimit 0\n",
-				get_wanface("wan"),
-				nvram_get("multicast_altnet") ? : "0.0.0.0/0");
-//				nvram_safe_get("lan_ifname"));
 
+			fprintf(fp,
+				"quickleave\n");
+			for (wan_unit = 1; wan_unit <= mwan_num; ++wan_unit) {
+				get_wan_prefix(wan_unit, wan_prefix);
+				if ((check_wanup(wan_prefix)) && (get_wanx_proto(wan_prefix) != WP_DISABLED)) {
+					count++;
+					fprintf(fp,
+						"phyint %s upstream\n"
+						"\taltnet %s\n",
+//						"phyint %s downstream ratelimit 0\n",
+						get_wanface(wan_prefix),
+						nvram_get("multicast_altnet") ? : "0.0.0.0/0");
+				}
+			}
+			if (!count) {
+				fclose(fp);
+				unlink(fp);
+				return;
+			}
+//				nvram_safe_get("lan_ifname"));
 				char lanN_ifname[] = "lanXX_ifname";
 				char multicast_lanN[] = "multicast_lanXX";
 				char br;
@@ -1592,7 +1611,7 @@ void set_tz(void)
 
 void start_ntpc(void)
 {
-	static char servers[32];
+	//static char servers[32];
 
 	set_tz();
 
@@ -1989,9 +2008,13 @@ static void start_samba(void)
 	fprintf(fp, "[global]\n"
 		" interfaces = %s\n"
 		" bind interfaces only = yes\n"
+		" max protocol = SMB2\n"
 		" workgroup = %s\n"
 		" netbios name = %s\n"
 		" server string = %s\n"
+		" dos charset = ASCII\n"
+		" unix charset = UTF8\n"
+		" display charset = UTF8\n"
 		" guest account = nobody\n"
 		" security = user\n"
 		" %s\n"
@@ -2001,6 +2024,7 @@ static void start_samba(void)
 		" syslog only = yes\n"
 		" timestamp logs = no\n"
 		" syslog = 1\n"
+		" passdb backend = smbpasswd\n"
 		" encrypt passwords = yes\n"
 		" preserve case = yes\n"
 		" short preserve case = yes\n",
@@ -2221,7 +2245,7 @@ static void start_media_server(void)
 	FILE *f;
 	int port, pid, https;
 	char *dbdir;
-	char *argv[] = { MEDIA_SERVER_APP, "-f", "/etc/"MEDIA_SERVER_APP".conf", "-R", NULL };
+	char *argv[] = { MEDIA_SERVER_APP, "-f", "/etc/"MEDIA_SERVER_APP".conf", "-r", NULL };
 	static int once = 1;
 	char *msi;
 
@@ -2229,15 +2253,17 @@ static void start_media_server(void)
 		start_service("media");
 		return;
 	}
-
 	if (nvram_get_int("ms_sas") == 0)
 		once = 0;
 
 	if (nvram_get_int("ms_enable") != 0) {
 		if ((!once) && (nvram_get_int("ms_rescan") == 0)) {
-			// no forced rescan
+			// no rescan
 			argv[3] = NULL;
 		}
+		else if (nvram_get_int("ms_rescan") == 1)
+			// forced rebuild
+			argv[3] = "-R";
 		nvram_unset("ms_rescan");
 
 		if (f_exists("/etc/"MEDIA_SERVER_APP".alt")) {
@@ -2943,7 +2969,7 @@ TOP:
 		if (action & A_START) {
 			rename("/tmp/ppp/wan_log", "/tmp/ppp/wan_log.~");
 			start_wan(BOOT);
-			sleep(2);
+			sleep(5);
 			force_to_dial("wan");
 			force_to_dial("wan2");
 #ifdef TCONFIG_MULTIWAN
@@ -2961,7 +2987,7 @@ TOP:
 
 		if (action & A_START) {
 			start_wan_if(BOOT, "wan");
-			sleep(2);
+			sleep(5);
 			force_to_dial("wan");
 		}
 		goto CLEAR;
@@ -2974,7 +3000,7 @@ TOP:
 
 		if (action & A_START) {
 			start_wan_if(BOOT, "wan2");
-			sleep(2);
+			sleep(5);
 			force_to_dial("wan2");
 		}
 		goto CLEAR;
@@ -2988,7 +3014,7 @@ TOP:
 
 		if (action & A_START) {
 			start_wan_if(BOOT, "wan3");
-			sleep(2);
+			sleep(5);
 			force_to_dial("wan3");
 		}
 		goto CLEAR;
@@ -3001,7 +3027,7 @@ TOP:
 
 		if (action & A_START) {
 			start_wan_if(BOOT, "wan4");
-			sleep(2);
+			sleep(5);
 			force_to_dial("wan4");
 		}
 		goto CLEAR;
