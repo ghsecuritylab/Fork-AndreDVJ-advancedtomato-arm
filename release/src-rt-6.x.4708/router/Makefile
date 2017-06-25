@@ -1307,7 +1307,8 @@ ntfs-3g-install: ntfs-3g
 
 libusb10/Makefile: libusb10/Makefile.in
 	cd libusb10 && CFLAGS="-Os -Wall $(EXTRACFLAGS)" LIBS="-lpthread" \
-	$(CONFIGURE) --prefix=/usr ac_cv_lib_rt_clock_gettime=no
+	autoreconf -fsi && \
+	$(CONFIGURE) --disable-udev --prefix=/usr ac_cv_lib_rt_clock_gettime=no
 
 libusb10: libusb10/Makefile
 	$(MAKE) -C $@ $(PARALLEL_BUILD)
@@ -1674,6 +1675,7 @@ endif
 
 libogg/stamp-h1:
 	cd libogg && \
+	autoreconf -fsi && \
 	CFLAGS="-Os $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	LDFLAGS="-fPIC -ffunction-sections -fdata-sections -Wl,--gc-sections" \
 	$(CONFIGURE) --enable-shared --enable-static --prefix=''
@@ -1695,6 +1697,7 @@ endif
 
 flac/stamp-h1: libogg
 	cd flac && \
+	autoreconf -fsi && \
 	CFLAGS="-Os $(EXTRACFLAGS) -fPIC -ffunction-sections -fdata-sections" \
 	CPPFLAGS="-I$(TOP)/libogg/include -I$(LINUXDIR)/include" \
 	LDFLAGS="-L$(TOP)/libogg/src/.libs -fPIC -ffunction-sections -fdata-sections -Wl,--gc-sections" \
@@ -2057,7 +2060,7 @@ pcre-clean:
 	fi )
 
 libxml2/stamp-h1:
-	cd libxml2 && \
+	cd libxml2 && autoreconf && \
 	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr --without-python --enable-static --enable-shared
 	touch $@
@@ -2068,11 +2071,11 @@ libxml2: libxml2/stamp-h1
 
 libxml2-install: libxml2
 	@$(SEP)
-	install -D libxml2/.libs/libxml2.so.2.9.1 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.1
-	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.1
+	install -D libxml2/.libs/libxml2.so.2.9.3 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.3
+	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.3
 	cd $(INSTALLDIR)/libxml2/usr/lib && \
-		ln -sf libxml2.so.2.9.1 libxml2.so.2 && \
-		ln -sf libxml2.so.2.9.1 libxml2.so
+		ln -sf libxml2.so.2.9.3 libxml2.so.2 && \
+		ln -sf libxml2.so.2.9.3 libxml2.so
 
 libxml2-clean:
 	-@$(MAKE) -C libxml2 clean
@@ -2091,16 +2094,16 @@ libpng: libpng/stamp-h1
 
 libpng-install: libpng
 	@$(SEP)
-	install -D libpng/.libs/libpng.so.3.51.0 $(INSTALLDIR)/libpng/usr/lib/libpng.so.3.51.0
-	$(STRIP) $(INSTALLDIR)/libpng/usr/lib/libpng.so.3.51.0
+	install -D libpng/.libs/libpng.so.3.57.0 $(INSTALLDIR)/libpng/usr/lib/libpng.so.3.57.0
+	$(STRIP) $(INSTALLDIR)/libpng/usr/lib/libpng.so.3.57.0
 	cd $(INSTALLDIR)/libpng/usr/lib && \
-		ln -sf libpng.so.3.51.0 libpng.so && \
-		ln -sf libpng.so.3.51.0 libpng.so.3
-	install -D libpng/.libs/libpng12.so.0.51.0 $(INSTALLDIR)/libpng/usr/lib/libpng12.so.0.51.0
-	$(STRIP) $(INSTALLDIR)/libpng/usr/lib/libpng12.so.0.51.0
+		ln -sf libpng.so.3.57.0 libpng.so && \
+		ln -sf libpng.so.3.57.0 libpng.so.3
+	install -D libpng/.libs/libpng12.so.0.57.0 $(INSTALLDIR)/libpng/usr/lib/libpng12.so.0.57.0
+	$(STRIP) $(INSTALLDIR)/libpng/usr/lib/libpng12.so.0.57.0
 	cd $(INSTALLDIR)/libpng/usr/lib && \
-		ln -sf libpng12.so.0.51.0 libpng12.so && \
-		ln -sf libpng12.so.0.51.0 libpng12.so.0
+		ln -sf libpng12.so.0.57.0 libpng12.so && \
+		ln -sf libpng12.so.0.57.0 libpng12.so.0
 
 libpng-clean:
 	-@$(MAKE) -C libpng clean
