@@ -1934,7 +1934,7 @@ pcre-clean:
 	fi )
 
 libxml2/stamp-h1:
-	cd libxml2 && \
+	cd libxml2 && autoreconf && \
 	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr --without-python --enable-static --enable-shared
 	touch $@
