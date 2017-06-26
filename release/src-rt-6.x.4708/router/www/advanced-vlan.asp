@@ -19,7 +19,7 @@
 	March 2015 Tvlz
 	https://bitbucket.org/tvlz/tvlz-advanced-vlan/
 
-	** Last Updated - JULY 22 2016 - Tvlz **
+	** Last Updated - Jun 23 2017 - Tvlz **
 
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
@@ -66,11 +66,6 @@
 			port_vlan_supported = 1;
 		}
 
-		// TESTED ONLY ON WRT54G v2 (boardtype 0x0101),WRT54GL v1.1 (boardtype 0x0467) and WNR3500L (boardtype 0x04cf)
-		// info on some of these boardtypes/routers obtained from
-		// http://wiki.openwrt.org/toh/asus/start
-		// http://wiki.openwrt.org/toh/linksys/start
-		// http://wiki.openwrt.org/toh/start
 		switch ( nvram[ 't_model_name' ] ) {
 			case 'vlan-testid0':
 			case 'Asus RT-AC56U':
