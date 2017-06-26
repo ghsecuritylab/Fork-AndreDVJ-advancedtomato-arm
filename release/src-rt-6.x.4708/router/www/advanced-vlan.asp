@@ -89,7 +89,6 @@
 			case 'Asus RT-AC68R/U':
 			case 'Asus RT-AC68P':
 			case 'Asus RT-AC68P/U B1':
-			case 'Asus RT-AC3200':
 			case 'Huawei WS880':
 			case 'Linksys EA6900':
 			case 'Netgear R6400':
@@ -110,6 +109,7 @@
 				COL_P4N = '4';
 				break;
 			case 'vlan-testid3':
+			case 'Asus RT-AC3200':
 				COL_P0N = '4';
 				COL_P1N = '3';
 				COL_P2N = '2';
