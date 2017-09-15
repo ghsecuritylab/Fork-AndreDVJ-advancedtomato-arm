@@ -387,6 +387,7 @@ No part of this file may be used without permission.
 				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_useronly\' name=\'vpn_'+t+'_useronly\'>';
 				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_tlsremote\' name=\'vpn_'+t+'_tlsremote\'>';
 				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_nopull\' name=\'vpn_'+t+'_nopull\'>';
+				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_noexec\' name=\'vpn_'+t+'_noexec\'>';
 				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_route\' name=\'vpn_'+t+'_route\'>';
 				htmlOut += '<input type=\'hidden\' id=\'vpn_'+t+'_routing_val\' name=\'vpn_'+t+'_routing_val\'>';
 
