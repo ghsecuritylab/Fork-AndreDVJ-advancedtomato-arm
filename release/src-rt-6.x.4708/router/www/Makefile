@@ -182,7 +182,7 @@ endif
 # Only include IPv6 options if IPv6 is configured in.
 ifneq ($(TCONFIG_IPV6),y)
 	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.js *.jsx); do \
+	for F in $(wildcard js/*.js js/*.jsx *.asp *.js *.jsx); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
 		-e "/IPV6-BEGIN/,/IPV6-END/d" \
 		|| true; \
@@ -244,21 +244,6 @@ endif
 ifneq ($(TCONFIG_CTF),y)
 	sed -i $(INSTALLDIR)/www/advanced-misc.asp -e "/CTF-BEGIN/,/CTF-END/d"
 endif
-
-ifeq ($(TOMATO_EXPERIMENTAL),1)
-	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp); do \
-		sed -e "s,<div class='title'>Tomato</div>,<div class='title'>Tomato <small><i>(beta)</i></small></div>," $$F > $$F.tmp; \
-		mv $$F.tmp $$F; \
-	done
-endif
-
-	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp); do \
-		sed -e "s,<div class='version'>Version <% version(); %></div>,<div class='version'>Version <% version(); %> by shibby</div>," $$F > $$F.tmp; \
-		mv $$F.tmp $$F; \
-	done
-
 
 # Only include the vpn pages if OpenVPN is compiled in
 # Remove AES ciphers from the GUI if openssl doesn't have an AES directory
@@ -338,10 +323,10 @@ else
 # Fonts
 	mkdir -p $(INSTALLDIR)/www/css/fonts
 	cp -r css/fonts/* $(INSTALLDIR)/www/css/fonts/.
-		
+
 # clean up compiler directives
 	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.js *.jsx *.html); do \
+	for F in $(wildcard *.asp *.js *.jsx js/*.js js/*.jsx *.html); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
 		-e "/LINUX26-BEGIN/d"	-e "/LINUX26-END/d" \
 		-e "/LINUX24-BEGIN/d"	-e "/LINUX24-END/d" \
@@ -382,15 +367,14 @@ else
 		|| true; \
 	done
 
-# After cleaning up the compiler directive, all html comments in asp can be removed
+# Use HTML compressor to compress HTML as much as possible sed -r -i "s,//\s?<%(.*)%>,/*! @preserve: \1*/," $$F &&
 	cd $(INSTALLDIR)/www && \
-	for F in $(wildcard *.asp *.html); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
-		-e :a -re 's/<!--.*?-->//g;/<!--/N;//ba' \
-		|| true; \
+	for F in $(wildcard *.asp ); do \
+		[ -f $(INSTALLDIR)/www/$$F ] && \
+		$(TOP)/www/tools/node_modules/.bin/html-minifier $$F --minify-css -o $$F || true; \
 	done
-	
-# Remove all javascript multiline comments in asp files
+
+# Remove all javascript multi line comments in asp files
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard *.asp *.html); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && sed -i $$F \
@@ -398,35 +382,25 @@ else
 		|| true; \
 	done
 
-# Copy YUI Compressor into WWW directory
-	cp tools/yuicompressor-2.4.8.jar $(INSTALLDIR)/www
-		
 # Compress JAVASCRIPT files
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard js/*.js *.js ); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && java -jar yuicompressor-2.4.8.jar --type js -o $$F $$F || true; \
-	done 
+		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/tools/node_modules/.bin/uglifyjs $$F -c -o $$F || true; \
+	done
 
 # Compress CSS files
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard css/schemes/*.css css/*.css *.css ); do \
-			[ -f $(INSTALLDIR)/www/$$F ] && java -jar yuicompressor-2.4.8.jar --type css -o $$F $$F || true; \
-	done 
-
-# Remove yuicompressor
-	rm 	$(INSTALLDIR)/www/yuicompressor-2.4.8.jar
+		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/tools/node_modules/.bin/uglifycss $$F --output $$F || true; \
+	done
 
 # make sure old and debugging crap is gone
 	@rm -f $(INSTALLDIR)/www/debug.js
 	@rm -f $(INSTALLDIR)/www/*-x.*
 	@rm -f $(INSTALLDIR)/www/*-old.*
 	@rm -f $(INSTALLDIR)/www/color.css
+	@rm -f $(INSTALLDIR)/www/authorization.asp
 
 # secure the files in the installdir and change file ACLs (and preserve the existing folder ACLs)
 #	chmod 0644 $(INSTALLDIR)/www/*
-	find $(INSTALLDIR)/www/ -type f -print0 | xargs -0 chmod 644	
-
-# remove C-style comments from java files. All "control" comments have been processed by now.
-	for F in $(wildcard js/*.jsx *.jsx); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/remcoms2.sh $(INSTALLDIR)/www/$$F c; \
-	done
+	find $(INSTALLDIR)/www/ -type f -print0 | xargs -0 chmod 644
