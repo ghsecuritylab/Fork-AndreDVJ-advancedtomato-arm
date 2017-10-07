@@ -43,19 +43,11 @@ No part of this file may be used without permission.
 		{
 			if (parseInt(ceilingString) >= parseInt(rateString))
 			{
-				elem.setInnerHTML(
-					resultsFieldName,
-					scale(
-						bandwidthString,
-						rateString,
-						ceilingString));
+				elem.setInnerHTML(resultsFieldName, scale(bandwidthString, rateString, ceilingString));
 			}
 			else
 			{
-				elem.setInnerHTML(
-					resultsFieldName,
-					'Ceiling must be greater than or equal to rate.');
-
+				elem.setInnerHTML(resultsFieldName, 'Ceiling must be greater than or equal to rate.');
 				return 0;
 			}
 
@@ -66,29 +58,25 @@ No part of this file may be used without permission.
 		{
 			var i, e, b, f;
 
-			if (!v_range('_qos_obw', quiet, 10, 99999999)) return 0;
-			for (i = 0; i < 10; ++i)
-			{
-				if (!verifyClassCeilingAndRate(
-					E('_qos_obw').value,
-					E('_f_orate_' + i).value,
-					E('_f_oceil_' + i).value,
-					'_okbps_' + i))
-				{
-					return 0;
-				}
-			}
+			for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+				var u = (uidx > 1) ? uidx : '';
 
-			if (!v_range('_qos_ibw', quiet, 10, 99999999)) return 0;
-			for (i = 0; i < 10; ++i)
-			{
-				if (!verifyClassCeilingAndRate(
-					E('_qos_ibw').value,
-					E('_f_irate_' + i).value,
-					E('_f_iceil_' + i).value,
-					'_ikbps_' + i))
+				if (!v_range('_wan' + u + '_qos_obw', quiet, 10, 99999999)) return 0;
+				for (i = 0; i < 10; ++i)
 				{
-					return 0;
+					if (!verifyClassCeilingAndRate(E('_wan' + u + '_qos_obw').value, E('_wan' + u + '_f_orate_' + i).value, E('_wan' + u + '_f_oceil_' + i).value, '_wan' + u + '_okbps_' + i))
+					{
+						return 0;
+					}
+				}
+
+				if (!v_range('_wan' + u + '_qos_ibw', quiet, 10, 99999999)) return 0;
+				for (i = 0; i < 10; ++i) 
+				{
+					if (!verifyClassCeilingAndRate(E('_wan' + u + '_qos_ibw').value, E('_wan' + u + '_f_irate_' + i).value, E('_wan' + u + '_f_iceil_' + i).value, '_wan' + u + '_ikbps_' + i))
+					{
+						return 0;
+					}
 				}
 			}
 
@@ -137,17 +125,23 @@ No part of this file may be used without permission.
 			fom.qos_classnames.value = qos.join(' ');
 
 			a = [];
-			for (i = 0; i < 10; ++i) {
-				a.push(E('_f_orate_' + i).value + '-' + E('_f_oceil_' + i).value);
+
+			for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+				var u = (uidx > 1) ? uidx : '';
+				for (i = 0; i < 10; ++i) {
+					a.push(E('_wan' + u + '_f_orate_' + i).value + '-' + E('_wan' + u + '_f_oceil_' + i).value);
+				}
 			}
 			fom.qos_orates.value = a.join(',');
 
 			a = [];
 
-			for (i = 0; i < 10; ++i)
-			{
-				//a.push(E('_f_iceil_' + i).value);
-				a.push(E('_f_irate_' + i).value + '-' + E('_f_iceil_' + i).value);
+			for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+				var u = (uidx > 1) ? uidx : '';
+				for (i = 0; i < 10; ++i)
+				{
+					a.push(E('_wan' + u + '_f_irate_' + i).value + '-' + E('_wan' + u + '_f_iceil_' + i).value);
+				}
 			}
 
 			fom.qos_irates.value = a.join(',');
@@ -236,14 +230,18 @@ No part of this file may be used without permission.
 				}
 
 				j = 0;
-				for (i = 0; i < 10; ++i) {
-					x = cc[j++] || 1;
-					y = cc[j++] || 1;
-					f.push({ title: classNames[i], multi: [
-						{ name: 'f_orate_' + i, type: 'select', options: pctListout, value: x, suffix: ' ' },
-						{ name:	'f_oceil_' + i, type: 'select', options: pctListout, value: y },
-						{ type: 'custom', custom: ' &nbsp; <span id="_okbps_' + i + '"></span>' } ]
-					});
+				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+					var u = (uidx > 1) ? uidx : '';
+					for (i = 0; i < 10; ++i) {
+						x = cc[j++] || 1;
+						y = cc[j++] || 1;
+						f.push(
+							{ title: classNames[i], multi: [
+								{ name: 'wan' + u + '_f_orate_' + i, type: 'select', options: pctListout, value: x, suffix: ' ' },
+								{ name: 'wan' + u + '_f_oceil_' + i, type: 'select', options: pctListout, value: y },
+								{ type: 'custom', custom: ' &nbsp; <span id="_wan' + u + '_okbps_' + i + '"><\/span>' } ]
+						});
+					}
 				}
 
 				$('.out-limit').forms(f);
@@ -257,24 +255,25 @@ No part of this file may be used without permission.
 				allRates = nvram.qos_irates.split(',');
 				f = [];
 
-				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx){
-					var u = (uidx >1) ? uidx : '';
+				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+					var u = (uidx > 1) ? uidx : '';
 					f.push({ title: 'WAN '+uidx+'<br>Max Bandwidth Limit', name: 'wan'+u+'_qos_ibw', type: 'text', maxlen: 8, size: 8, suffix: ' <small>kbit/s </small>', value: nvram['wan'+u+'_qos_ibw'] });
 				}
 
-				for (i = 0; i < 10; ++i)
-				{
-					splitRate = allRates[i].split('-');
-					incoming_rate = splitRate[0] || 1;
-					incoming_ceil = splitRate[1] || 100;
-
-					f.push(
-						{
-							title: classNames[i], multi: [
-								{ name:	'f_irate_' + i, type: 'select', options: pctListin, value: incoming_rate, suffix: ' ' },
-								{ name:	'f_iceil_' + i, type: 'select', options: pctListin, value: incoming_ceil },
-								{ custom: ' &nbsp; <span id="_ikbps_' + i + '"></span>' } ]
-					});
+				for (var uidx = 1; uidx <= nvram.mwan_num; ++uidx) {
+					var u = (uidx > 1) ? uidx : '';
+					for (i = 0; i < 10; ++i)
+					{
+						splitRate = allRates[i].split('-');
+						incoming_rate = splitRate[0] || 1;
+						incoming_ceil = splitRate[1] || 100;
+						f.push(
+						{ title: classNames[i], multi: [
+							{ name: 'wan' + u + '_f_irate_' + i, type: 'select', options: pctListin, value: incoming_rate, suffix: ' ' },
+							{ name: 'wan' + u + '_f_iceil_' + i, type: 'select', options: pctListin, value: incoming_ceil },
+							{ type: 'custom', custom: ' &nbsp; <span id="_wan' + u + '_ikbps_' + i + '"><\/span>' } ]
+						});
+					}
 				}
 				$('.in-limit').forms(f);
 			</script>
