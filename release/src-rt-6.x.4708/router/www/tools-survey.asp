@@ -59,12 +59,9 @@ No part of this file may be used without permission.
 					r = cmpInt(da.rssi, db.rssi);
 					break;
 				case 4:
-					r = cmpInt(da.noise, db.noise);
-					break;
-				case 5:
 					r = cmpInt(da.qual, db.qual);
 					break;
-				case 6:
+				case 5:
 					r = cmpInt(da.channel, db.channel);
 					break;
 				default:
@@ -121,8 +118,6 @@ No part of this file may be used without permission.
 					e.channel = e.channel + '<br><small>' + s[9] + ' MHz</small>';
 				}
 				e.rssi = s[4];
-				e.noise = s[5];
-				e.saw = 1;
 
 				t = '';
 				k = 0;
@@ -200,15 +195,16 @@ No part of this file may be used without permission.
 
 				e = entries[i];
 
-				if (!e.saw) {
-					e.rssi = MAX(e.rssi - 5, -101);
-					e.noise = MAX(e.noise - 2, -101);
-					if ((e.rssi == -101) || (e.noise == -101))
-					e.noise = e.rssi = -999;
+				if (e.rssi >= -50){
+					e.qual = 100;
+        	    } else if (e.rssi >= -80) { // between -50 ~ -80dbm
+					e.qual = Math.round(24 + ((e.rssi + 80) * 26)/10);
+				} else if (e.rssi >= -90) { // between -80 ~ -90dbm
+					e.qual = Math.round(24 + ((e.rssi + 90) * 26)/10);
+				} else {
+					e.qual = 0;
 				}
-				e.saw = 0;
 
-				e.qual = MAX(e.rssi - e.noise, 0);
 				var bar = '';
 				switch(MIN(MAX(Math.floor(e.qual / 10), 1), 6)) {
 					case 1: case 2:
@@ -237,7 +233,6 @@ No part of this file may be used without permission.
 					'' + e.ssid,
 					mac,
 					(e.rssi == -999) ? '' : (e.rssi + ' <small>dBm</small>'),
-					(e.noise == -999) ? '' : (e.noise + ' <small>dBm</small>'),
 					'<small>' + e.qual + '</small></b> <div class="progress small"><div class="bar ' + bar + '" style="width:' + e.qual + '%;"></div></div>',
 					'' + e.channel,
 					'' + e.cap,
@@ -256,7 +251,7 @@ No part of this file may be used without permission.
 
 		sg.setup = function() {
 			this.init('survey-grid', 'sort');
-			this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Noise &nbsp; &nbsp; ', 'Quality', 'Ch', 'Capabilities', 'Rates']);
+			this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Quality', 'Ch', 'Capabilities', 'Rates']);
 			this.populate();
 			this.sort(0);
 		}

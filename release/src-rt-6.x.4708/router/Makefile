@@ -2466,11 +2466,11 @@ libcurl-install:
 	install -D libcurl/src/.libs/curl $(INSTALLDIR)/libcurl/usr/sbin/curl
 	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/sbin/curl
 	install -d $(INSTALLDIR)/libcurl/usr/lib
-	install -D libcurl/lib/.libs/libcurl.so.4.4.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.4.0
-	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.4.0
+	install -D libcurl/lib/.libs/libcurl.so.4.5.0 $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.5.0
+	$(STRIP) -s $(INSTALLDIR)/libcurl/usr/lib/libcurl.so.4.5.0
 	cd $(INSTALLDIR)/libcurl/usr/lib/ && \
-		ln -sf libcurl.so.4.4.0 libcurl.so.4 && \
-		ln -sf libcurl.so.4.4.0 libcurl.so
+		ln -sf libcurl.so.4.5.0 libcurl.so.4 && \
+		ln -sf libcurl.so.4.5.0 libcurl.so
 
 libevent/stamp-h1:
 	cd libevent && CC=$(CC) \
@@ -2795,11 +2795,11 @@ libsodium: libsodium/stamp-h1
 
 libsodium-install:
 	install -d $(INSTALLDIR)/libsodium/usr/lib
-	install -D libsodium/src/libsodium/.libs/libsodium.so.18.2.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.2.0
-	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.18.2.0
+	install -D libsodium/src/libsodium/.libs/libsodium.so.23.0.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
+	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
 	cd $(INSTALLDIR)/libsodium/usr/lib/ && \
-		ln -sf libsodium.so.18.2.0 libsodium.so.18 && \
-		ln -sf libsodium.so.18.2.0 libsodium.so
+		ln -sf libsodium.so.23.0.0 libsodium.so.23 && \
+		ln -sf libsodium.so.23.0.0 libsodium.so
 
 libsodium-clean:
 	-$(MAKE) -C libsodium clean
