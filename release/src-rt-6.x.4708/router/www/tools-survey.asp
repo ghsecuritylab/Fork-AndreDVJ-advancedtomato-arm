@@ -197,7 +197,7 @@ No part of this file may be used without permission.
 
 				if (e.rssi >= -50){
 					e.qual = 100;
-        	    } else if (e.rssi >= -80) { // between -50 ~ -80dbm
+				} else if (e.rssi >= -80) { // between -50 ~ -80dbm
 					e.qual = Math.round(24 + ((e.rssi + 80) * 26)/10);
 				} else if (e.rssi >= -90) { // between -80 ~ -90dbm
 					e.qual = Math.round(24 + ((e.rssi + 90) * 26)/10);
