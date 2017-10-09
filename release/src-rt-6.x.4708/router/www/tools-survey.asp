@@ -15,10 +15,10 @@ No part of this file may be used without permission.
 		#survey-grid .grate {
 			color: green;
 		}
-		#survey-grid .co4,
-		#survey-grid .co5 {
+		#survey-grid .co4 {
 			text-align: right;
 		}
+		#survey-grid .co5,
 		#survey-grid .co6,
 		#survey-grid .co7 {
 			text-align: center;
