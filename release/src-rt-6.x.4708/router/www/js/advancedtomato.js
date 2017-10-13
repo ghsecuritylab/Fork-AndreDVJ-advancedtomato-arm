@@ -161,10 +161,10 @@ function AdvancedTomato() {
 
     /* Handle NVRAM global functions and notifications
      ************************************************************************************************/
-    if ( nvram === undefined ) { return false; }
+    if ( typeof nvram == 'undefined' ) { return false; }
 
     // Check for update
-    if ( nvram.at_update !== undefined && nvram.at_update != '' ) {
+    if ( typeof nvram.at_update !== "undefined" && nvram.at_update != '' ) {
 
         var n          = cookie.get( 'latest-update' );
         var lastUpdate = nvram[ 'at_update' ].replace( '.', '' );
@@ -186,7 +186,7 @@ function AdvancedTomato() {
     }
 
     // Check if tomatoanon is configured
-    if ( nvram.tomatoanon_answer !== undefined ) {
+    if ( typeof nvram.tomatoanon_answer !== "undefined" ) {
 
         if ( nvram.tomatoanon_answer != '1' ) {
 
@@ -198,7 +198,7 @@ function AdvancedTomato() {
     }
 
     // Check for Navigation State NVRAM value
-    if ( nvram.at_nav_state !== undefined ) {
+    if ( typeof nvram.at_nav_state !== 'undefined' ) {
 
         if ( nvram.at_nav_state == 'collapsed' || $( window ).width() <= 768 ) {
 
@@ -299,15 +299,22 @@ function loadPage( page, is_history ) {
     // Some things that need to be done here =)
     page = page.replace( '#', '' );
     if ( page == 'status-home.asp' || page == '/' || page == null ) { page = 'status-home.asp'; }
-    if ( window.ajaxLoadingState ) { return false; } else { window.ajaxLoadingState = true; }
+    if ( window.ajaxLoadingState ) return false; else window.ajaxLoadingState = true;
 
-    // Since we use ajax, functions and timers stay in memory/cache. Here we undefine & stop them to prevent issues with other pages.
-    if ( typeof( ref ) != 'undefined' ) {
+    // Since we use ajax, functions and timers stay in memory/cache. Here we undefined & stop them to prevent issues with other pages.
+    if ( typeof ref !== 'undefined' ) {
+
         ref.destroy();
-        ref = undefined;
         delete ref;
+
     }
-    if ( typeof( wdog ) != 'undefined' ) { clearTimeout( wdog ); } // Delayed function that kills our refreshers!
+
+    // Delayed function that kills our refreshers!
+    if ( typeof wdog !== 'undefined' ) {
+
+        clearTimeout( wdog );
+
+    }
 
     // Start page pre-loader
     $( '#nprogress' ).append( '<div class="bar"></div>' );
@@ -317,7 +324,7 @@ function loadPage( page, is_history ) {
 
 
     // Switch to JQUERY AJAX function call (doesn't capture errors allowing much easier debugging)
-    $.ajax( { url: page, async: true, cache: false, timeout: 6550 } )
+    $.ajax( { url: page, async: true, cache: false, timeout: 2950 } )
         .done( function( resp ) {
 
             var dom   = $( resp );
@@ -402,7 +409,7 @@ function loadPage( page, is_history ) {
                     window.ajaxLoadingState = false;
                     loadPage( page, is_history );
 
-                }, 7000 );
+                }, 3000 );
 
                 // Don't continue
                 return;
