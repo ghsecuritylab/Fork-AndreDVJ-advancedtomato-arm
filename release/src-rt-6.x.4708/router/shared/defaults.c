@@ -167,7 +167,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "dhcp3_lease",		"1440"				, 0 },
 
 #ifdef TCONFIG_USB
-	// 3G Modem
+	// 3G/4G Modem
 	{ "wan_modem_pin",		""				, 0 },
 	{ "wan_modem_dev",		"ttyUSB0"			, 0 },
 	{ "wan_modem_init",		"*99#"				, 0 },
@@ -618,6 +618,14 @@ struct nvram_tuple router_defaults[] = {
 	{ "dr_lan3_rx",			"0"				, 0 },	// Dynamic-Routing LAN in
 	{ "dr_wan_tx",			"0"				, 0 },	// Dynamic-Routing WAN out
 	{ "dr_wan_rx",			"0"				, 0 },	// Dynamic-Routing WAN in
+	{ "dr_wan2_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
+	{ "dr_wan2_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
+#ifdef TCONFIG_MULTIWAN
+	{ "dr_wan3_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
+	{ "dr_wan3_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
+	{ "dr_wan4_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
+	{ "dr_wan4_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
+#endif
 #endif
 
 // advanced-vlan
@@ -932,9 +940,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "smbd_cset",			"utf8"				, 0 },
 	{ "smbd_custom",		""				, 0 },
 	{ "smbd_autoshare",		"2"				, 0 },
-	{ "smbd_shares",
-		"jffs</jffs<JFFS<1<0>root$</<Hidden Root<0<1"
-	, 0 },
+	{ "smbd_shares",		"jffs</jffs<JFFS<1<0>root$</<Hidden Root<0<1"	, 0 },
 	{ "smbd_user",			"nas"				, 0 },
 	{ "smbd_passwd",		""				, 0 },
 	{ "smbd_ifnames",		"br0"				, 0 },
@@ -1142,6 +1148,7 @@ struct nvram_tuple router_defaults[] = {
 
 #ifdef TCONFIG_PPTPD
 	{ "pptp_client_enable",   "0"             , 0 },
+	{ "pptp_client_usewan",   "wan"           , 0 },
 	{ "pptp_client_peerdns",  "0"             , 0 },
 	{ "pptp_client_mtuenable","0"             , 0 },
 	{ "pptp_client_mtu",      "1450"          , 0 },

@@ -151,8 +151,7 @@ static void _execute_command(char *url, char *command, char *query, wofilter_t w
 			command ? "" : "./", command ? command : url,
 			query ? "<" : "", query ? webQueryFile : "");
 		fclose(f);
-	}
-	else {
+	} else {
 		close(fe);
 		unlink(webExecFile);
 		if (query) {
@@ -167,8 +166,7 @@ static void _execute_command(char *url, char *command, char *query, wofilter_t w
 		if ((f = fdopen(fq, "wb")) != NULL) {
 			fprintf(f, "%s\n", query);
 			fclose(f);
-		}
-		else {
+		} else {
 			unlink(webExecFile);
 			close(fq);
 			unlink(webQueryFile);
@@ -249,7 +247,7 @@ static void wo_spin(char *url)
 	strlcpy(s, nvram_safe_get("web_css"), sizeof(s));
 	strlcat(s, "_spin.gif", sizeof(s));
 	if (f_exists(s)) do_file(s);
-		else do_file("_spin.gif");
+	else do_file("_spin.gif");
 }
 */
 
@@ -258,8 +256,7 @@ void common_redirect(void)
 	if (atoi(webcgi_safeget("_ajax", ""))) {
 		send_header(200, NULL, mime_html, 0);
 		web_puts("OK");
-	}
-	else {
+	} else {
 		redirect(webcgi_safeget("_redirect", "/"));
 	}
 }
@@ -711,38 +708,38 @@ static const nvset_t nvset_list[] = {
 	{ "wan_wins",			V_IP				},
 
 #ifdef TCONFIG_USB
-	// 3G MODEM
+	// 3G/4G MODEM
 	{ "wan_modem_pin",		V_LENGTH(0,6)			},
-	{ "wan_modem_dev",		V_LENGTH(0,8)			},
+	{ "wan_modem_dev",		V_LENGTH(0,8)			},	// ttyUSB0, cdc-wdm1...
 	{ "wan_modem_init",		V_LENGTH(0,25)			},
 	{ "wan_modem_apn",		V_LENGTH(0,25)			},
 	{ "wan_modem_speed",		V_LENGTH(0,6)			},
-	{ "wan_modem_band",		V_LENGTH(0, 16)			},  // all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
+	{ "wan_modem_band",		V_LENGTH(0, 16)			},	// all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
 	{ "wan_modem_roam",		V_RANGE(0, 3)			},	// 0 - not supported, 1 - supported, 2 - no change, 3 - roam only
 
 	{ "wan2_modem_pin",		V_LENGTH(0,6)			},
-	{ "wan2_modem_dev",		V_LENGTH(0,8)			},
+	{ "wan2_modem_dev",		V_LENGTH(0,8)			},	// ttyUSB0, cdc-wdm1...
 	{ "wan2_modem_init",		V_LENGTH(0,25)			},
 	{ "wan2_modem_apn",		V_LENGTH(0,25)			},
 	{ "wan2_modem_speed",		V_LENGTH(0,6)			},
-	{ "wan2_modem_band",	V_LENGTH(0, 16)			},  // all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
+	{ "wan2_modem_band",	V_LENGTH(0, 16)			},	// all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
 	{ "wan2_modem_roam",	V_RANGE(0, 3)			},	// 0 - not supported, 1 - supported, 2 - no change, 3 - roam only
 
 #ifdef TCONFIG_MULTIWAN
 	{ "wan3_modem_pin",		V_LENGTH(0,6)			},
-	{ "wan3_modem_dev",		V_LENGTH(0,8)			},
+	{ "wan3_modem_dev",		V_LENGTH(0,8)			},	// ttyUSB0, cdc-wdm1...
 	{ "wan3_modem_init",		V_LENGTH(0,25)			},
 	{ "wan3_modem_apn",		V_LENGTH(0,25)			},
 	{ "wan3_modem_speed",		V_LENGTH(0,6)			},
-	{ "wan3_modem_band",	V_LENGTH(0, 16)			},  // all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
+	{ "wan3_modem_band",	V_LENGTH(0, 16)			},	// all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
 	{ "wan3_modem_roam",	V_RANGE(0, 3)			},	// 0 - not supported, 1 - supported, 2 - no change, 3 - roam only
 
 	{ "wan4_modem_pin",		V_LENGTH(0,6)			},
-	{ "wan4_modem_dev",		V_LENGTH(0,8)			},
+	{ "wan4_modem_dev",		V_LENGTH(0,8)			},	// ttyUSB0, cdc-wdm1...
 	{ "wan4_modem_init",		V_LENGTH(0,25)			},
 	{ "wan4_modem_apn",		V_LENGTH(0,25)			},
 	{ "wan4_modem_speed",		V_LENGTH(0,6)			},
-	{ "wan4_modem_band",	V_LENGTH(0, 16)			},  // all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
+	{ "wan4_modem_band",	V_LENGTH(0, 16)			},	// all - 7FFFFFFFFFFFFFFF, 800MHz - 80000, 1800MHz - 4, 2100MHz - 1, 2600MHz - 40
 	{ "wan4_modem_roam",	V_RANGE(0, 3)			},	// 0 - not supported, 1 - supported, 2 - no change, 3 - roam only
 #endif
 #endif
@@ -789,7 +786,7 @@ static const nvset_t nvset_list[] = {
 	// wireless
 	{ "wl_radio",			V_01				},
 	{ "wl_mode",			V_LENGTH(2, 3)		},	// ap, sta, wet, wds
-	{ "wl_net_mode",		V_LENGTH(5, 8)		},  // disabled, mixed, b-only, g-only, bg-mixed, n-only [speedbooster]
+	{ "wl_net_mode",		V_LENGTH(5, 8)		},	// disabled, mixed, b-only, g-only, bg-mixed, n-only [speedbooster]
 	{ "wl_ssid",			V_LENGTH(1, 32)		},
 	{ "wl_closed",			V_01				},
 	{ "wl_channel",			V_RANGE(0, 216)		},
@@ -1794,6 +1791,7 @@ wl_ap_ssid
 */
 #ifdef TCONFIG_PPTPD
 	{ "pptp_client_enable",   V_01                  },
+	{ "pptp_client_usewan",   V_TEXT(0,5)           },
 	{ "pptp_client_peerdns",  V_RANGE(0,2)          },
 	{ "pptp_client_mtuenable",V_01                  },
 	{ "pptp_client_mtu",      V_RANGE(576, 1500)	},
@@ -1986,22 +1984,21 @@ static int save_variables(int write)
 				dirty = 1;
 				nvram_set("http_passwd", p1);
 			}
-  		}
-  		else {
+  		} else {
 			sprintf(s, msgf, "password");
 			resmsg_set(s);
 			return 0;
-  		}
+		}
 	}
 
 	for (n = 0; n < 50; ++n) {
 		sprintf(s, "rrule%d", n);
 		if ((p = webcgi_get(s)) != NULL) {
-	        	if (strlen(p) > 2048) {
+            if (strlen(p) > 2048) {
 				sprintf(s, msgf, s);
 				resmsg_set(s);
 				return 0;
-	        	}
+			}
 			if ((write) && (!nvram_match(s, p))) {
 				dirty = 1;
 				DEBUG_NVRAMSET(s, p);
@@ -2051,15 +2048,12 @@ static void wo_tomato(char *url)
 	rboot = atoi(webcgi_safeget("_reboot", "0"));
 	if (rboot) {
 		parse_asp("reboot.asp");
-	}
-	else {
+	} else {
 		if (ajax) {
 			web_printf("@msg:%s", resmsg_get());
-		}
-		else if (atoi(webcgi_safeget("_moveip", "0"))) {
+		} else if (atoi(webcgi_safeget("_moveip", "0"))) {
 			parse_asp("saved-moved.asp");
-		}
-		else if (!*red) {
+		} else if (!*red) {
 			parse_asp("saved.asp");
 		}
 	}
@@ -2078,8 +2072,7 @@ static void wo_tomato(char *url)
 
 		if (*v == '*') {
 			kill(1, SIGHUP);
-		}
-		else {
+		} else {
 			exec_service(v);
 		}
 	}
