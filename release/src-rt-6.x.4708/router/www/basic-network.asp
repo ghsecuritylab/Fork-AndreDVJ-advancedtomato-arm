@@ -1102,9 +1102,11 @@ No part of this file may be used without permission.
 
 					/* REMOVE-BEGIN
 					 if ((wl_vis[uidx]._f_wl_mode == 1) && (wmode != 'ap') && (sm2.substr(0, 4) == 'wpa2')) {
-					 ferror.set('_wl'+u+'_security_mode', 'WPA2 is supported only in AP mode.', quiet || !ok);
-					 ok = 0;
-					 }  else ferror.clear('_wl'+u+'_security_mode');
+						 ferror.set('_wl'+u+'_security_mode', 'WPA2 is supported only in AP mode.', quiet || !ok);
+						 ok = 0;
+					 } else {
+						 ferror.clear('_wl'+u+'_security_mode');
+					 }
 					 REMOVE-END */
 
 					// --- N standard does not support WPA+TKIP ---
@@ -1149,7 +1151,9 @@ No part of this file may be used without permission.
 					if (((wmode == 'wds') || (wmode == 'apwds')) && (wl_vis[uidx]._wl_channel == 1) && (E('_wl'+u+'_channel').value == '0')) {
 						ferror.set('_wl'+u+'_channel', 'Fixed wireless channel required in WDS mode.', quiet || !ok);
 						ok = 0;
-					} else ferror.clear('_wl'+u+'_channel');
+					} else {
+						ferror.clear('_wl'+u+'_channel');
+					}
 
 				}
 			}

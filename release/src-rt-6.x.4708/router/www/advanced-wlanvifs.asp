@@ -789,6 +789,7 @@ LAN Access admin module by Augusto Bott
 							}
 						}
 					}
+
 					wl_vis[vidx]._f_wl_nctrlsb = (E('_wl'+u+'_nbw_cap').value == 0) ? 0 : wl_vis[vidx]._wl_nbw_cap;
 
 					/* REMOVE-BEGIN
@@ -1355,7 +1356,7 @@ LAN Access admin module by Augusto Bott
 	<input type="hidden" name="lan1_ifnames" value="">
 	<input type="hidden" name="lan2_ifnames" value="">
 	<input type="hidden" name="lan3_ifnames" value="">
-	<input type='hidden' name='wl_macmode' value=''>
+	<input type="hidden" name="wl_macmode" value="">
 
 	<div class="box" id="sesdiv" style="display:none">
 		<div class="heading">Virtual Wireless Interfaces</div>
@@ -1395,11 +1396,11 @@ LAN Access admin module by Augusto Bott
 						<li><b>SSID</b> - Wireless Service Set Identifier.</li>
 						<li><b>Mode</b> - Interface mode: Access Point, WDS, Wireless Client, etc...</li>
 						<li><b>Bridge</b> - Which LAN bridge this VIF should be assigned.</li>
-						<li><b>WFilter</b> - <a href="basic-wfilter.asp" class="new_window">Wireless Filter</a>:
+						<li><b>WFilter</b> - <a href="#basic-wfilter.asp" class="new_window">Wireless Filter</a>:
 							<ul>
 								<li><i>Disabled</i> - Disable filter on that interface.</li>
-								<li><i>Block</i> - Block clients from the <a href="basic-wfilter.asp" class="new_window">list</a> on that interface.</li>
-								<li><i>Permit</i> - Permit only clients from the <a href="basic-wfilter.asp" class="new_window">list</a> on that interface.</li>
+								<li><i>Block</i> - Block clients from the <a href="#basic-wfilter.asp" class="new_window">list</a> on that interface.</li>
+								<li><i>Permit</i> - Permit only clients from the <a href="#basic-wfilter.asp" class="new_window">list</a> on that interface.</li>
 							</ul>
 						</li>
 					</ul>
@@ -1410,7 +1411,7 @@ LAN Access admin module by Augusto Bott
 							<li>When creating/defining a new wireless VIF, its MAC address will be shown (incorrectly) as '00:00:00:00:00:00', as it's unknown at that moment (until network is restarted and this page is reloaded).</li>
 							<li>When saving changes, the MAC addresses of all defined non-primary wireless VIFs could sometimes be (already) <i>set</i> but might be <i>recreated</i> by the WL driver (so that previously defined/saved settings might need to be updated/changed accordingly on <a href=#advanced-mac.asp>Advanced/MAC Address</a> after saving settings and rebooting your router).</li>
 							<li>This web interface allows configuring a maximum of 4 VIFs for each physical wireless interface available - up to 3 extra VIFs can be defined in addition to the primary VIF (<i>on devices with multiple VIF capabilities</i>).</li>
-							<li>By definition, configuration settings for the <i>primary VIF</i> of any physical wireless interfaces shouldn't be touched here (use the <a class="ajaxload" href="basic-network.asp">Basic/Network</a> page instead).</li>
+							<li>By definition, configuration settings for the <i>primary VIF</i> of any physical wireless interfaces shouldn't be touched here (use the <a class="ajaxload" href="#basic-network.asp">Basic/Network</a> page instead).</li>
 						</ul>
 					</ul>
 				</div>
@@ -1502,7 +1503,7 @@ LAN Access admin module by Augusto Bott
 								suffix: '</div> <button class="btn" type="button" id="_f_wl'+u+'_scan" value="Scan" onclick="scanButton('+u+')">Scan <i class="icon-search"></i></button> <span class="spinner" id="spin'+u+'"></span>',
 								value: eval('nvram["wl'+u+'_channel"]') },
 							{ title: 'Channel Width', name: 'wl'+u+'_nbw_cap', type: 'select', options: [],
-								value: eval('nvram["wl'+u+'_nbw_cap"]'), prefix: '<span id="__wl'+u+'_nbw_cap">', suffix: '<\/span>' },
+								value: eval('nvram["wl'+u+'_nbw_cap"]'), prefix: '<span id="__wl'+u+'_nbw_cap">', suffix: '</span>' },
 							{ title: 'Control Sideband', name: 'f_wl'+u+'_nctrlsb', type: 'select', options: [['lower','Lower'],['upper','Upper']],
 								value: eval('nvram["wl'+u+'_nctrlsb"]') == 'none' ? 'lower' : eval('nvram["wl'+u+'_nctrlsb"]') }
 						);
@@ -1512,7 +1513,7 @@ LAN Access admin module by Augusto Bott
 						nvram['wl'+u+'_crypto'] = 'aes';
 
 					f.push (
-						{ title: '<a href="basic-wfilter.asp" class="new_window">Wireless Filter<\/a>', name: 'f_wl'+u+'_macmode', type: 'select',
+						{ title: '<a href="#basic-wfilter.asp" class="new_window">Wireless Filter<\/a>', name: 'f_wl'+u+'_macmode', type: 'select',
 							options: [['disabled','Disable filter on that interface'],['deny','Block clients from the list on that interface'],['allow','Permit only clients from the list on that interface']],
 							value: nvram['wl'+u+'_macmode'] },
 						{ title: 'Security', name: 'wl'+u+'_security_mode', type: 'select',
@@ -1526,7 +1527,7 @@ LAN Access admin module by Augusto Bott
 						{ title: 'Shared Key', indent: 2, name: 'wl'+u+'_radius_key', type: 'password', maxlen: 80, size: 32, peekaboo: 1,
 							suffix: ' <button class="btn" type="button" id="_f_wl'+u+'_psk_random2" value="Random" onclick="random_psk(\'_wl'+u+'_radius_key\')">Random</button>',
 							value: eval('nvram["wl'+u+'_radius_key"]') },
-						{ title: 'Group Key Renewal', indent: 2, name: 'wl'+u+'_wpa_gtk_rekey', type: 'text', maxlen: 4, size: 6, suffix: '&nbsp; <small>seconds<\/small>',
+						{ title: 'Group Key Renewal', indent: 2, name: 'wl'+u+'_wpa_gtk_rekey', type: 'text', maxlen: 4, size: 6, suffix: '&nbsp; <small>seconds</small>',
 							value: eval('nvram["wl'+u+'_wpa_gtk_rekey"]') || '3600' },
 						{ title: 'Radius Server', indent: 2, multi: [
 							{ name: 'wl'+u+'_radius_ipaddr', type: 'text', maxlen: 15, size: 17, value: eval('nvram["wl'+u+'_radius_ipaddr"]') },
