@@ -9,12 +9,6 @@ No part of this file may be used without permission.
 --><title>Wireless Survey</title>
 <content>
 	<style type="text/css">
-		#survey-grid .brate {
-			color: blue;
-		}
-		#survey-grid .grate {
-			color: green;
-		}
 		#survey-grid .co4 {
 			text-align: right;
 		}

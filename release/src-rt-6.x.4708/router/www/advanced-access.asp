@@ -199,7 +199,7 @@ LAN Access admin module by Augusto Bott
 		<div class="content">
 			<table class="line-table" id="la-grid"></table><br /><hr>
 
-			<h4>Notes <a href="javascript:toggleVisibility('notes');"><span id="sesdiv_notes_showhide"><i class="icon-chevron-up"></i></span></a></h4>
+			<h4><a href="javascript:toggleVisibility('notes');">Notes <span id="sesdiv_notes_showhide"><i class="icon-chevron-up"></i></span></a></h4>
 			<div class="section" id="sesdiv_notes" style="display:none">
 				<ul>
 					<li><b>Src</b> - Source LAN bridge.</li>
@@ -216,4 +216,5 @@ LAN Access admin module by Augusto Bott
 	<span id="footer-msg" class="alert alert-warning" style="visibility: hidden;"></span>
 
 	<script type="text/javascript">init();</script>
+	</form>
 </content>
