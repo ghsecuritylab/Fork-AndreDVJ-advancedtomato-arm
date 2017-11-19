@@ -2327,9 +2327,7 @@ function escapeHTML(s)
 
 function escapeCGI(s)
 {
-	// Don't call escape here as it is deprecated and mangles unicode
-	// Which should not be an issue since we are UTF-8
-	return s.replace( /\+/g, '%2B' );
+	 return escape( s ).replace( /\+/g, '%2B' );	// escape() doesn't handle +
 }
 
 function escapeD(s)
