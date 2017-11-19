@@ -67,10 +67,10 @@ function refreshBandWidth(uidx)
 	val = (!nm_loaded[uidx] || (e.value + '' == '')) ? eval('nvram.wl'+u+'_nbw_cap') : e.value;
 
 	for (i = 0; i < m.length; ++i)
-	buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '<\/option>';
+		buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '</option>';
 
 	e = E('__wl'+u+'_nbw_cap');
-	buf = '<select name="wl'+u+'_nbw_cap" onchange="verifyFields(this, 1)" id = "_wl'+u+'_nbw_cap">' + buf + '<\/select>';
+	buf = '<select name="wl'+u+'_nbw_cap" onchange="verifyFields(this, 1)" id = "_wl'+u+'_nbw_cap">' + buf + '</select>';
 	elem.setInnerHTML(e, buf);
 	nm_loaded[uidx] = 1;
 }

@@ -33,7 +33,9 @@ LAN Access admin module by Augusto Bott
 	<script type="text/javascript" src="js/wireless.jsx?_http_id=<% nv(http_id); %>"></script>
 	<script type="text/javascript" src="js/interfaces.js"></script>
 	<script type="text/javascript" src="js/wireless.js"></script>
-	<script type="text/javascript">
+	<script type='text/javascript'>
+
+		var nvram;
 
 		// <% nvram("nas_alternate,wl_auth,wl_auth_mode,wl_bss_enabled,wl_channel,wl_closed,wl_corerev,wl_crypto,wl_hwaddr,wl_ifname,wl_key,wl_key1,wl_key2,wl_key3,wl_key4,wl_lazywds,wl_mode,wl_nband,wl_nbw_cap,wl_nctrlsb,wl_net_mode,wl_passphrase,wl_phytype,wl_radio,wl_radius_ipaddr,wl_radius_key,wl_radius_port,wl_security_mode,wl_ssid,wl_vifs,wl_wds,wl_wds_enable,wl_wep_bit,wl_wpa_gtk_rekey,wl_wpa_psk,wl_bss_maxassoc,wl_wme,lan_ifname,lan_ifnames,lan1_ifname,lan1_ifnames,lan2_ifname,lan2_ifnames,lan3_ifname,lan3_ifnames,t_features,wl_macmode,wl_maclist");%>
 
@@ -1513,7 +1515,7 @@ LAN Access admin module by Augusto Bott
 						nvram['wl'+u+'_crypto'] = 'aes';
 
 					f.push (
-						{ title: '<a href="#basic-wfilter.asp" class="new_window">Wireless Filter<\/a>', name: 'f_wl'+u+'_macmode', type: 'select',
+						{ title: '<a href="#basic-wfilter.asp" class="new_window">Wireless Filter</a>', name: 'f_wl'+u+'_macmode', type: 'select',
 							options: [['disabled','Disable filter on that interface'],['deny','Block clients from the list on that interface'],['allow','Permit only clients from the list on that interface']],
 							value: nvram['wl'+u+'_macmode'] },
 						{ title: 'Security', name: 'wl'+u+'_security_mode', type: 'select',
