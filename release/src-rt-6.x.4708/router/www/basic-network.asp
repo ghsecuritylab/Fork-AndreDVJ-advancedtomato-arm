@@ -1102,9 +1102,11 @@ No part of this file may be used without permission.
 
 					/* REMOVE-BEGIN
 					 if ((wl_vis[uidx]._f_wl_mode == 1) && (wmode != 'ap') && (sm2.substr(0, 4) == 'wpa2')) {
-					 ferror.set('_wl'+u+'_security_mode', 'WPA2 is supported only in AP mode.', quiet || !ok);
-					 ok = 0;
-					 }  else ferror.clear('_wl'+u+'_security_mode');
+						 ferror.set('_wl'+u+'_security_mode', 'WPA2 is supported only in AP mode.', quiet || !ok);
+						 ok = 0;
+					 } else {
+						 ferror.clear('_wl'+u+'_security_mode');
+					 }
 					 REMOVE-END */
 
 					// --- N standard does not support WPA+TKIP ---
@@ -1149,7 +1151,9 @@ No part of this file may be used without permission.
 					if (((wmode == 'wds') || (wmode == 'apwds')) && (wl_vis[uidx]._wl_channel == 1) && (E('_wl'+u+'_channel').value == '0')) {
 						ferror.set('_wl'+u+'_channel', 'Fixed wireless channel required in WDS mode.', quiet || !ok);
 						ok = 0;
-					} else ferror.clear('_wl'+u+'_channel');
+					} else {
+						ferror.clear('_wl'+u+'_channel');
+					}
 
 				}
 			}
@@ -1745,7 +1749,7 @@ No part of this file may be used without permission.
 							suffix : ' <i>works only with non-Hilink modems</i>'
 						},
 						{ title: 'Roaming', name: 'wan'+u+'_modem_roam', type: 'select', options: [['2', 'No change*'],['1', 'Supported'],['0', 'Disabled'],['3', 'Roam only']], value: nvram['wan'+u+'_modem_roam'], suffix: ' <small>*default; works only with non-Hilink modems<\/small>' },
-						{ title: 'LTE Band', name: 'wan'+u+'_modem_band', type: 'select', options: [['7FFFFFFFFFFFFFFF', 'All supported*'],['80000', 'B20 (800 MHz)'],['4', 'B3 (1800 MHz)'],['1', 'B1 (2100 MHz)'],['40', 'B7 (2600 MHz)']], value: nvram['wan'+u+'_modem_band'], suffix: ' <small>*default; tested only on non-Hilink Huawei modems<\/small>' },
+						{ title: 'LTE Band', name: 'wan'+u+'_modem_band', type: 'select', options: [['7FFFFFFFFFFFFFFF', 'All supported*'],['80000', 'B20 (800 MHz)'],['80','B8 (900 MHz)'],['4', 'B3 (1800 MHz)'],['1', 'B1 (2100 MHz)'],['40', 'B7 (2600 MHz)']], value: nvram['wan'+u+'_modem_band'], suffix: ' <small>*default; tested only on non-Hilink Huawei modems<\/small>' },
 						{ title: 'Username', name: 'wan' + u + '_ppp_username', type: 'text', maxlen: 60, size: 64, value: nvram[ 'wan' + u + '_ppp_username' ] },
 						{ title: 'Password', name: 'wan' + u + '_ppp_passwd', type: 'password', maxlen: 60, size: 64, peekaboo: 1, value: nvram[ 'wan' + u + '_ppp_passwd' ] },
 						{ title: 'Service Name', name: 'wan' + u + '_ppp_service', type: 'text', maxlen: 50, size: 64, value: nvram[ 'wan' + u + '_ppp_service' ] },

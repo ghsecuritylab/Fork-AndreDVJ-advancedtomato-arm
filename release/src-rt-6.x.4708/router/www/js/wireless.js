@@ -1,7 +1,6 @@
 function selectedBand(uidx)
 {
 	if (bands[uidx].length > 1) {
-		var u = wl_fface(uidx);
 		var e = E('_f_wl'+u+'_nband');
 		return (e.value + '' == '' ? eval('nvram["wl'+u+'_nband"]') : e.value);
 	} else if (bands[uidx].length > 0) {
@@ -38,10 +37,10 @@ function refreshNetModes(uidx)
 	val = (!nm_loaded[uidx] || (e.value + '' == '')) ? eval('nvram["wl'+u+'_net_mode"]') : e.value;
 	if (val == 'disabled') val = 'mixed';
 	for (i = 0; i < m.length; ++i)
-		buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '<\/option>';
+		buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '</option>';
 
 	e = E('__wl'+u+'_net_mode');
-	buf = '<select name="wl'+u+'_net_mode" onchange="verifyFields(this, 1)" id = "_wl'+u+'_net_mode">' + buf + '<\/select>';
+	buf = '<select name="wl'+u+'_net_mode" onchange="verifyFields(this, 1)" id = "_wl'+u+'_net_mode">' + buf + '</select>';
 	elem.setInnerHTML(e, buf);
 
 	nm_loaded[uidx] = 1;
@@ -68,10 +67,10 @@ function refreshBandWidth(uidx)
 	val = (!nm_loaded[uidx] || (e.value + '' == '')) ? eval('nvram.wl'+u+'_nbw_cap') : e.value;
 
 	for (i = 0; i < m.length; ++i)
-	buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '<\/option>';
+		buf += '<option value="' + m[i][0] + '"' + ((m[i][0] == val) ? ' selected="selected"' : '') + '>' + m[i][1] + '</option>';
 
 	e = E('__wl'+u+'_nbw_cap');
-	buf = '<select name="wl'+u+'_nbw_cap" onchange="verifyFields(this, 1)" id = "_wl'+u+'_nbw_cap">' + buf + '<\/select>';
+	buf = '<select name="wl'+u+'_nbw_cap" onchange="verifyFields(this, 1)" id = "_wl'+u+'_nbw_cap">' + buf + '</select>';
 	elem.setInnerHTML(e, buf);
 	nm_loaded[uidx] = 1;
 }
@@ -102,7 +101,7 @@ function refreshChannels(uidx)
 			buf = '';
 			val = (!ch_loaded[uidx] || (e.value + '' == '')) ? eval('nvram["wl'+u+'_channel"]') : e.value;
 			for (i = 0; i < ghz[uidx].length; ++i)
-				buf += '<option value="' + ghz[uidx][i][0] + '"' + ((ghz[uidx][i][0] == val) ? ' selected' : '') + '>' + ghz[uidx][i][1] + '</option>';
+				buf += '<option value="' + ghz[uidx][i][0] + '"' + ((ghz[uidx][i][0] == val) ? ' selected="selected"' : '') + '>' + ghz[uidx][i][1] + '</option>';
 
 			e = E('__wl'+u+'_channel');
 			buf = '<select name="wl'+u+'_channel" onchange="verifyFields(this, 1)" id = "_wl'+u+'_channel">' + buf + '</select>';
@@ -209,6 +208,18 @@ function scan()
 
 	spin(1, unit);
 	xob.post('update.cgi', 'exec=wlscan&arg0='+unit);
+}
+
+function spin(x, unit)
+{
+	for (var u = 0; u < wl_ifaces.length; ++u) {
+		E('_f_wl'+wl_unit(u)+'_scan').disabled = x;
+	}
+	var e = E('_f_wl'+unit+'_scan');
+
+	if (x) e.value = 'Scan ' + (wscan.tries + 1);
+		else e.value = 'Scan';
+	E('spin'+unit).style.visibility = x ? 'visible' : 'hidden';
 }
 
 function scanButton(u)

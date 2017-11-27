@@ -112,8 +112,6 @@ No part of this file may be used without permission.
 		function earlyInit()
 		{
 			smg.setup();
-
-			init();
 		}
 
 		function init()

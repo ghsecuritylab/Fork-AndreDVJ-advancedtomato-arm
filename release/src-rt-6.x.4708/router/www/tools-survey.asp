@@ -9,12 +9,6 @@ No part of this file may be used without permission.
 --><title>Wireless Survey</title>
 <content>
 	<style type="text/css">
-		#survey-grid .brate {
-			color: blue;
-		}
-		#survey-grid .grate {
-			color: green;
-		}
 		#survey-grid .co4 {
 			text-align: right;
 		}
@@ -110,7 +104,7 @@ No part of this file may be used without permission.
 				e.bssid = s[0];
 				e.ssid = s[1];
 				e.channel = s[3];
-				e.channel = e.channel + '<br /><small>' + s[9] + ' GHz<\/small>'+ '<br /><small>' + s[4] + ' MHz<\/small>';
+				e.channel = e.channel + '<br /><small>' + s[9] + ' GHz</small>'+ '<br /><small>' + s[4] + ' MHz</small>';
 				e.rssi = s[2];
 				e.cap = s[7]+ '<br />' +s[8];
 				e.rates = s[6];

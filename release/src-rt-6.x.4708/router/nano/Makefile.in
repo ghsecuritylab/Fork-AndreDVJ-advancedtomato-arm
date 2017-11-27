@@ -239,7 +239,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = lib m4 po src syntax
+DIST_SUBDIRS = doc lib m4 po src syntax
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/nano.spec.in ABOUT-NLS AUTHORS COPYING COPYING.DOC \
 	ChangeLog INSTALL NEWS README THANKS TODO ar-lib compile \
@@ -1465,7 +1465,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = gnu no-dependencies
-SUBDIRS = lib m4 po src $(am__append_1)
+SUBDIRS = doc lib m4 po src $(am__append_1)
 EXTRA_DIST = ChangeLog.1999-2006 ChangeLog.2007-2015 \
 		IMPROVEMENTS README.GIT nano.spec
 
