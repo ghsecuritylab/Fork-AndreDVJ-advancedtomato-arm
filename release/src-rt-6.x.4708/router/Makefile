@@ -2074,6 +2074,7 @@ php-install:
 
 nginx/stamp-h1: openssl zlib pcre
 	@$(SEP)
+	$(call patch_files,nginx)
 	cd $(TOP)/nginx && ./configure --crossbuild=Linux::$(ARCH) \
 		--prefix=/usr \
 		--sbin-path=/usr/sbin \
@@ -2102,6 +2103,7 @@ nginx: nginx/stamp-h1
 nginx-clean:
 	-@$(MAKE) -C nginx clean
 	-@rm -f nginx/stamp-h1
+	$(call unpatch_files,nginx)
 
 nginx-install:
 	install -d $(INSTALLDIR)/nginx/usr/sbin
