@@ -1297,7 +1297,7 @@ void start_wan_done(char *wan_ifname, char *prefix)
 
 #ifdef TCONFIG_DNSSEC
 		if (nvram_match("dnssec_enable", "1"))
-			killall("dnsmasq", SIGHUP);
+			killall("dnsmasq", SIGINT);
 #endif
 
 		stop_upnp();
