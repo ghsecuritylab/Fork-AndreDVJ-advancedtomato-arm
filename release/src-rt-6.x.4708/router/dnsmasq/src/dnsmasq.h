@@ -1382,12 +1382,6 @@ int make_icmp_sock(void);
 int icmp_ping(struct in_addr addr);
 int delay_dhcp(time_t start, int sec, int fd, uint32_t addr, unsigned short id);
 #endif
-#ifdef HAVE_TOMATO
-void tomato_helper(time_t now);
-#endif
-#ifdef HAVE_LEASEFILE_EXPIRE //originally TOMATO option
-void flush_lease_file(time_t now);
-#endif
 void queue_event(int event);
 void send_alarm(time_t event, time_t now);
 void send_event(int fd, int event, int data, char *msg);

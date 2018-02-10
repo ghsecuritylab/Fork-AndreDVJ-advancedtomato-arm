@@ -1,7 +1,7 @@
 /**************************************************************************
  *   rcfile.c  --  This file is part of GNU nano.                         *
  *                                                                        *
- *   Copyright (C) 2001-2011, 2013-2018 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2001-2011, 2013-2017 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014 Mike Frysinger                                    *
  *   Copyright (C) 2014-2017 Benno Schulenberg                            *
  *                                                                        *
@@ -188,25 +188,30 @@ char *parse_argument(char *ptr)
 	const char *ptr_save = ptr;
 	char *last_quote = NULL;
 
+	assert(ptr != NULL);
+
 	if (*ptr != '"')
 		return parse_next_word(ptr);
 
-	while (*ptr != '\0') {
-		if (*++ptr == '"')
+	do {
+		ptr++;
+		if (*ptr == '"')
 			last_quote = ptr;
-	}
+	} while (*ptr != '\0');
 
 	if (last_quote == NULL) {
+		if (*ptr == '\0')
+			ptr = NULL;
+		else
+			*ptr++ = '\0';
 		rcfile_error(N_("Argument '%s' has an unterminated \""), ptr_save);
-		return NULL;
+	} else {
+		*last_quote = '\0';
+		ptr = last_quote + 1;
 	}
-
-	*last_quote = '\0';
-	ptr = last_quote + 1;
-
-	while (isblank((unsigned char)*ptr))
-		ptr++;
-
+	if (ptr != NULL)
+		while (isblank((unsigned char)*ptr))
+			ptr++;
 	return ptr;
 }
 
@@ -215,14 +220,19 @@ char *parse_argument(char *ptr)
  * null-terminate it, and return a pointer to the /next/ word. */
 char *parse_next_regex(char *ptr)
 {
+	assert(ptr != NULL);
+
 	/* Continue until the end of line, or until a " followed by a
 	 * blank character or the end of line. */
 	while (*ptr != '\0' && (*ptr != '"' ||
 				(*(ptr + 1) != '\0' && !isblank((unsigned char)ptr[1]))))
 		ptr++;
 
+	assert(*ptr == '"' || *ptr == '\0');
+
 	if (*ptr == '\0') {
-		rcfile_error(N_("Regex strings must begin and end with a \" character"));
+		rcfile_error(
+				N_("Regex strings must begin and end with a \" character"));
 		return NULL;
 	}
 
@@ -264,6 +274,8 @@ void parse_syntax(char *ptr)
 		/* A pointer to what should be the name of the syntax. */
 
 	opensyntax = FALSE;
+
+	assert(ptr != NULL);
 
 	/* Check that the syntax name is not empty. */
 	if (*ptr == '\0' || (*ptr == '"' &&
@@ -317,7 +329,8 @@ void parse_syntax(char *ptr)
 
 	/* The default syntax should have no associated extensions. */
 	if (strcmp(live_syntax->name, "default") == 0 && *ptr != '\0') {
-		rcfile_error(N_("The \"default\" syntax does not accept extensions"));
+		rcfile_error(
+				N_("The \"default\" syntax does not accept extensions"));
 		return;
 	}
 
@@ -351,6 +364,8 @@ void parse_binding(char *ptr, bool dobind)
 	char *keyptr = NULL, *keycopy = NULL, *funcptr = NULL, *menuptr = NULL;
 	sc *s, *newsc = NULL;
 	int menu;
+
+	assert(ptr != NULL);
 
 #ifdef DEBUG
 	fprintf(stderr, "Starting the rebinding code...\n");
@@ -576,8 +591,7 @@ short color_to_short(const char *colorname, bool *bright)
 	if (strncasecmp(colorname, "bright", 6) == 0) {
 		*bright = TRUE;
 		colorname += 6;
-	} else
-		*bright = FALSE;
+	}
 
 	if (strcasecmp(colorname, "green") == 0)
 		return COLOR_GREEN;
@@ -596,7 +610,11 @@ short color_to_short(const char *colorname, bool *bright)
 	else if (strcasecmp(colorname, "black") == 0)
 		return COLOR_BLACK;
 
-	rcfile_error(N_("Color \"%s\" not understood"), colorname);
+	rcfile_error(N_("Color \"%s\" not understood.\n"
+				"Valid colors are \"green\", \"red\", \"blue\",\n"
+				"\"white\", \"yellow\", \"cyan\", \"magenta\" and\n"
+				"\"black\", with the optional prefix \"bright\"\n"
+				"for foreground colors."), colorname);
 	return -1;
 }
 
@@ -606,12 +624,13 @@ short color_to_short(const char *colorname, bool *bright)
 void parse_colors(char *ptr, int rex_flags)
 {
 	short fg, bg;
-	bool bright;
+	bool bright = FALSE;
 	char *item;
 
 	if (!opensyntax) {
-		rcfile_error(N_("A '%s' command requires a preceding 'syntax' command"),
-						"color");
+		rcfile_error(
+				N_("A '%s' command requires a preceding 'syntax' command"),
+				"color");
 		return;
 	}
 
@@ -646,7 +665,8 @@ void parse_colors(char *ptr, int rex_flags)
 		}
 
 		if (*ptr != '"') {
-			rcfile_error(N_("Regex strings must begin and end with a \" character"));
+			rcfile_error(
+				N_("Regex strings must begin and end with a \" character"));
 			ptr = parse_next_regex(ptr);
 			continue;
 		}
@@ -754,21 +774,6 @@ bool parse_color_names(char *combostr, short *fg, short *bg, bool *bright)
 	return TRUE;
 }
 
-/* Parse the argument of an interface color option. */
-colortype *parse_interface_color(char *combostr)
-{
-	colortype *trio = nmalloc(sizeof(colortype));
-
-	if (parse_color_names(combostr, &trio->fg, &trio->bg, &trio->bright)) {
-		free(combostr);
-		return trio;
-	} else {
-		free(combostr);
-		free(trio);
-		return NULL;
-	}
-}
-
 /* Read regex strings enclosed in double quotes from the line pointed at
  * by ptr, and store them quoteless in the passed storage place. */
 void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
@@ -805,7 +810,8 @@ void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
 		regexlisttype *newthing;
 
 		if (*ptr != '"') {
-			rcfile_error(N_("Regex strings must begin and end with a \" character"));
+			rcfile_error(
+				N_("Regex strings must begin and end with a \" character"));
 			return;
 		}
 
@@ -835,6 +841,8 @@ void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
 /* Gather and store the string after a comment/linter/formatter command. */
 void pick_up_name(const char *kind, char *ptr, char **storage)
 {
+	assert(ptr != NULL);
+
 	if (!opensyntax) {
 		rcfile_error(
 				N_("A '%s' command requires a preceding 'syntax' command"), kind);
@@ -848,17 +856,17 @@ void pick_up_name(const char *kind, char *ptr, char **storage)
 
 	/* If the argument starts with a quote, find the terminating quote. */
 	if (*ptr == '"') {
-		char *look = ptr + strlen(ptr);
+		char *look = ++ptr;
+
+		look += strlen(ptr);
 
 		while (*look != '"') {
-			if (--look == ptr) {
+			if (--look < ptr) {
 				rcfile_error(N_("Argument of '%s' lacks closing \""), kind);
 				return;
 			}
 		}
-
 		*look = '\0';
-		ptr++;
 	}
 
 	*storage = mallocstrcpy(*storage, ptr);
@@ -1078,17 +1086,17 @@ void parse_rcfile(FILE *rcstream, bool syntax_only)
 
 #ifdef ENABLE_COLOR
 		if (strcasecmp(rcopts[i].name, "titlecolor") == 0)
-			color_combo[TITLE_BAR] = parse_interface_color(option);
+			specified_color_combo[TITLE_BAR] = option;
 		else if (strcasecmp(rcopts[i].name, "numbercolor") == 0)
-			color_combo[LINE_NUMBER] = parse_interface_color(option);
+			specified_color_combo[LINE_NUMBER] = option;
 		else if (strcasecmp(rcopts[i].name, "selectedcolor") == 0)
-			color_combo[SELECTED_TEXT] = parse_interface_color(option);
+			specified_color_combo[SELECTED_TEXT] = option;
 		else if (strcasecmp(rcopts[i].name, "statuscolor") == 0)
-			color_combo[STATUS_BAR] = parse_interface_color(option);
+			specified_color_combo[STATUS_BAR] = option;
 		else if (strcasecmp(rcopts[i].name, "keycolor") == 0)
-			color_combo[KEY_COMBO] = parse_interface_color(option);
+			specified_color_combo[KEY_COMBO] = option;
 		else if (strcasecmp(rcopts[i].name, "functioncolor") == 0)
-			color_combo[FUNCTION_TAG] = parse_interface_color(option);
+			specified_color_combo[FUNCTION_TAG] = option;
 		else
 #endif
 #ifdef ENABLE_OPERATINGDIR
@@ -1167,7 +1175,8 @@ void parse_rcfile(FILE *rcstream, bool syntax_only)
 				tabsize = -1;
 			}
 			free(option);
-		}
+		} else
+			assert(FALSE);
 	}
 
 #ifdef ENABLE_COLOR
