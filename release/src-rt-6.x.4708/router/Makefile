@@ -18,6 +18,23 @@ include common.mak
 export PARALLEL_BUILD := -j`grep -c '^processor' /proc/cpuinfo`
 
 
+define patch_files =
+ find patches/$(1) -maxdepth 1 -type f -name '*.patch' | sort -t '\0' -n | while read FILE; do \
+  ( if ! patch -p0 -Rf --dry-run --silent < $$FILE 2>/dev/null; then \
+   patch -p0 < $$FILE; \
+  fi ) \
+ done
+endef
+
+define unpatch_files =
+ find patches/$(1) -maxdepth 1 -type f -name '*.patch' | sort -t '\0' -n | while read FILE; do \
+  ( if patch -p0 -Rf --dry-run --silent < $$FILE 2>/dev/null; then \
+   patch -p0 -Rf < $$FILE; \
+  fi ) \
+ done
+endef
+
+
 #
 #
 #
@@ -989,6 +1006,7 @@ OPENSSL_CIPHERS:=
 endif
 
 openssl/stamp-h1:
+	$(call patch_files,openssl)
 	cd openssl && \
 	./Configure $(HOSTCONFIG) --openssldir=/etc --cross-compile-prefix=' ' \
 	-ffunction-sections -fdata-sections -Wl,--gc-sections \
@@ -1009,6 +1027,7 @@ openssl: openssl/stamp-h1
 openssl-clean:
 	-@$(MAKE) -C openssl clean
 	@rm -f openssl/stamp-h1
+	$(call unpatch_files,openssl)
 
 openssl-install:
 	install -D openssl/libcrypto.so.1.0.0 $(INSTALLDIR)/openssl/usr/lib/libcrypto.so.1.0.0
@@ -1059,6 +1078,7 @@ bridge-install:
 
 dnsmasq: $(if $(TCONFIG_DNSSEC),nettle,)
 	@$(SEP)
+	$(call patch_files,dnsmasq)
 	@$(MAKE) -C dnsmasq $(PARALLEL_BUILD) \
 	COPTS="$(if $(TCONFIG_DNSSEC),-I$(TOP)/nettle/include -I$(TOP)/gmp -DHAVE_DNSSEC -DHAVE_DNSSEC_STATIC,) \
 		$(if $(TCONFIG_IPV6),-DUSE_IPV6,-DNO_IPV6) \
@@ -1070,6 +1090,9 @@ dnsmasq: $(if $(TCONFIG_DNSSEC),nettle,)
 dnsmasq-install:
 	install -D dnsmasq/src/dnsmasq $(INSTALLDIR)/dnsmasq/usr/sbin/dnsmasq
 	$(STRIP) $(INSTALLDIR)/dnsmasq/usr/sbin/dnsmasq
+
+dnsmasq-clean:
+	$(call unpatch_files,dnsmasq)
 
 nettle/stamp-h1: gmp
 	@cd nettle && CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
@@ -1252,11 +1275,13 @@ miniupnpd-config:
 
 miniupnpd: $(IPTABLES_TARGET) miniupnpd-config
 	@$(SEP)
+	$(call patch_files,miniupnpd)
 	$(MAKE) -C miniupnpd -f Makefile.linux $(PARALLEL_BUILD)
 
 miniupnpd-clean:
 	-@$(MAKE) -C miniupnpd -f Makefile.linux clean
 	@rm -f miniupnpd/config.h
+	$(call unpatch_files,miniupnpd)
 
 miniupnpd-install:
 	install -D miniupnpd/miniupnpd $(INSTALLDIR)/miniupnpd/usr/sbin/miniupnpd
@@ -1497,12 +1522,15 @@ rp-l2tp-install:
 	$(STRIP) $(INSTALLDIR)/rp-l2tp/usr/sbin/l2tpd
 
 xl2tpd: pppd
+	$(call patch_files,xl2tpd)
 	CFLAGS="-g $(EXTRACFLAGS)" $(MAKE) -C $@ PREFIX=/usr xl2tpd $(PARALLEL_BUILD)
 
 xl2tpd-install:
 	install -D xl2tpd/xl2tpd $(INSTALLDIR)/xl2tpd/usr/sbin/xl2tpd
 	$(STRIP) $(INSTALLDIR)/xl2tpd/usr/sbin/xl2tpd
 
+xl2tpd-clean:
+	$(call unpatch_files,xl2tpd)
 
 bpalogin-install:
 	install -D bpalogin/bpalogin $(INSTALLDIR)/bpalogin/usr/sbin/bpalogin
@@ -1852,11 +1880,13 @@ endif
 
 minidlna: zlib sqlite ffmpeg libogg flac jpeg libexif libid3tag libvorbis
 	@$(SEP)
+	$(call patch_files,minidlna)
 	@$(MAKE) -C minidlna CC=$(CC) $(if $(MEDIA_SERVER_STATIC),STATIC=1,) minidlna $(PARALLEL_BUILD)
 
 minidlna-clean:
 	-@$(MAKE) -C minidlna clean
 	@rm -f minidlna/stamp-h1
+	$(call unpatch_files,minidlna)
 
 minidlna-install:
 	@$(SEP)
@@ -2106,9 +2136,7 @@ libpng-clean:
 
 php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	@$(SEP)
-	( if ! patch -R -f -d php --dry-run --silent < patches/php/101-fix-cross-compiling-issue.patch; then \
-		patch -b -d php < patches/php/101-fix-cross-compiling-issue.patch; \
-	fi ) && \
+	$(call patch_files,php)
 	cd php && CC=$(CC) CXX=$(ARCH)-g++ AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) \
 	CFLAGS="-Os -Wall -I$(TOP)/zlib -I$(TOP)/libxml2/include/libxml -I$(TOP)/libxml2/include -I$(TOP)/pcre -I$(TOP)/libiconv/include \
 		-I$(TOP)/libpng/staged/usr/include -I$(TOP)/libcurl/staged/include" \
@@ -2155,8 +2183,7 @@ php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	--without-mcrypt \
 	--without-openssl \
 	--disable-pcntl \
-	--without-mysqli \
-	--with-mysql \
+	--with-mysqli \
 	--with-mysql-sock="/var/run/mysqld.sock" \
 	--with-pdo-mysql \
 	--without-pdo-pgsql \
@@ -2188,6 +2215,7 @@ php: php/stamp-h1
 php-clean:
 	-@$(MAKE) -C php clean
 	-@rm php/stamp-h1
+	$(call unpatch_files,php)
 
 php-install:
 	@$(SEP)
@@ -2200,6 +2228,7 @@ php-install:
 
 nginx/stamp-h1: openssl zlib pcre
 	@$(SEP)
+	$(call patch_files,nginx)
 	cd $(TOP)/nginx && ./configure --crossbuild=Linux::$(ARCH) \
 		--prefix=/usr \
 		--sbin-path=/usr/sbin \
@@ -2228,6 +2257,7 @@ nginx: nginx/stamp-h1
 nginx-clean:
 	-@$(MAKE) -C nginx clean
 	-@rm -f nginx/stamp-h1
+	$(call unpatch_files,nginx)
 
 nginx-install:
 	install -d $(INSTALLDIR)/nginx/usr/sbin
@@ -2279,10 +2309,9 @@ libncurses-install:
 
 mysql/stamp-h1: openssl zlib libncurses
 	@$(SEP)
-	( if ! patch -R -f -d mysql/sql --dry-run --silent < patches/mysql/101-bison-compat.patch; then \
-		patch -b -d mysql/sql < patches/mysql/101-bison-compat.patch; \
-	fi ) && \
-	cd mysql && cp -f configure.arm configure && \
+	@cp -f $(TOP)/patches/mysql/.host.tgz $(TOP)/mysql/ || true
+	$(call patch_files,mysql)
+	cd mysql && \
 	CFLAGS="-O2 -Wall -fno-delete-null-pointer-checks -funit-at-a-time --param large-function-growth=800 \
 		--param max-inline-insns-single=3000 -ffunction-sections -fdata-sections -I$(TOP)/zlib \
 		-I$(TOP)/openssl/include -I$(TOP)/libncurses/include" \
@@ -2320,6 +2349,9 @@ mysql-clean:
 	-@$(MAKE) -C mysql clean
 	-@rm -f mysql/stamp-h1
 	-@rm -rf mysql/staged mysql/host
+	-@rm -f mysql/.host.tgz
+	$(call unpatch_files,mysql)
+
 
 mysql-install:
 	install -d $(INSTALLDIR)/mysql/usr/bin
@@ -2329,7 +2361,6 @@ mysql-install:
 	install -d $(INSTALLDIR)/mysql/usr/lib/mysql/plugin
 	install -d $(INSTALLDIR)/mysql/usr/share
 	install -d $(INSTALLDIR)/mysql/usr/share/mysql
-	install -D -m 755 mysql/mycheck $(INSTALLDIR)/mysql/usr/bin
 	install -D -m 755 mysql/staged/usr/bin/my_print_defaults $(INSTALLDIR)/mysql/usr/bin
 	$(STRIP) $(INSTALLDIR)/mysql/usr/bin/my_print_defaults
 	install -D -m 755 mysql/staged/usr/bin/myisamchk $(INSTALLDIR)/mysql/usr/bin
@@ -2572,7 +2603,7 @@ btgui:
 
 btgui-install:
 	install -d $(INSTALLDIR)/btgui/usr/bin
-	install -D transmission/btcheck $(INSTALLDIR)/btgui/usr/bin/btcheck
+	install -D patches/transmission/btcheck $(INSTALLDIR)/btgui/usr/bin/btcheck
 
 libnfsidmap/stamp-h1:
 	cd libnfsidmap && \
@@ -2833,7 +2864,7 @@ tor/stamp-h1: openssl zlib libevent
 	CFLAGS="-O2 -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr --with-libevent-dir=$(TOP)/libevent/staged/usr/local \
 		--with-openssl-dir=$(TOP)/openssl --with-zlib-dir=$(TOP)/zlib \
-		--disable-asciidoc --disable-tool-name-check --disable-unittests
+		--disable-asciidoc --disable-tool-name-check --disable-unittests --disable-lzma
 	touch tor/stamp-h1
 
 tor: tor/stamp-h1
@@ -2899,6 +2930,7 @@ libmnl-clean:
 	-@rm -rf libmnl/staged
 
 ipset/stamp-h1: libmnl
+	$(call patch_files,ipset)
 	cd $(TOP)/ipset && CC=$(CC) STRIP=$(STRIP) \
 	autoreconf -fsi && \
 	CFLAGS="-Os -Wall $(EXTRACFLAGS) -ffunction-sections -fdata-sections" \
@@ -2914,16 +2946,17 @@ ipset: ipset/stamp-h1
 ipset-install:
 	install -D ipset/src/ipset $(INSTALLDIR)/ipset/usr/sbin/ipset
 	install -d $(INSTALLDIR)/ipset/usr/lib/
-	install ipset/lib/.libs/libipset.so.3.7.0 $(INSTALLDIR)/ipset/usr/lib/libipset.so.3.7.0
-	$(STRIP) $(INSTALLDIR)/ipset/usr/lib/libipset.so.3.7.0
+	install ipset/lib/.libs/libipset.so.11.0.0 $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.0.0
+	$(STRIP) $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.0.0
 	$(STRIP) $(INSTALLDIR)/ipset/usr/sbin/ipset
 	cd $(INSTALLDIR)/ipset/usr/lib/ && \
-		ln -sf libipset.so.3.7.0 libipset.so.3 && \
-		ln -sf libipset.so.3.7.0 libipset.so
+		ln -sf libipset.so.11.0.0 libipset.so.11 && \
+		ln -sf libipset.so.11.0.0 libipset.so
 
 ipset-clean:
 	-@$(MAKE) -C ipset clean
 	-@rm -rf ipset/Makefile ipset/stamp-h1
+	$(call unpatch_files,ipset)
 
 libjson-c/stamp-h1:
 	cd $(TOP)/libjson-c && CC=$(CC) STRIP=$(CROSS_COMPILE)strip \

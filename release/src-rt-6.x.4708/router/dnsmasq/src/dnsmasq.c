@@ -1,4 +1,4 @@
-/* dnsmasq is Copyright (c) 2000-2017 Simon Kelley
+/* dnsmasq is Copyright (c) 2000-2018 Simon Kelley
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,45 +13,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* Jon Zarate AFAIK wrote the original Tomato specific code, primarily to
-   support extra info in the GUI. Following is a vague clue as to how it
-   hangs together.
 
-   device list status is handled by www/devlist.c - this sends a SIGUSR2
-   to dnsmasq which causes the 'tomato_helper' function to execute in
-   addition to the normal dnsmasq SIGUSR2 code (Switch logfile, but since
-   Tomato not using that it doesn't matter) devlist.c waits up to 5 secs
-   for file '/var/tmp/dhcp/leases.!' to disappear before continuing
-   (Must be a better way to do this IPC stuff)
-
-   tomato_helper(lease.c) does a couple of things:
-
-   It looks for /var/tmp/dhcp/delete and deletes any known leases by IP
-   address found therein.  It deletes /var/tmp/dhcp/delete when done.
-   This implements the 'delete lease' from GUI functionality.
-
-   It dumps the current dhcp leases into /var/tmp/dhcp/lease.! (tmp file)
-   subtracting the current time from the lease expiry time, thus producing
-   a 'lease remaining' time for the GUI.
-   The temp file is renamed to /var/tmp/dhcp/leases thus signalling devlist.c
-   that it may proceed.  Finally when devlist.c is finished
-   /var/tmp/dhcp/leases is removed.
-
-   dnsmasq.c also intercepts SIGHUP so that it may flush the lease file.
-   This is so lease expiry times survive a process restart since dnsmasq
-   reads the lease file at start-up.
-
-   Finally(?) lease_update_file (lease.c) writes out the remaining lease
-   duration for each dhcp lease rather than lease expiry time (with RTC) or
-   lease length (no RTC) for dnsmasq's internal lease database. 
-
-   dhcp lease file is /var/lib/misc/dnsmasq.leases
-
-   Above description K Darbyshire-Bryant 04/12/13
-*/
-
-  
- 
 /* Declare static char *compiler_opts  in config.h */
 #define DNSMASQ_COMPILE_OPTS
 
@@ -115,7 +77,8 @@ int main (int argc, char **argv)
   sigaction(SIGTERM, &sigact, NULL);
   sigaction(SIGALRM, &sigact, NULL);
   sigaction(SIGCHLD, &sigact, NULL);
-
+  sigaction(SIGINT, &sigact, NULL);
+  
   /* ignore SIGPIPE */
   sigact.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &sigact, NULL);
@@ -156,8 +119,9 @@ int main (int argc, char **argv)
       daemon->namebuff = safe_malloc(MAXDNAME * 2);
       daemon->keyname = safe_malloc(MAXDNAME * 2);
       daemon->workspacename = safe_malloc(MAXDNAME * 2);
-      /* one char flag per possible RR in answer section. */
-      daemon->rr_status = safe_malloc(256);
+      /* one char flag per possible RR in answer section (may get extended). */
+      daemon->rr_status_sz = 64;
+      daemon->rr_status = safe_malloc(daemon->rr_status_sz);
     }
 #endif
 
@@ -796,7 +760,7 @@ int main (int argc, char **argv)
       
       daemon->dnssec_no_time_check = option_bool(OPT_DNSSEC_TIME);
       if (option_bool(OPT_DNSSEC_TIME) && !daemon->back_to_the_future)
-	my_syslog(LOG_INFO, _("DNSSEC signature timestamps not checked until first cache reload"));
+	my_syslog(LOG_INFO, _("DNSSEC signature timestamps not checked until receipt of SIGINT"));
       
       if (rc == 1)
 	my_syslog(LOG_INFO, _("DNSSEC signature timestamps not checked until system time valid"));
@@ -1120,7 +1084,7 @@ static void sig_handler(int sig)
     {
       /* ignore anything other than TERM during startup
 	 and in helper proc. (helper ignore TERM too) */
-      if (sig == SIGTERM)
+      if (sig == SIGTERM || sig == SIGINT)
 	exit(EC_MISC);
     }
   else if (pid != getpid())
@@ -1146,6 +1110,15 @@ static void sig_handler(int sig)
 	event = EVENT_DUMP;
       else if (sig == SIGUSR2)
 	event = EVENT_REOPEN;
+      else if (sig == SIGINT)
+	{
+	  /* Handle SIGINT normally in debug mode, so
+	     ctrl-c continues to operate. */
+	  if (option_bool(OPT_DEBUG))
+	    exit(EC_MISC);
+	  else
+	    event = EVENT_TIME;
+	}
       else
 	return;
 
@@ -1273,14 +1246,7 @@ static void async_event(int pipe, time_t now)
       {
       case EVENT_RELOAD:
 	daemon->soa_sn++; /* Bump zone serial, as it may have changed. */
-
-#ifdef HAVE_DNSSEC
-	if (daemon->dnssec_no_time_check && option_bool(OPT_DNSSEC_VALID) && option_bool(OPT_DNSSEC_TIME))
-	  {
-	    my_syslog(LOG_INFO, _("now checking DNSSEC signature timestamps"));
-	    daemon->dnssec_no_time_check = 0;
-	  } 
-#endif
+	
 	/* fall through */
 	
       case EVENT_INIT:
@@ -1377,19 +1343,6 @@ static void async_event(int pipe, time_t now)
 	   we leave them logging to the old file. */
 	if (daemon->log_file != NULL)
 	  log_reopen(daemon->log_file);
-
-#ifdef HAVE_TOMATO
-	tomato_helper(now); //possibly delete & write out leases for tomato
-#endif //TOMATO
-/* following is Asus tweak.  Interestingly Asus read the dnsmasq leases db
-   directly.  They signal dnsmasq to update via SIGUSR2 and wait 1 second
-   assuming the file will be complete by the time they come to parse it.
-   Race conditions anyone?  What if dnsmasq happens to be updating the
-   file anyway? */
-#if defined(HAVE_DHCP) && defined(HAVE_LEASEFILE_EXPIRE) && !defined(HAVE_TOMATO)
-	if (daemon->dhcp || daemon->dhcp6)
-		flush_lease_file(now);
-#endif
 	break;
 
       case EVENT_NEWADDR:
@@ -1402,6 +1355,17 @@ static void async_event(int pipe, time_t now)
 	poll_resolv(0, 1, now);
 	break;
 
+      case EVENT_TIME:
+#ifdef HAVE_DNSSEC
+	if (daemon->dnssec_no_time_check && option_bool(OPT_DNSSEC_VALID) && option_bool(OPT_DNSSEC_TIME))
+	  {
+	    my_syslog(LOG_INFO, _("now checking DNSSEC signature timestamps"));
+	    daemon->dnssec_no_time_check = 0;
+	    clear_cache_and_reload(now);
+	  }
+#endif
+	break;
+	
       case EVENT_TERM:
 	/* Knock all our children on the head. */
 	for (i = 0; i < MAX_PROCS; i++)
@@ -1420,12 +1384,6 @@ static void async_event(int pipe, time_t now)
 	    } while (!helper_buf_empty() || do_script_run(now));
 	    while (retry_send(close(daemon->helperfd)));
 	  }
-#endif
-
-//Originally TOMATO tweak
-#if defined(HAVE_DHCP) && defined(HAVE_LEASEFILE_EXPIRE)
-	if (daemon->dhcp || daemon->dhcp6)
-		flush_lease_file(now);
 #endif
 	
 	if (daemon->lease_stream)

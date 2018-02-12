@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "gd.h"
+#include "gd_errors.h"
 
 #include "php.h"
 
@@ -235,11 +236,11 @@ gdImagePtr gdImageCreateFromGifCtx(gdIOCtxPtr fd) /* {{{ */
 		}
 		im->interlace = BitSet(buf[8], INTERLACE);
 		if (!useGlobalColormap) {
-			if (ReadColorMap(fd, bitPixel, localColorMap)) { 
+			if (ReadColorMap(fd, bitPixel, localColorMap)) {
 				gdImageDestroy(im);
 				return 0;
 			}
-			ReadImage(im, fd, width, height, localColorMap, 
+			ReadImage(im, fd, width, height, localColorMap,
 					BitSet(buf[8], INTERLACE), &ZeroDataBlock);
 		} else {
 			if (!haveGlobalColormap) {
@@ -247,7 +248,7 @@ gdImagePtr gdImageCreateFromGifCtx(gdIOCtxPtr fd) /* {{{ */
 				return 0;
 			}
 			ReadImage(im, fd, width, height,
-						ColorMap, 
+						ColorMap,
 						BitSet(buf[8], INTERLACE), &ZeroDataBlock);
 		}
 		if (Transparent != (-1)) {
@@ -261,10 +262,6 @@ terminated:
 	if (!im) {
 		return 0;
 	}
-	if (!im->colorsTotal) {
-		gdImageDestroy(im);
-		return 0;
-	}
 	/* Check for open colors at the end, so
 	   we can reduce colorsTotal and ultimately
 	   BitsPerPixel */
@@ -274,6 +271,10 @@ terminated:
 		} else {
 			break;
 		}
+	}
+	if (!im->colorsTotal) {
+		gdImageDestroy(im);
+		return 0;
 	}
 	return im;
 }
@@ -364,7 +365,7 @@ GetDataBlock(gdIOCtx *fd, unsigned char *buf, int *ZeroDataBlockP)
 		} else {
 			tmp = estrdup("");
 		}
-		php_gd_error_ex(E_NOTICE, "[GetDataBlock returning %d: %s]", rv, tmp);
+		gd_error_ex(GD_NOTICE, "[GetDataBlock returning %d: %s]", rv, tmp);
 		efree(tmp);
 	}
 	return(rv);
@@ -375,7 +376,7 @@ static int
 GetCode_(gdIOCtx *fd, CODE_STATIC_DATA *scd, int code_size, int flag, int *ZeroDataBlockP)
 {
 	int           i, j, ret;
-	unsigned char count;
+	int           count;
 
 	if (flag) {
 		scd->curbit = 0;
@@ -570,7 +571,7 @@ ReadImage(gdImagePtr im, gdIOCtx *fd, int len, int height, unsigned char (*cmap)
 	}
 
 	if (c > MAX_LWZ_BITS) {
-		return;	
+		return;
 	}
 
 	/* Stash the color map into the image */

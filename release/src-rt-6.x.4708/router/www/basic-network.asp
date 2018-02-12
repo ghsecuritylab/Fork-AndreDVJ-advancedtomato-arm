@@ -1819,18 +1819,18 @@ No part of this file may be used without permission.
 			<script type="text/javascript">
 				dns = nvram.wan_dns.split(/\s+/);
 				$('.content.lan-settings').forms([
-	                { title: 'Default Gateway', name: 'lan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.lan_gateway },
-	                { title: 'Static DNS', suffix: '&nbsp; <i>(IP:port)</i>', name: 'f_dns_1', type: 'text', maxlen: 21, size: 25, value: dns[0] || '0.0.0.0' },
-	                { title: '', name: 'f_dns_2', type: 'text', maxlen: 21, size: 25, value: dns[1] || '0.0.0.0' },
-	                /* DNSSEC-BEGIN */
-	                { title: 'Enable DNSSEC', name: 'f_dnssec_enable', type: 'checkbox', suffix: ' <i>(must be supported by the upstream nameservers)</i>', value: (nvram.dnssec_enable == 1) },
-	                /* DNSSEC-END */
-	                /* DNSCRYPT-BEGIN */
-	                { title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
-	                { title: 'Ephemeral Keys', indent: 2, name: 'f_dnscrypt_ephemeral_keys', type: 'checkbox', suffix: '&nbsp; <small>warning: this option requires extra CPU cycles!</small>', value: (nvram.dnscrypt_ephemeral_keys == 1) },
-	                { title: 'Manual Entry', indent: 2, name: 'f_dnscrypt_manual', type: 'checkbox', value: (nvram.dnscrypt_manual == 1) },
-					{ title: 'Resolver', indent: 2, name: 'dnscrypt_resolver', type: 'select', options: [/*dnscrypt_resolvers*/],  value: nvram.dnscrypt_resolver, suffix: ' <a href=\'https://github.com/jedisct1/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
-					{ title: 'Resolver Address', indent: 2, name: 'dnscrypt_resolver_address', type: 'text', maxlen: 50, size: 25, value: nvram.dnscrypt_resolver_address, suffix: ' <a href=\'https://github.com/jedisct1/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
+					{ title: 'Default Gateway', name: 'lan_gateway', type: 'text', maxlen: 15, size: 17, value: nvram.lan_gateway },
+					{ title: 'Static DNS', suffix: '&nbsp; <i>(IP:port)</i>', name: 'f_dns_1', type: 'text', maxlen: 21, size: 25, value: dns[0] || '0.0.0.0' },
+					{ title: '', name: 'f_dns_2', type: 'text', maxlen: 21, size: 25, value: dns[1] || '0.0.0.0' },
+					/* DNSSEC-BEGIN */
+					{ title: 'Enable DNSSEC', name: 'f_dnssec_enable', type: 'checkbox', suffix: ' <i>(must be supported by the upstream nameservers)</i>', value: (nvram.dnssec_enable == 1) },
+					/* DNSSEC-END */
+					/* DNSCRYPT-BEGIN */
+					{ title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
+					{ title: 'Ephemeral Keys', indent: 2, name: 'f_dnscrypt_ephemeral_keys', type: 'checkbox', suffix: '&nbsp; <small>warning: this option requires extra CPU cycles!</small>', value: (nvram.dnscrypt_ephemeral_keys == 1) },
+					{ title: 'Manual Entry', indent: 2, name: 'f_dnscrypt_manual', type: 'checkbox', value: (nvram.dnscrypt_manual == 1) },
+					{ title: 'Resolver', indent: 2, name: 'dnscrypt_resolver', type: 'select', options: [/*dnscrypt_resolvers*/],  value: nvram.dnscrypt_resolver, suffix: ' <a href=\'https://github.com/dyne/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
+					{ title: 'Resolver Address', indent: 2, name: 'dnscrypt_resolver_address', type: 'text', maxlen: 50, size: 25, value: nvram.dnscrypt_resolver_address, suffix: ' <a href=\'https://github.com/dyne/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
 					{ title: 'Provider Name', indent: 2, name: 'dnscrypt_provider_name', type: 'text', maxlen: 60, size: 25, value: nvram.dnscrypt_provider_name },
 					{ title: 'Provider Public Key', indent: 2, name: 'dnscrypt_provider_key', type: 'text', maxlen: 80, size: 25, value: nvram.dnscrypt_provider_key },
 					{ title: 'Priority', indent: 2, name: 'dnscrypt_priority', type: 'select', options: [['1','Strict-Order'],['2','No-Resolv'],['0','None']], value: nvram.dnscrypt_priority },
