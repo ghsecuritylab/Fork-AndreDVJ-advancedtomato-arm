@@ -1606,7 +1606,7 @@ dropbear-install:
 dropbear-clean:
 	-@$(MAKE) -C dropbear clean
 	@rm -f dropbear/config.h
-	$(call patch_files,dropbear)
+	$(call unpatch_files,dropbear)
 
 dropbear/config.h:
 	$(call patch_files,dropbear)
