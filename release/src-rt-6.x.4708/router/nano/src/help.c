@@ -1,7 +1,7 @@
 /**************************************************************************
  *   help.c  --  This file is part of GNU nano.                           *
  *                                                                        *
- *   Copyright (C) 2000-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2000-2011, 2013-2018 Free Software Foundation, Inc.    *
  *   Copyright (C) 2017 Rishabh Dave                                      *
  *   Copyright (C) 2014-2017 Benno Schulenberg                            *
  *                                                                        *
@@ -215,13 +215,17 @@ void do_help(void)
 			do_findprevious();
 		} else if (func == do_findnext) {
 			do_findnext();
+#ifdef ENABLE_NANORC
+		} else if (func == (void *)implant) {
+			implant(first_sc_for(MHELP, func)->expansion);
+#endif
 		} else if (kbinput == KEY_WINCH) {
 			; /* Nothing to do. */
 #endif
 #ifdef ENABLE_MOUSE
 		} else if (kbinput == KEY_MOUSE) {
-			int dummy_x, dummy_y;
-			get_mouseinput(&dummy_x, &dummy_y, TRUE);
+			int dummy_row, dummy_col;
+			get_mouseinput(&dummy_row, &dummy_col, TRUE);
 #endif
 		} else if (func == do_exit) {
 			/* Exit from the help viewer. */
@@ -471,7 +475,7 @@ void help_init(void)
 		size_t endis_len = strlen(_("enable/disable"));
 
 		for (s = sclist; s != NULL; s = s->next)
-			if (s->scfunc == do_toggle_void)
+			if (s->func == do_toggle_void)
 				allocsize += strlen(_(flagtostr(s->toggle))) + endis_len + 8;
 	}
 #endif
@@ -504,7 +508,7 @@ void help_init(void)
 			if ((s->menus & currmenu) == 0)
 				continue;
 
-			if (s->scfunc == f->scfunc) {
+			if (s->func == f->func) {
 				scsfound++;
 				/* Make the first column narrower (6) than the second (10),
 				 * but allow it to spill into the second, for "M-Space". */
@@ -620,7 +624,7 @@ size_t help_line_len(const char *ptr)
 	else if (wrap_location > 0)
 		return wrap_location;
 	else
-		return 0;
+		return 1;
 }
 
 #endif /* ENABLE_HELP */

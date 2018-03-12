@@ -1,7 +1,7 @@
 /**************************************************************************
  *   rcfile.c  --  This file is part of GNU nano.                         *
  *                                                                        *
- *   Copyright (C) 2001-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 2001-2011, 2013-2018 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014 Mike Frysinger                                    *
  *   Copyright (C) 2014-2017 Benno Schulenberg                            *
  *                                                                        *
@@ -42,7 +42,6 @@ static const rcoption rcopts[] = {
 #ifdef ENABLE_JUSTIFY
 	{"brackets", 0},
 #endif
-	{"const", CONSTANT_SHOW},  /* deprecated form, remove in 2018 */
 	{"constantshow", CONSTANT_SHOW},
 #ifdef ENABLED_WRAPORJUSTIFY
 	{"fill", 0},
@@ -67,7 +66,6 @@ static const rcoption rcopts[] = {
 	{"operatingdir", 0},
 #endif
 #ifdef ENABLE_HISTORIES
-	{"poslog", POS_HISTORY},  /* deprecated form, remove in 2018 */
 	{"positionlog", POS_HISTORY},
 #endif
 	{"preserve", PRESERVE},
@@ -117,6 +115,7 @@ static const rcoption rcopts[] = {
 	{"numbercolor", 0},
 	{"selectedcolor", 0},
 	{"statuscolor", 0},
+	{"errorcolor", 0},
 	{"keycolor", 0},
 	{"functioncolor", 0},
 #endif
@@ -188,30 +187,25 @@ char *parse_argument(char *ptr)
 	const char *ptr_save = ptr;
 	char *last_quote = NULL;
 
-	assert(ptr != NULL);
-
 	if (*ptr != '"')
 		return parse_next_word(ptr);
 
-	do {
-		ptr++;
-		if (*ptr == '"')
+	while (*ptr != '\0') {
+		if (*++ptr == '"')
 			last_quote = ptr;
-	} while (*ptr != '\0');
+	}
 
 	if (last_quote == NULL) {
-		if (*ptr == '\0')
-			ptr = NULL;
-		else
-			*ptr++ = '\0';
 		rcfile_error(N_("Argument '%s' has an unterminated \""), ptr_save);
-	} else {
-		*last_quote = '\0';
-		ptr = last_quote + 1;
+		return NULL;
 	}
-	if (ptr != NULL)
-		while (isblank((unsigned char)*ptr))
-			ptr++;
+
+	*last_quote = '\0';
+	ptr = last_quote + 1;
+
+	while (isblank((unsigned char)*ptr))
+		ptr++;
+
 	return ptr;
 }
 
@@ -220,19 +214,14 @@ char *parse_argument(char *ptr)
  * null-terminate it, and return a pointer to the /next/ word. */
 char *parse_next_regex(char *ptr)
 {
-	assert(ptr != NULL);
-
 	/* Continue until the end of line, or until a " followed by a
 	 * blank character or the end of line. */
 	while (*ptr != '\0' && (*ptr != '"' ||
 				(*(ptr + 1) != '\0' && !isblank((unsigned char)ptr[1]))))
 		ptr++;
 
-	assert(*ptr == '"' || *ptr == '\0');
-
 	if (*ptr == '\0') {
-		rcfile_error(
-				N_("Regex strings must begin and end with a \" character"));
+		rcfile_error(N_("Regex strings must begin and end with a \" character"));
 		return NULL;
 	}
 
@@ -270,12 +259,9 @@ bool nregcomp(const char *regex, int compile_flags)
  * line at ptr, and add it to the global linked list of color syntaxes. */
 void parse_syntax(char *ptr)
 {
-	char *nameptr;
-		/* A pointer to what should be the name of the syntax. */
+	char *nameptr = ptr;
 
 	opensyntax = FALSE;
-
-	assert(ptr != NULL);
 
 	/* Check that the syntax name is not empty. */
 	if (*ptr == '\0' || (*ptr == '"' &&
@@ -284,17 +270,19 @@ void parse_syntax(char *ptr)
 		return;
 	}
 
-	nameptr = ++ptr;
 	ptr = parse_next_word(ptr);
 
-	/* Check that the name starts and ends with a double quote. */
-	if (*(nameptr - 1) != '\x22' || nameptr[strlen(nameptr) - 1] != '\x22') {
-		rcfile_error(N_("A syntax name must be quoted"));
+	/* Check that quotes around the name are either paired or absent. */
+	if ((*nameptr == '\x22') ^ (nameptr[strlen(nameptr) - 1] == '\x22')) {
+		rcfile_error(N_("Unpaired quote in syntax name"));
 		return;
 	}
 
-	/* Strip the end quote. */
-	nameptr[strlen(nameptr) - 1] = '\0';
+	/* If the name is quoted, strip the quotes. */
+	if (*nameptr == '\x22') {
+		nameptr++;
+		nameptr[strlen(nameptr) - 1] = '\0';
+	}
 
 	/* Redefining the "none" syntax is not allowed. */
 	if (strcmp(nameptr, "none") == 0) {
@@ -329,8 +317,7 @@ void parse_syntax(char *ptr)
 
 	/* The default syntax should have no associated extensions. */
 	if (strcmp(live_syntax->name, "default") == 0 && *ptr != '\0') {
-		rcfile_error(
-				N_("The \"default\" syntax does not accept extensions"));
+		rcfile_error(N_("The \"default\" syntax does not accept extensions"));
 		return;
 	}
 
@@ -340,22 +327,17 @@ void parse_syntax(char *ptr)
 }
 #endif /* ENABLE_COLOR */
 
-/* Check whether the given executable function is "universal" (meaning
- * any horizontal movement or deletion) and thus is present in almost
- * all menus. */
+/* Return TRUE when the given function is present in almost all menus. */
 bool is_universal(void (*func)(void))
 {
-	if (func == do_left || func == do_right ||
+	return (func == do_left || func == do_right ||
 		func == do_home || func == do_end ||
 #ifndef NANO_TINY
 		func == do_prev_word_void || func == do_next_word_void ||
 #endif
 		func == do_delete || func == do_backspace ||
 		func == do_cut_text_void || func == do_uncut_text ||
-		func == do_tab || func == do_enter || func == do_verbatim_input)
-		return TRUE;
-	else
-		return FALSE;
+		func == do_tab || func == do_enter || func == do_verbatim_input);
 }
 
 /* Bind or unbind a key combo, to or from a function. */
@@ -364,8 +346,6 @@ void parse_binding(char *ptr, bool dobind)
 	char *keyptr = NULL, *keycopy = NULL, *funcptr = NULL, *menuptr = NULL;
 	sc *s, *newsc = NULL;
 	int menu;
-
-	assert(ptr != NULL);
 
 #ifdef DEBUG
 	fprintf(stderr, "Starting the rebinding code...\n");
@@ -411,7 +391,7 @@ void parse_binding(char *ptr, bool dobind)
 
 	if (dobind) {
 		funcptr = ptr;
-		ptr = parse_next_word(ptr);
+		ptr = parse_argument(ptr);
 
 		if (funcptr[0] == '\0') {
 			rcfile_error(N_("Must specify a function to bind the key to"));
@@ -429,7 +409,18 @@ void parse_binding(char *ptr, bool dobind)
 	}
 
 	if (dobind) {
-		newsc = strtosc(funcptr);
+		/* If the thing to bind starts with a double quote, it is a string,
+		 * otherwise it is the name of a function. */
+		if (*funcptr == '"') {
+			newsc = nmalloc(sizeof(sc));
+			newsc->func = (void *)implant;
+			newsc->expansion = mallocstrcpy(NULL, funcptr + 1);
+#ifndef NANO_TINY
+			newsc->toggle = 0;
+#endif
+		} else
+		    newsc = strtosc(funcptr);
+
 		if (newsc == NULL) {
 			rcfile_error(N_("Cannot map name \"%s\" to a function"), funcptr);
 			goto free_things;
@@ -448,20 +439,21 @@ void parse_binding(char *ptr, bool dobind)
 
 		/* Tally up the menus where the function exists. */
 		for (f = allfuncs; f != NULL; f = f->next)
-			if (f->scfunc == newsc->scfunc)
+			if (f->func == newsc->func)
 				mask = mask | f->menus;
 
 #ifndef NANO_TINY
 		/* Handle the special case of the toggles. */
-		if (newsc->scfunc == do_toggle_void)
+		if (newsc->func == do_toggle_void)
 			mask = MMAIN;
 #endif
-
+#ifdef ENABLE_NANORC
+		/* Handle the special case of a key defined as a string. */
+		if (newsc->func == (void *)implant)
+			mask = MMOST | MHELP;
+#endif
 		/* Now limit the given menu to those where the function exists. */
-		if (is_universal(newsc->scfunc))
-			menu = menu & MMOST;
-		else
-			menu = menu & mask;
+		menu = menu & (is_universal(newsc->func) ? MMOST : mask);
 
 		if (!menu) {
 			rcfile_error(N_("Function '%s' does not exist in menu '%s'"), funcptr, menuptr);
@@ -487,9 +479,9 @@ void parse_binding(char *ptr, bool dobind)
 	if (dobind) {
 #ifndef NANO_TINY
 		/* If this is a toggle, copy its sequence number. */
-		if (newsc->scfunc == do_toggle_void) {
+		if (newsc->func == do_toggle_void) {
 			for (s = sclist; s != NULL; s = s->next)
-				if (s->scfunc == do_toggle_void && s->toggle == newsc->toggle)
+				if (s->func == do_toggle_void && s->toggle == newsc->toggle)
 					newsc->ordinal = s->ordinal;
 		} else
 			newsc->ordinal = 0;
@@ -591,7 +583,8 @@ short color_to_short(const char *colorname, bool *bright)
 	if (strncasecmp(colorname, "bright", 6) == 0) {
 		*bright = TRUE;
 		colorname += 6;
-	}
+	} else
+		*bright = FALSE;
 
 	if (strcasecmp(colorname, "green") == 0)
 		return COLOR_GREEN;
@@ -610,11 +603,7 @@ short color_to_short(const char *colorname, bool *bright)
 	else if (strcasecmp(colorname, "black") == 0)
 		return COLOR_BLACK;
 
-	rcfile_error(N_("Color \"%s\" not understood.\n"
-				"Valid colors are \"green\", \"red\", \"blue\",\n"
-				"\"white\", \"yellow\", \"cyan\", \"magenta\" and\n"
-				"\"black\", with the optional prefix \"bright\"\n"
-				"for foreground colors."), colorname);
+	rcfile_error(N_("Color \"%s\" not understood"), colorname);
 	return -1;
 }
 
@@ -624,13 +613,12 @@ short color_to_short(const char *colorname, bool *bright)
 void parse_colors(char *ptr, int rex_flags)
 {
 	short fg, bg;
-	bool bright = FALSE;
+	bool bright;
 	char *item;
 
 	if (!opensyntax) {
-		rcfile_error(
-				N_("A '%s' command requires a preceding 'syntax' command"),
-				"color");
+		rcfile_error(N_("A '%s' command requires a preceding 'syntax' command"),
+						"color");
 		return;
 	}
 
@@ -665,8 +653,7 @@ void parse_colors(char *ptr, int rex_flags)
 		}
 
 		if (*ptr != '"') {
-			rcfile_error(
-				N_("Regex strings must begin and end with a \" character"));
+			rcfile_error(N_("Regex strings must begin and end with a \" character"));
 			ptr = parse_next_regex(ptr);
 			continue;
 		}
@@ -774,6 +761,21 @@ bool parse_color_names(char *combostr, short *fg, short *bg, bool *bright)
 	return TRUE;
 }
 
+/* Parse the argument of an interface color option. */
+colortype *parse_interface_color(char *combostr)
+{
+	colortype *trio = nmalloc(sizeof(colortype));
+
+	if (parse_color_names(combostr, &trio->fg, &trio->bg, &trio->bright)) {
+		free(combostr);
+		return trio;
+	} else {
+		free(combostr);
+		free(trio);
+		return NULL;
+	}
+}
+
 /* Read regex strings enclosed in double quotes from the line pointed at
  * by ptr, and store them quoteless in the passed storage place. */
 void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
@@ -810,8 +812,7 @@ void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
 		regexlisttype *newthing;
 
 		if (*ptr != '"') {
-			rcfile_error(
-				N_("Regex strings must begin and end with a \" character"));
+			rcfile_error(N_("Regex strings must begin and end with a \" character"));
 			return;
 		}
 
@@ -841,8 +842,6 @@ void grab_and_store(const char *kind, char *ptr, regexlisttype **storage)
 /* Gather and store the string after a comment/linter/formatter command. */
 void pick_up_name(const char *kind, char *ptr, char **storage)
 {
-	assert(ptr != NULL);
-
 	if (!opensyntax) {
 		rcfile_error(
 				N_("A '%s' command requires a preceding 'syntax' command"), kind);
@@ -856,17 +855,17 @@ void pick_up_name(const char *kind, char *ptr, char **storage)
 
 	/* If the argument starts with a quote, find the terminating quote. */
 	if (*ptr == '"') {
-		char *look = ++ptr;
-
-		look += strlen(ptr);
+		char *look = ptr + strlen(ptr);
 
 		while (*look != '"') {
-			if (--look < ptr) {
+			if (--look == ptr) {
 				rcfile_error(N_("Argument of '%s' lacks closing \""), kind);
 				return;
 			}
 		}
+
 		*look = '\0';
+		ptr++;
 	}
 
 	*storage = mallocstrcpy(*storage, ptr);
@@ -885,8 +884,8 @@ static void check_vitals_mapped(void)
 
 	for  (v = 0; v < VITALS; v++) {
 		for (f = allfuncs; f != NULL; f = f->next) {
-			if (f->scfunc == vitals[v] && f->menus & inmenus[v]) {
-				const sc *s = first_sc_for(inmenus[v], f->scfunc);
+			if (f->func == vitals[v] && f->menus & inmenus[v]) {
+				const sc *s = first_sc_for(inmenus[v], f->func);
 				if (!s) {
 					fprintf(stderr, _("Fatal error: no keys mapped for function "
 										"\"%s\".  Exiting.\n"), f->desc);
@@ -1086,17 +1085,19 @@ void parse_rcfile(FILE *rcstream, bool syntax_only)
 
 #ifdef ENABLE_COLOR
 		if (strcasecmp(rcopts[i].name, "titlecolor") == 0)
-			specified_color_combo[TITLE_BAR] = option;
+			color_combo[TITLE_BAR] = parse_interface_color(option);
 		else if (strcasecmp(rcopts[i].name, "numbercolor") == 0)
-			specified_color_combo[LINE_NUMBER] = option;
+			color_combo[LINE_NUMBER] = parse_interface_color(option);
 		else if (strcasecmp(rcopts[i].name, "selectedcolor") == 0)
-			specified_color_combo[SELECTED_TEXT] = option;
+			color_combo[SELECTED_TEXT] = parse_interface_color(option);
 		else if (strcasecmp(rcopts[i].name, "statuscolor") == 0)
-			specified_color_combo[STATUS_BAR] = option;
+			color_combo[STATUS_BAR] = parse_interface_color(option);
+		else if (strcasecmp(rcopts[i].name, "errorcolor") == 0)
+			color_combo[ERROR_MESSAGE] = parse_interface_color(option);
 		else if (strcasecmp(rcopts[i].name, "keycolor") == 0)
-			specified_color_combo[KEY_COMBO] = option;
+			color_combo[KEY_COMBO] = parse_interface_color(option);
 		else if (strcasecmp(rcopts[i].name, "functioncolor") == 0)
-			specified_color_combo[FUNCTION_TAG] = option;
+			color_combo[FUNCTION_TAG] = parse_interface_color(option);
 		else
 #endif
 #ifdef ENABLE_OPERATINGDIR
@@ -1175,8 +1176,7 @@ void parse_rcfile(FILE *rcstream, bool syntax_only)
 				tabsize = -1;
 			}
 			free(option);
-		} else
-			assert(FALSE);
+		}
 	}
 
 #ifdef ENABLE_COLOR

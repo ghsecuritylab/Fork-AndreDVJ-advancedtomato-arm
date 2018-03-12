@@ -1,7 +1,7 @@
 /**************************************************************************
  *   utils.c  --  This file is part of GNU nano.                          *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2018 Free Software Foundation, Inc.    *
  *   Copyright (C) 2016-2017 Benno Schulenberg                            *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
@@ -48,7 +48,7 @@ void get_homedir(void)
 
 		/* Only set homedir if some home directory could be determined,
 		 * otherwise keep homedir NULL. */
-		if (homenv != NULL && strcmp(homenv, "") != 0)
+		if (homenv != NULL && *homenv != '\0')
 			homedir = mallocstrcpy(NULL, homenv);
 	}
 }
@@ -378,10 +378,11 @@ char *mallocstrncpy(char *dest, const char *src, size_t n)
 	if (src == NULL)
 		src = "";
 
-	if (src != dest)
-		free(dest);
-
-	dest = charalloc(n);
+#ifndef NANO_TINY
+	if (src == dest)
+		fprintf(stderr, "\r*** Copying a string to itself -- please report a bug ***");
+#endif
+	dest = charealloc(dest, n);
 	strncpy(dest, src, n);
 
 	return dest;

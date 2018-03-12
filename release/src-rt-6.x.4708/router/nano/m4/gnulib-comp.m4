@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2017 Free Software Foundation, Inc.
+# Copyright (C) 2002-2018 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -788,7 +788,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/malloc/scratch_buffer_set_array_size.c
   lib/malloca.c
   lib/malloca.h
-  lib/malloca.valgrind
   lib/math.c
   lib/math.in.h
   lib/mbrtowc.c

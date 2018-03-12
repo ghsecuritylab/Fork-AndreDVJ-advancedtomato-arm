@@ -1,7 +1,7 @@
 /**************************************************************************
  *   cut.c  --  This file is part of GNU nano.                            *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2018 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014 Mark Majeres                                      *
  *   Copyright (C) 2016 Benno Schulenberg                                 *
  *                                                                        *
@@ -188,10 +188,6 @@ void do_cut_text(bool copy_text, bool cut_till_eof)
 
 	refresh_needed = TRUE;
 
-#ifdef ENABLE_COLOR
-	check_the_multis(openfile->current);
-#endif
-
 #ifdef DEBUG
 	dump_filestruct(cutbuffer);
 #endif
@@ -286,8 +282,4 @@ void do_uncut_text(void)
 
 	set_modified();
 	refresh_needed = TRUE;
-
-#ifdef ENABLE_COLOR
-	check_the_multis(openfile->current);
-#endif
 }

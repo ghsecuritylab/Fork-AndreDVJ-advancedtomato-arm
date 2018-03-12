@@ -1,7 +1,7 @@
 /**************************************************************************
  *   proto.h  --  This file is part of GNU nano.                          *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2018 Free Software Foundation, Inc.    *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -30,7 +30,7 @@ extern volatile sig_atomic_t the_window_resized;
 #endif
 
 #ifdef __linux__
-extern bool console;
+extern bool on_a_vt;
 #endif
 
 extern bool meta_key;
@@ -172,7 +172,7 @@ extern regmatch_t regmatches[10];
 
 extern int hilite_attribute;
 #ifdef ENABLE_COLOR
-extern char* specified_color_combo[NUMBER_OF_ELEMENTS];
+extern colortype *color_combo[NUMBER_OF_ELEMENTS];
 #endif
 extern int interface_color_pair[NUMBER_OF_ELEMENTS];
 
@@ -404,7 +404,7 @@ void unlink_node(filestruct *fileptr);
 void delete_node(filestruct *fileptr);
 filestruct *copy_filestruct(const filestruct *src);
 void free_filestruct(filestruct *src);
-void renumber(filestruct *fileptr);
+void renumber(filestruct *line);
 partition *partition_filestruct(filestruct *top, size_t top_x,
 		filestruct *bot, size_t bot_x);
 void unpartition_filestruct(partition **p);
@@ -442,15 +442,9 @@ void enable_flow_control(void);
 void terminal_init(void);
 void unbound_key(int code);
 int do_input(bool allow_funcs);
-#ifdef ENABLE_MOUSE
-int do_mouse(void);
-#endif
 void do_output(char *output, size_t output_len, bool allow_cntrls);
 
 /* Most functions in prompt.c. */
-#ifdef ENABLE_MOUSE
-int do_statusbar_mouse(void);
-#endif
 void do_statusbar_output(int *the_input, size_t input_len, bool filtering);
 void do_statusbar_home(void);
 void do_statusbar_end(void);
@@ -501,6 +495,7 @@ void go_looking(void);
 ssize_t do_replace_loop(const char *needle, bool whole_word_only,
 		const filestruct *real_current, size_t *real_current_x);
 void do_replace(void);
+void ask_for_replacement(void);
 void goto_line_posx(ssize_t line, size_t pos_x);
 void do_gotolinecolumn(ssize_t line, ssize_t column, bool use_answer,
 		bool interactive);
@@ -624,9 +619,12 @@ void dump_filestruct(const filestruct *inptr);
 /* Most functions in winio.c. */
 void record_macro(void);
 void run_macro(void);
-void get_key_buffer(WINDOW *win);
 size_t get_key_buffer_len(void);
+void put_back(int keycode);
 void unget_kbinput(int kbinput, bool metakey);
+#ifdef ENABLE_NANORC
+void implant(const char *string);
+#endif
 int get_kbinput(WINDOW *win, bool showcursor);
 int parse_kbinput(WINDOW *win);
 int arrow_from_abcd(int kbinput);
@@ -636,7 +634,7 @@ int get_control_kbinput(int kbinput);
 int *get_verbatim_kbinput(WINDOW *win, size_t *kbinput_len);
 int *parse_verbatim_kbinput(WINDOW *win, size_t *count);
 #ifdef ENABLE_MOUSE
-int get_mouseinput(int *mouse_x, int *mouse_y, bool allow_shortcuts);
+int get_mouseinput(int *mouse_row, int *mouse_col, bool allow_shortcuts);
 #endif
 const sc *get_shortcut(int *kbinput);
 void blank_row(WINDOW *win, int y, int x, int n);
@@ -699,7 +697,7 @@ void case_sens_void(void);
 void regexp_void(void);
 void backwards_void(void);
 void flip_replace(void);
-void gototext_void(void);
+void flip_goto(void);
 #ifdef ENABLE_BROWSER
 void to_files_void(void);
 void goto_dir_void(void);

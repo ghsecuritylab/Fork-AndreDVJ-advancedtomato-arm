@@ -1,3 +1,159 @@
+Changes between v2.9.3 and v2.9.4:
+----------------------------------
+
+Benno Schulenberg (65):
+      bindings: make a key defined as string work also in browser and viewer
+      bindings: rename the bindable function 'gototext' to 'flipgoto'
+      bindings: revert the ^/ changes, as ^/ is not always Go-To-Line
+      bindings: show ^/ instead of ^_ for Go-To-Line
+      build: fix compilation when configured with --enable-tiny
+      bump version numbers and add a news item for the 2.9.4 release
+      docs: mention that a key can be bound to a string
+      docs: note also in the Info manual that text can be selected with Shift
+      editing: when --smooth is used, make <Enter>-at-bottom scroll one row
+      general: detect in a better way whether we're running on a Linux console
+      gnulib: update to its current upstream state
+      goto: avoid a segfault, by initializing 'answer' when it is NULL
+      help: mention that some keys work on a region when the mark is on
+      help: tweak the descriptions of ^X and ^R
+      input: handle the implant() function separately also for the prompt
+      input: handle the implant() function separately, as it is special
+      memory: avoid a leak when toggling from Search to Goto
+      memory: squeal when there is something wrong, instead of stumbling on
+      new feature: allow binding a key to a string (in a nanorc file)
+      prompt: disallow pasting when in restricted mode
+      rcfile: allow a syntax name to be unquoted
+      search: clear the existing answer when starting a new search
+      search: get rid of some unneeded recursion when just toggling things
+      selecting: cancel the softmark upon any attempt to move the cursor
+      small addition: allow customizing the color of an error message
+      syntax: color also ^/ in nano's help texts and in nanorc files
+      syntaxes: remove quotes from each syntax name, and color it differently
+      syntax: nanorc: color also bindings to a string as valid
+      tweaks: adjust comments and indentation after the previous change
+      tweaks: adjust two comments, move two declarations, rewrap three lines
+      tweaks: appease valgrind concerning syscalls with uninitialized values
+      tweaks: condense a comment and elide an 'if'
+      tweaks: correct a typo in NEWS
+      tweaks: correct a typo that broke binding a key to a string
+      tweaks: do not needlessly renumber the lines in the buffer
+      tweaks: don't call strcmp() to determine whether a string is empty
+      tweaks: drop an assert, add a warning, and change a 'for' to a 'while'
+      tweaks: drop some debugging stuff, and adjust what remains of it
+      tweaks: elide another variable, to call a function less often
+      tweaks: elide an unneeded variable
+      tweaks: elide an unneeded variable
+      tweaks: elide an unneeded variable
+      tweaks: elide an unused variable and parameter
+      tweaks: elide two unneeded booleans
+      tweaks: exclude an unlikely error message from the tiny version
+      tweaks: exclude an unlikely warning from the tiny version
+      tweaks: fix a copy-and-paste error
+      tweaks: make the fsfromline() call only for the undo types that need it
+      tweaks: plug a memory leak when using Verbatim Input at a prompt
+      tweaks: refactor the implanting of a key expansion
+      tweaks: remove another superfluous check
+      tweaks: remove a superfluous check
+      tweaks: remove two deprecated options and six rebindable function names
+      tweaks: remove two superfluous checks, and restrict two others
+      tweaks: rename a parameter and a variable, to be more fitting
+      tweaks: rename a variable to be more distinct and greppable
+      tweaks: rename two variables, to be more meaningful
+      tweaks: reshuffle some code, to be slightly less ugly
+      tweaks: reshuffle some of the search-and-replace cleanup calls
+      tweaks: reshuffle the undo types into mostly the same order everywhere
+      tweaks: shorten the name of two record elements
+      tweaks: slightly rewrap the FAQ's table of contents
+      tweaks: transform a 'do' to a 'while', and reshuffle a comment
+      tweaks: unabbreviate two variable names
+      undo: when redoing, don't try to find a line number that might not exist
+
+Brand Huntsman (1):
+      color: remove unneeded bright comparision to prevent duplicate pairs
+
+David Lawrence Ramsey (3):
+      docs: mention that errorcolor does have default colors
+      input: don't stop prepending when the user adds text via a shortcut
+      tweaks: fix typo in rebindable function name
+
+Tom Levy (1):
+      syntax: go: highlight also floats with leading zeroes as valid
+
+
+Changes between v2.9.2 and v2.9.3:
+----------------------------------
+
+Benno Schulenberg (65):
+      build: fix compilation when configured with --enable(tiny,color,nanorc}
+      build: fix compilation with --enable-tiny --enable-justify
+      build: let ./configure fail (not just warn) when curses.h is missing
+      bump version numbers and add a news item for the 2.9.3 release
+      copyright: update the years for the FSF
+      display: wipe the status bar when doing a total refresh
+      docs: remove the note about needing a recent ncurses for macros to work
+      docs: update the FAQ for the changed default location of history files
+      docs: update the TODO file to the current state of affairs
+      gnulib: update to its current upstream state
+      help: don't get stuck when there is an unwrappable piece of text
+      input: consume only the actual length of an escape sequence
+      input: fully reset state when a three-digit character code is cut short
+      input: make <Shift+Tab> do an unindent also on a Manjaro console
+      input: recognize escape sequences for <Shift+PageUp> and <Shift+PageDown>
+      input: recognize more escape sequences for <Shift+Home> and <Shift+End>
+      input: recognize the deviant keycode for <Ctrl+End> in urxvt
+      options: recognize -M and --trimblanks on the command line
+      painting: look for an end match only after a start match, if any
+      prompt: show whitespace only in the filename, not in the whole line
+      replacing: don't skip the first character of a backwards-marked region
+      search: suppress the occurrence at the cursor only when replacing
+      startup: allow a named pipe as file argument when --noread is used
+      startup: make an error message succinct and to the point
+      startup: move the initialization of colors, so any error gets printed
+      syntax: go: colorize only valid octal numbers
+      syntax: lua: do not color debug.setinfo as it doesn't exist
+      syntax: nanohelp: color also the Sh-Tab key combo
+      tweaks: change a 'do' to a 'while', and return early to elide an 'if'
+      tweaks: check for the type of terminal far earlier
+      tweaks: condense a condition and a comment, and reshuffle a line
+      tweaks: condense and rewrap some comments, and reindent two lines
+      tweaks: condense the conditional compilation of shortcut reassignments
+      tweaks: don't bother freeing the key buffer, just reallocate it
+      tweaks: don't bother to reallocate when the keybuffer size decreases
+      tweaks: drop a superfluous parameter, as it is always 1
+      tweaks: drop a useless assert, and don't abort over an unhandled option
+      tweaks: drop two unneeded initializations, and trim a comment
+      tweaks: elide a tiny intermediate buffer, and rename two variables
+      tweaks: exclude --trimblanks when no wrapping or justifying is configured
+      tweaks: fully include Savefile and Wherewas in the tiny version
+      tweaks: indenting text files with tabs is not a good idea
+      tweaks: mark the two blocks that have a deviant indentation
+      tweaks: move a bunch of comments to the lines that they refer to
+      tweaks: move two functions to their proper place, orderingwise
+      tweaks: remove a fragment of dead code
+      tweaks: remove a handful of redundant (because always true) asserts
+      tweaks: remove a superfluous case -- there can never be four digits
+      tweaks: remove a superfluous check, as we insert always one code
+      tweaks: rename a function, for aptness, and drop a superfluous check
+      tweaks: rename a function, to be more distinct
+      tweaks: rename a variable, and further condense some comments
+      tweaks: rename a variable, for more contrast
+      tweaks: rename a variable, to better fit its usage
+      tweaks: rename two variables, and swap their declaration order
+      tweaks: rename two variables, for preciseness and shortness
+      tweaks: reshuffle a couple of lines
+      tweaks: reshuffle a couple of lines, to make a bit more sense
+      tweaks: reshuffle some stuff, and avoid a memory leak
+      tweaks: reshuffle two condition series, to look better
+      tweaks: rewrap a bunch of lines in the NEWS file
+      tweaks: set a modifier in a single place, for conciseness
+      tweaks: swap the row and col parameters to a more consistent order
+      tweaks: transform a parameter, from a pointer to the value itself
+      wrapping: don't trim a blank character that the user just typed
+
+Brand Huntsman (1):
+      startup: parse interface colors when they are read, not when initialized
+
+
 Changes between v2.9.1 and v2.9.2:
 ----------------------------------
 

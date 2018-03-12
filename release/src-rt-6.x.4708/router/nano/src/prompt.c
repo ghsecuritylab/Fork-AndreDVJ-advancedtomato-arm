@@ -1,7 +1,7 @@
 /**************************************************************************
  *   prompt.c  --  This file is part of GNU nano.                         *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2017 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2018 Free Software Foundation, Inc.    *
  *   Copyright (C) 2016 Benno Schulenberg                                 *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
@@ -28,11 +28,34 @@ static char *prompt = NULL;
 static size_t statusbar_x = HIGHEST_POSITIVE;
 		/* The cursor position in answer. */
 
+#ifdef ENABLE_MOUSE
+/* Handle a mouse click on the statusbar prompt or the shortcut list. */
+int do_statusbar_mouse(void)
+{
+	int click_row, click_col;
+	int retval = get_mouseinput(&click_row, &click_col, TRUE);
+
+	/* We can click on the statusbar window text to move the cursor. */
+	if (retval == 0 && wmouse_trafo(bottomwin, &click_row, &click_col, FALSE)) {
+		size_t start_col = strlenpt(prompt) + 2;
+
+		/* Move to where the click occurred. */
+		if (click_row == 0 && click_col >= start_col) {
+			statusbar_x = actual_x(answer,
+							get_statusbar_page_start(start_col, start_col +
+							statusbar_xplustabs()) + click_col - start_col);
+			update_the_statusbar();
+		}
+	}
+
+	return retval;
+}
+#endif
+
 /* Read in a keystroke, interpret it if it is a shortcut or toggle, and
- * return it.  Set ran_func to TRUE if we ran a function associated with
- * a shortcut key, and set finished to TRUE if we're done after running
+ * return it.  Set finished to TRUE if we're done after running
  * or trying to run a function associated with a shortcut key. */
-int do_statusbar_input(bool *ran_func, bool *finished)
+int do_statusbar_input(bool *finished)
 {
 	int input;
 		/* The character we read in. */
@@ -40,11 +63,8 @@ int do_statusbar_input(bool *ran_func, bool *finished)
 		/* The input buffer. */
 	static size_t kbinput_len = 0;
 		/* The length of the input buffer. */
-	const sc *s;
-	bool have_shortcut = FALSE;
-	const subnfunc *f;
+	const sc *shortcut;
 
-	*ran_func = FALSE;
 	*finished = FALSE;
 
 	/* Read in a character. */
@@ -67,15 +87,11 @@ int do_statusbar_input(bool *ran_func, bool *finished)
 #endif
 
 	/* Check for a shortcut in the current list. */
-	s = get_shortcut(&input);
-
-	/* If we got a shortcut from the current list, or a "universal"
-	 * statusbar prompt shortcut, set have_shortcut to TRUE. */
-	have_shortcut = (s != NULL);
+	shortcut = get_shortcut(&input);
 
 	/* If we got a non-high-bit control key, a meta key sequence, or a
 	 * function key, and it's not a shortcut or toggle, throw it out. */
-	if (!have_shortcut) {
+	if (shortcut == NULL) {
 		if (is_ascii_cntrl_char(input) || meta_key || !is_byte(input)) {
 			beep();
 			input = ERR;
@@ -84,7 +100,7 @@ int do_statusbar_input(bool *ran_func, bool *finished)
 
 	/* If the keystroke isn't a shortcut nor a toggle, it's a normal text
 	 * character: add the it to the input buffer, when allowed. */
-	if (input != ERR && !have_shortcut) {
+	if (input != ERR && shortcut == NULL) {
 		/* Only accept input when not in restricted mode, or when not at
 		 * the "Write File" prompt, or when there is no filename yet. */
 		if (!ISSET(RESTRICTED) || currmenu != MWRITEFILE ||
@@ -98,7 +114,7 @@ int do_statusbar_input(bool *ran_func, bool *finished)
 	/* If we got a shortcut, or if there aren't any other keystrokes waiting
 	 * after the one we read in, we need to insert all the characters in the
 	 * input buffer (if not empty) into the answer. */
-	if ((have_shortcut || get_key_buffer_len() == 0) && kbinput != NULL) {
+	if ((shortcut || get_key_buffer_len() == 0) && kbinput != NULL) {
 		/* Inject all characters in the input buffer at once, filtering out
 		 * control characters. */
 		do_statusbar_output(kbinput, kbinput_len, TRUE);
@@ -109,87 +125,60 @@ int do_statusbar_input(bool *ran_func, bool *finished)
 		kbinput = NULL;
 	}
 
-	if (have_shortcut) {
-		if (s->scfunc == do_tab || s->scfunc == do_enter)
+	if (shortcut) {
+		if (shortcut->func == do_tab || shortcut->func == do_enter)
 			;
-		else if (s->scfunc == do_left)
+		else if (shortcut->func == do_left)
 			do_statusbar_left();
-		else if (s->scfunc == do_right)
+		else if (shortcut->func == do_right)
 			do_statusbar_right();
 #ifndef NANO_TINY
-		else if (s->scfunc == do_prev_word_void)
+		else if (shortcut->func == do_prev_word_void)
 			do_statusbar_prev_word();
-		else if (s->scfunc == do_next_word_void)
+		else if (shortcut->func == do_next_word_void)
 			do_statusbar_next_word();
 #endif
-		else if (s->scfunc == do_home)
+		else if (shortcut->func == do_home)
 			do_statusbar_home();
-		else if (s->scfunc == do_end)
+		else if (shortcut->func == do_end)
 			do_statusbar_end();
 		/* When in restricted mode at the "Write File" prompt and the
 		 * filename isn't blank, disallow any input and deletion. */
 		else if (ISSET(RESTRICTED) && currmenu == MWRITEFILE &&
 								openfile->filename[0] != '\0' &&
-								(s->scfunc == do_verbatim_input ||
-								s->scfunc == do_cut_text_void ||
-								s->scfunc == do_delete ||
-								s->scfunc == do_backspace))
+								(shortcut->func == do_verbatim_input ||
+								shortcut->func == do_cut_text_void ||
+								shortcut->func == do_uncut_text ||
+								shortcut->func == do_delete ||
+								shortcut->func == do_backspace))
 			;
-		else if (s->scfunc == do_verbatim_input)
+#ifdef ENABLE_NANORC
+		else if (shortcut->func == (void *)implant)
+			implant(shortcut->expansion);
+#endif
+		else if (shortcut->func == do_verbatim_input)
 			do_statusbar_verbatim_input();
-		else if (s->scfunc == do_cut_text_void)
+		else if (shortcut->func == do_cut_text_void)
 			do_statusbar_cut_text();
-		else if (s->scfunc == do_delete)
+		else if (shortcut->func == do_delete)
 			do_statusbar_delete();
-		else if (s->scfunc == do_backspace)
+		else if (shortcut->func == do_backspace)
 			do_statusbar_backspace();
-		else if (s->scfunc == do_uncut_text) {
+		else if (shortcut->func == do_uncut_text) {
 			if (cutbuffer != NULL)
 				do_statusbar_uncut_text();
 		} else {
-			/* Handle any other shortcut in the current menu, setting
-			 * ran_func to TRUE if we try to run their associated functions,
-			 * and setting finished to TRUE to indicatethat we're done after
-			 * running or trying to run their associated functions. */
-			f = sctofunc(s);
-			if (s->scfunc != NULL) {
-				*ran_func = TRUE;
-				if (f && (!ISSET(VIEW_MODE) || f->viewok) &&
-								f->scfunc != do_gotolinecolumn_void)
-					f->scfunc();
-			}
+			/* Handle any other shortcut in the current menu, setting finished
+			 * to TRUE to indicate that we're done after running or trying to
+			 * run its associated function. */
+			if (!ISSET(VIEW_MODE) || sctofunc(shortcut)->viewok)
+				shortcut->func();
 			*finished = TRUE;
 		}
 	}
 
 	return input;
 }
-
-#ifdef ENABLE_MOUSE
-/* Handle a mouse click on the statusbar prompt or the shortcut list. */
-int do_statusbar_mouse(void)
-{
-	int mouse_x, mouse_y;
-	int retval = get_mouseinput(&mouse_x, &mouse_y, TRUE);
-
-	/* We can click on the statusbar window text to move the cursor. */
-	if (retval == 0 && wmouse_trafo(bottomwin, &mouse_y, &mouse_x, FALSE)) {
-		size_t start_col;
-
-		start_col = strlenpt(prompt) + 2;
-
-		/* Move to where the click occurred. */
-		if (mouse_x >= start_col && mouse_y == 0) {
-			statusbar_x = actual_x(answer,
-						get_statusbar_page_start(start_col, start_col +
-						statusbar_xplustabs()) + mouse_x - start_col);
-			update_the_statusbar();
-		}
-	}
-
-	return retval;
-}
-#endif
 
 /* The user typed input_len multibyte characters.  Add them to the answer,
  * filtering out ASCII control characters if filtering is TRUE. */
@@ -356,6 +345,8 @@ void do_statusbar_verbatim_input(void)
 	kbinput = get_verbatim_kbinput(bottomwin, &kbinput_len);
 
 	do_statusbar_output(kbinput, kbinput_len, FALSE);
+
+	free(kbinput);
 }
 
 /* Return the zero-based column position of the cursor in the answer. */
@@ -443,7 +434,7 @@ functionptrtype acquire_an_answer(int *actual, bool allow_tabs,
 		void (*refresh_func)(void))
 {
 	int kbinput = ERR;
-	bool ran_func, finished;
+	bool finished;
 	functionptrtype func;
 #ifdef ENABLE_TABCOMP
 	bool tabbed = FALSE;
@@ -470,7 +461,7 @@ functionptrtype acquire_an_answer(int *actual, bool allow_tabs,
 	update_the_statusbar();
 
 	while (TRUE) {
-		kbinput = do_statusbar_input(&ran_func, &finished);
+		kbinput = do_statusbar_input(&finished);
 
 #ifndef NANO_TINY
 		/* If the window size changed, go reformat the prompt string. */
@@ -617,7 +608,8 @@ int do_prompt(bool allow_tabs, bool allow_files,
 
 	bottombars(menu);
 
-	answer = mallocstrcpy(answer, curranswer);
+	if (answer != curranswer || answer == NULL)
+		answer = mallocstrcpy(answer, curranswer);
 
 #ifndef NANO_TINY
   redo_theprompt:
@@ -669,7 +661,6 @@ int do_prompt(bool allow_tabs, bool allow_files,
 int do_yesno_prompt(bool all, const char *msg)
 {
 	int response = -2, width = 16;
-	char *message = display_string(msg, 0, COLS, FALSE);
 
 	/* TRANSLATORS: For the next three strings, if possible, specify
 	 * the single-byte letters for both your language and English.
@@ -717,7 +708,7 @@ int do_yesno_prompt(bool all, const char *msg)
 		/* Color the statusbar over its full width and display the question. */
 		wattron(bottomwin, interface_color_pair[TITLE_BAR]);
 		blank_statusbar();
-		mvwaddnstr(bottomwin, 0, 0, message, actual_x(message, COLS - 1));
+		mvwaddnstr(bottomwin, 0, 0, msg, actual_x(msg, COLS - 1));
 		wattroff(bottomwin, interface_color_pair[TITLE_BAR]);
 		wnoutrefresh(bottomwin);
 
@@ -754,8 +745,6 @@ int do_yesno_prompt(bool all, const char *msg)
 		}
 #endif /* ENABLE_MOUSE */
 	}
-
-	free(message);
 
 	return response;
 }

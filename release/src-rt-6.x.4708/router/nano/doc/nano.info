@@ -11,7 +11,7 @@ File: nano.info,  Node: Top,  Next: Introduction,  Up: (dir)
 nano
 ****
 
-This manual documents the GNU ‘nano’ editor, version 2.9.2.
+This manual documents the GNU ‘nano’ editor, version 2.9.4.
 
 * Menu:
 
@@ -135,6 +135,11 @@ File: nano.info,  Node: Command-line Options,  Next: Editor Basics,  Prev: Invok
 ‘--nonewlines’
      Don’t add newlines to the ends of files.
 
+‘-M’
+‘--trimblanks’
+     Snip trailing whitespace from the wrapped line when automatic
+     hard-wrapping occurs or when text is justified.
+
 ‘-N’
 ‘--noconvert’
      Disable automatic conversion of files from DOS/Mac format.
@@ -147,7 +152,6 @@ File: nano.info,  Node: Command-line Options,  Next: Editor Basics,  Prev: Invok
 ‘--positionlog’
      For the 200 most recent files, log the last position of the cursor,
      and place it at that position again upon reopening such a file.
-     (The old form of this option, ‘--poslog’, is deprecated.)
 
 ‘-Q "CHARACTERS"’
 ‘--quotestr="CHARACTERS"’
@@ -433,10 +437,13 @@ File: nano.info,  Node: The Mark,  Next: Screen Layout,  Prev: The Cutbuffer,  U
 Text can be selected by first ’setting the Mark’ (default key bindings:
 ‘^6’ and ‘M-A’) and then moving the cursor to the other end of the
 portion to be selected.  The selected portion of text will be
-highlighted in reverse video (or in bold if you set the boldtext
-option).  This selection can now be cut or copied in its entirety with a
-single ‘^K’ or ‘M-6’.  Or the selection can be used to limit the scope
-of a search-and-replace (‘^\’) or spell-checking session (‘^T’).
+highlighted.  This selection can now be cut or copied in its entirety
+with a single ‘^K’ or ‘M-6’.  Or the selection can be used to limit the
+scope of a search-and-replace (‘^\’) or spell-checking session (‘^T’).
+
+   On some terminals, it is also possible to select text by holding down
+‘Shift’ together with the cursor keys.  Such a selection is cancelled
+upon any cursor movement where ‘Shift’ isn’t held.
 
    Cutting or copying selected text will toggle the mark off
 automatically.  If necessary, it can be toggled off manually with
@@ -515,8 +522,7 @@ without saving.
 
    The recording and playback of keyboard macros works correctly only on
 a terminal emulator, not on a Linux console (VT), because the latter is
-a deficient terminal.  And it works only with recent versions of
-ncurses.
+a deficient terminal.
 
 
 File: nano.info,  Node: Built-in Help,  Next: Feature Toggles,  Prev: Editor Basics,  Up: Top
@@ -683,14 +689,17 @@ The supported settings in a nanorc file are:
      Do case-sensitive searches by default.
 
 ‘set constantshow’
-     Constantly display the cursor position on the status bar.  (The old
-     form of this option, ‘set const’, is deprecated.)  Note that this
-     overrides ‘quickblank’.
+     Constantly display the cursor position on the status bar.  Note
+     that this overrides ‘quickblank’.
 
 ‘set cutfromcursor’
      Use cut-from-cursor-to-end-of-line by default, instead of cutting
      the whole line.  (The old form of this option, ‘set cut’, is
      deprecated.)
+
+‘set errorcolor FGCOLOR,BGCOLOR’
+     Use this color combination for the status bar when an error message
+     is displayed.  *Note set functioncolor:: for valid color names.
 
 ‘set fill NUMBER’
      Hard-wrap lines at column number NUMBER.  If NUMBER is 0 or less,
@@ -768,7 +777,7 @@ The supported settings in a nanorc file are:
 ‘set positionlog’
      Save the cursor position of files between editing sessions.  The
      cursor position is remembered for the 200 most-recently edited
-     files.  (The old form of this option, ‘set poslog’, is deprecated.)
+     files.
 
 ‘set preserve’
      Preserve the XON and XOFF keys (‘^Q’ and ‘^S’).
@@ -988,12 +997,18 @@ File: nano.info,  Node: Rebinding Keys,  Prev: Syntax Highlighting,  Up: Nanorc 
 7.3 Rebinding Keys
 ==================
 
-Key bindings can be changed via the following two commands in a nanorc
+Key bindings can be changed via the following three commands in a nanorc
 file:
 
 ‘bind key function menu’
      Rebinds ‘key’ to ‘function’ in the context of ‘menu’ (or in all
      menus where the function exists by using ‘all’).
+
+‘bind key "string" menu’
+     Makes ‘key’ produce ‘string’ in the context of ‘menu’ (or in all
+     menus where the key exists when ‘all’ is used).  The ‘string’ can
+     consist of text or commands or a mix of them.  (To enter a command
+     into the ‘string’, precede its keystroke with ‘M-V’.)
 
 ‘unbind key menu’
      Unbinds ‘key’ from ‘menu’ (or from all menus where it exists by
@@ -1042,8 +1057,7 @@ file:
      Starts a backward search for text in the current buffer.
 
 ‘searchagain’
-     Repeats the last search command without prompting.  (The form
-     ‘research’ is deprecated.)
+     Repeats the last search command without prompting.
 
 ‘findprevious’
      As ‘searchagain’, but always in the backward direction.
@@ -1079,7 +1093,7 @@ file:
 
 ‘curpos’
      Shows the current cursor position: the line, column, and character
-     positions.  (The form ‘cursorpos’ is deprecated.)
+     positions.
 
 ‘wordcount’
      Counts the number of words, lines and characters in the current
@@ -1168,9 +1182,6 @@ file:
      Goes to a specific line (and column if specified).  Negative
      numbers count from the end of the file (and end of the line).
 
-‘gototext’
-     Switches from targeting a line number to searching for text.
-
 ‘findbracket’
      Moves the cursor to the bracket (brace, parenthesis, etc.)  that
      matches (pairs) with the one under the cursor.
@@ -1223,7 +1234,7 @@ file:
 
 ‘regexp’
      Toggles whether searching/replacing is based on literal strings or
-     regular expressions.  (The form ‘regex’ is deprecated.)
+     regular expressions.
 
 ‘backwards’
      Toggles whether searching/replacing goes forward or backward.
@@ -1236,14 +1247,17 @@ file:
 
 ‘flipreplace’
      Toggles between searching for something and replacing something.
-     (The form ‘dontreplace’ is deprecated.)
+
+‘flipgoto’
+     Toggles between searching for text and targeting a line number.
+     (The form ‘gototext’ is deprecated.)
 
 ‘flipexecute’
      Toggles between inserting a file and executing a command.
 
 ‘flipnewbuffer’
      Toggles between inserting into the current buffer and into a new
-     empty buffer.  (The form ‘newbuffer’ is deprecated.)
+     empty buffer.
 
 ‘dosformat’
      When writing a file, switches to writing a DOS format (CR/LF).
@@ -1353,7 +1367,6 @@ file:
 
 ‘replacewith’
      The ’replace with’ menu, which comes up after ’search to replace’.
-     (The form ‘replace2’ is deprecated.)
 
 ‘gotoline’
      The ’goto line (and column)’ menu.
@@ -1624,28 +1637,28 @@ Node: Top199
 Node: Introduction556
 Node: Invoking1356
 Node: Command-line Options2402
-Ref: --speller9385
-Ref: Expert Mode10620
-Node: Editor Basics11647
-Node: Entering Text11931
-Node: Commands12920
-Node: The Cutbuffer13717
-Node: The Mark14438
-Node: Screen Layout15228
-Node: Search and Replace16407
-Node: Using the Mouse17142
-Node: Limitations17759
-Node: Built-in Help18323
-Node: Feature Toggles18747
-Node: Nanorc Files21204
-Node: Settings22801
-Ref: set functioncolor25394
-Ref: Whitespace31685
-Node: Syntax Highlighting32241
-Node: Rebinding Keys37232
-Node: The File Browser48149
-Node: Pico Compatibility49009
-Node: Building and Configure Options52306
+Ref: --speller9467
+Ref: Expert Mode10702
+Node: Editor Basics11729
+Node: Entering Text12013
+Node: Commands13002
+Node: The Cutbuffer13799
+Node: The Mark14520
+Node: Screen Layout15454
+Node: Search and Replace16633
+Node: Using the Mouse17368
+Node: Limitations17985
+Node: Built-in Help18497
+Node: Feature Toggles18921
+Node: Nanorc Files21378
+Node: Settings22975
+Ref: set functioncolor25679
+Ref: Whitespace31905
+Node: Syntax Highlighting32461
+Node: Rebinding Keys37452
+Node: The File Browser48483
+Node: Pico Compatibility49343
+Node: Building and Configure Options52640
 
 End Tag Table
 
