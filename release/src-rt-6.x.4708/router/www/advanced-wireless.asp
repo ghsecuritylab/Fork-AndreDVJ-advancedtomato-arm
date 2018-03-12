@@ -9,7 +9,7 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript" src="js/wireless.jsx?_http_id=<% nv(http_id); %>"></script>
 	<script type="text/javascript">
-		//	<% nvram("t_model_name,wl_security_mode,wl_afterburner,wl_ap_isolate,wl_auth,wl_bcn,wl_dtim,wl_frag,wl_frameburst,wl_gmode_protection,wl_plcphdr,wl_rate,wl_rateset,wl_rts,wl_wme,wl_wme_no_ack,wl_wme_apsd,wl_txpwr,wl_mrate,t_features,wl_distance,wl_maxassoc,wlx_hpamp,wlx_hperx,wl_reg_mode,wl_country_code,wl_country,wl_btc_mode,wl_mimo_preamble,wl_obss_coex,wl_mitigation,wl_interference_override,wl_wmf_bss_enable"); %>
+		//	<% nvram("t_model_name,wl_security_mode,wl_afterburner,wl_ap_isolate,wl_atf,wl_auth,wl_bcn,wl_dtim,wl_frag,wl_frameburst,wl_gmode_protection,wl_plcphdr,wl_rate,wl_rateset,wl_rts,wl_wme,wl_wme_no_ack,wl_wme_apsd,wl_txpwr,wl_mrate,t_features,wl_distance,wl_maxassoc,wlx_hpamp,wlx_hperx,wl_reg_mode,wl_country_code,wl_country,wl_btc_mode,wl_mimo_preamble,wl_obss_coex,wl_mitigation,wl_interference_override,wl_wmf_bss_enable"); %>
 		//	<% wlcountries(); %>
 
 		hp = features('hpamp');
