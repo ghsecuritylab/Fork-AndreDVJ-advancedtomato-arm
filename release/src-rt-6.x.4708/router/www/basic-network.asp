@@ -1760,7 +1760,7 @@ No part of this file may be used without permission.
 							value: nvram[ 'wan' + u + '_ppp_demand' ]
 						},
 						{
-							title: 'Max Idle Time', indent: 2, name: 'wan' + u + '_ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minutes)</i>',
+							title: 'Max Idle Time', indent: 2, name: 'wan' + u + '_ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minutes)</i> <br> <small>Note: When the WAN link is down, DNS queries directed at the router from the LAN side will be sent to address 192.51.100.1 <br>(to allow DNS queries to trigger Connect On Demand) until the WAN comes up</small>',
 							value: nvram[ 'wan' + u + '_ppp_idletime' ]
 						},
 						{
