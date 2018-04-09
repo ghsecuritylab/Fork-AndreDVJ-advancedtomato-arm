@@ -371,7 +371,7 @@ else
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard *.asp ); do \
 		[ -f $(INSTALLDIR)/www/$$F ] && \
-		$(TOP)/www/tools/node_modules/.bin/html-minifier $$F --minify-css -o $$F || true; \
+		chmod +x $(TOP)/www/tools/node_modules/.bin/html-minifier && $(TOP)/www/tools/node_modules/.bin/html-minifier $$F --minify-css -o $$F || true; \
 	done
 
 # Remove all javascript multi line comments in asp files
@@ -385,13 +385,13 @@ else
 # Compress JAVASCRIPT files
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard js/*.js *.js ); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/tools/node_modules/.bin/uglifyjs $$F -c -o $$F || true; \
+		[ -f $(INSTALLDIR)/www/$$F ] && chmod +x $(TOP)/www/tools/node_modules/.bin/uglifyjs && $(TOP)/www/tools/node_modules/.bin/uglifyjs $$F -c -o $$F || true; \
 	done
 
 # Compress CSS files
 	cd $(INSTALLDIR)/www && \
 	for F in $(wildcard css/schemes/*.css css/*.css *.css ); do \
-		[ -f $(INSTALLDIR)/www/$$F ] && $(TOP)/www/tools/node_modules/.bin/uglifycss $$F --output $$F || true; \
+		[ -f $(INSTALLDIR)/www/$$F ] && chmod +x $(TOP)/www/tools/node_modules/.bin/uglifycss && $(TOP)/www/tools/node_modules/.bin/uglifycss $$F --output $$F || true; \
 	done
 
 # make sure old and debugging crap is gone
