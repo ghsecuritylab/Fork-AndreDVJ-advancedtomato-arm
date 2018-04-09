@@ -771,8 +771,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_roam'] = 0;
 						break;
 					case 'ppp3g':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_l2tp_server_ip'] = 0;
 						vis['_wan'+u+'_pptp_server_ip'] = 0;
@@ -828,8 +826,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_roam'] = 0;
 						break;
 					case 'pptp':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_l2tp_server_ip'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_gateway'] = (!E('_f_wan'+u+'_pptp_dhcp').checked);
@@ -844,8 +840,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_speed'] = 0;
 						break;
 					case 'l2tp':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_pptp_server_ip'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_gateway'] = (!E('_f_wan'+u+'_pptp_dhcp').checked);
