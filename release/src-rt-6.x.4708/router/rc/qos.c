@@ -293,18 +293,14 @@ void ipt_qos(void)
 	qface = wanfaces.iface[0].name;
 	ipt_write(
 		"-A FORWARD -o %s -j QOSO\n"
-		"-A OUTPUT -o %s -j QOSO\n"
-		"-A FORWARD -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n"
-		"-A OUTPUT -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n",
+		"-A OUTPUT -o %s -j QOSO\n",
 		qface, qface, qface, qface);
 
 	if(check_wanup("wan2")){
 		qface = wan2faces.iface[0].name;
 		ipt_write(
 			"-A FORWARD -o %s -j QOSO\n"
-			"-A OUTPUT -o %s -j QOSO\n"
-			"-A FORWARD -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n"
-			"-A OUTPUT -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n",
+			"-A OUTPUT -o %s -j QOSO\n",
 			qface, qface, qface, qface);
 	}
 
@@ -313,18 +309,14 @@ void ipt_qos(void)
 		qface = wan3faces.iface[0].name;
 		ipt_write(
 			"-A FORWARD -o %s -j QOSO\n"
-			"-A OUTPUT -o %s -j QOSO\n"
-			"-A FORWARD -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n"
-			"-A OUTPUT -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n",
+			"-A OUTPUT -o %s -j QOSO\n",
 			qface, qface, qface, qface);
 	}
 	if(check_wanup("wan4")){
 		qface = wan4faces.iface[0].name;
 		ipt_write(
 			"-A FORWARD -o %s -j QOSO\n"
-			"-A OUTPUT -o %s -j QOSO\n"
-			"-A FORWARD -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n"
-			"-A OUTPUT -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n",
+			"-A OUTPUT -o %s -j QOSO\n",
 			qface, qface, qface, qface);
 	}
 #endif
@@ -334,9 +326,7 @@ void ipt_qos(void)
 		ip6t_write(
 			"-A FORWARD -o %s -j QOSO\n"
 			"-A OUTPUT -o %s -p icmpv6 -j RETURN\n"
-			"-A OUTPUT -o %s -j QOSO\n"
-			"-A FORWARD -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n"
-			"-A OUTPUT -o %s -m connmark ! --mark 0 -j CONNMARK --save-mark\n",
+			"-A OUTPUT -o %s -j QOSO\n",
 			wan6face, wan6face, wan6face, wan6face, wan6face);
 	}
 #endif
