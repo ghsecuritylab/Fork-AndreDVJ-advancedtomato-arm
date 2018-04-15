@@ -1012,6 +1012,7 @@ iptables-1.4.x-install:
 	install -D iptables-1.4.x/iptables/.libs/xtables-multi $(INSTALLDIR)/iptables-1.4.x/usr/sbin/xtables-multi
 	cd $(INSTALLDIR)/iptables-1.4.x/usr/sbin && \
 		ln -sf xtables-multi iptables-restore && \
+		ln -sf xtables-multi iptables-save && \
 		ln -sf xtables-multi iptables
 	install -d $(INSTALLDIR)/iptables-1.4.x/usr/lib/xtables
 	install -D iptables-1.4.x/libiptc/.libs/lib*.so $(INSTALLDIR)/iptables-1.4.x/usr/lib/
@@ -1031,6 +1032,7 @@ iptables-1.4.x-install:
 ifeq ($(TCONFIG_IPV6),y)
 	cd $(INSTALLDIR)/iptables-1.4.x/usr/sbin && \
 		ln -sf xtables-multi ip6tables-restore && \
+		ln -sf xtables-multi ip6tables-save && \
 		ln -sf xtables-multi ip6tables
 endif
 
