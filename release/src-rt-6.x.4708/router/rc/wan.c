@@ -1455,7 +1455,9 @@ void stop_wan(void)
 #endif
 
 	stop_vpn_eas();
-	stop_adblock();
+	if (nvram_match("adblock_enable", "1")) {
+		stop_adblock();
+	}
 	clear_resolv();
 	stop_wan_if("wan");
 	stop_wan_if("wan2");

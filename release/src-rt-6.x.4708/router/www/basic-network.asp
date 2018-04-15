@@ -771,8 +771,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_roam'] = 0;
 						break;
 					case 'ppp3g':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_l2tp_server_ip'] = 0;
 						vis['_wan'+u+'_pptp_server_ip'] = 0;
@@ -828,8 +826,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_roam'] = 0;
 						break;
 					case 'pptp':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_l2tp_server_ip'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_gateway'] = (!E('_f_wan'+u+'_pptp_dhcp').checked);
@@ -844,8 +840,6 @@ No part of this file may be used without permission.
 						vis['_wan'+u+'_modem_speed'] = 0;
 						break;
 					case 'l2tp':
-						vis['_wan'+u+'_pppoe_lei'] = 0;
-						vis['_wan'+u+'_pppoe_lef'] = 0;
 						vis['_wan'+u+'_pptp_server_ip'] = 0;
 						vis['_wan'+u+'_ppp_service'] = 0;
 						vis['_wan'+u+'_gateway'] = (!E('_f_wan'+u+'_pptp_dhcp').checked);
@@ -1760,7 +1754,7 @@ No part of this file may be used without permission.
 							value: nvram[ 'wan' + u + '_ppp_demand' ]
 						},
 						{
-							title: 'Max Idle Time', indent: 2, name: 'wan' + u + '_ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minutes)</i>',
+							title: 'Max Idle Time', indent: 2, name: 'wan' + u + '_ppp_idletime', type: 'text', maxlen: 5, size: 7, suffix: ' <i>(minutes)</i> <br> <small>Note: When the WAN link is down, DNS queries directed at the router from the LAN side will be sent to address 192.51.100.1 <br>(to allow DNS queries to trigger Connect On Demand) until the WAN comes up</small>',
 							value: nvram[ 'wan' + u + '_ppp_idletime' ]
 						},
 						{
@@ -1818,8 +1812,8 @@ No part of this file may be used without permission.
 					{ title: 'Use dnscrypt-proxy', name: 'f_dnscrypt_proxy', type: 'checkbox', value: (nvram.dnscrypt_proxy == 1) },
 					{ title: 'Ephemeral Keys', indent: 2, name: 'f_dnscrypt_ephemeral_keys', type: 'checkbox', suffix: '&nbsp; <small>warning: this option requires extra CPU cycles!</small>', value: (nvram.dnscrypt_ephemeral_keys == 1) },
 					{ title: 'Manual Entry', indent: 2, name: 'f_dnscrypt_manual', type: 'checkbox', value: (nvram.dnscrypt_manual == 1) },
-					{ title: 'Resolver', indent: 2, name: 'dnscrypt_resolver', type: 'select', options: [/*dnscrypt_resolvers*/],  value: nvram.dnscrypt_resolver, suffix: ' <a href=\'https://github.com/dyne/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
-					{ title: 'Resolver Address', indent: 2, name: 'dnscrypt_resolver_address', type: 'text', maxlen: 50, size: 25, value: nvram.dnscrypt_resolver_address, suffix: ' <a href=\'https://github.com/dyne/dnscrypt-proxy/blob/master/dnscrypt-resolvers.csv\' target=\'_new\'>Resolver Details</a>' },
+					{ title: 'Resolver', indent: 2, name: 'dnscrypt_resolver', type: 'select', options: [/*dnscrypt_resolvers*/],  value: nvram.dnscrypt_resolver, suffix: ' <a href=\'https://dnscrypt.info/public-servers\' target=\'_new\'>Resolver Details</a>' },
+					{ title: 'Resolver Address', indent: 2, name: 'dnscrypt_resolver_address', type: 'text', maxlen: 50, size: 25, value: nvram.dnscrypt_resolver_address, suffix: ' <a href=\'https://dnscrypt.info/public-servers\' target=\'_new\'>Resolver Details</a>' },
 					{ title: 'Provider Name', indent: 2, name: 'dnscrypt_provider_name', type: 'text', maxlen: 60, size: 25, value: nvram.dnscrypt_provider_name },
 					{ title: 'Provider Public Key', indent: 2, name: 'dnscrypt_provider_key', type: 'text', maxlen: 80, size: 25, value: nvram.dnscrypt_provider_key },
 					{ title: 'Priority', indent: 2, name: 'dnscrypt_priority', type: 'select', options: [['1','Strict-Order'],['2','No-Resolv'],['0','None']], value: nvram.dnscrypt_priority },
