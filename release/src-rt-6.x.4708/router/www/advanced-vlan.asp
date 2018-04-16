@@ -19,7 +19,7 @@
 	March 2015 Tvlz
 	https://bitbucket.org/tvlz/tvlz-advanced-vlan/
 
-	** Last Updated - Jun 23 2017 - Tvlz **
+	** Last Updated - Apr 16 2018 - Tvlz **
 
 	For use with Tomato Firmware only.
 	No part of this file may be used without permission.
@@ -70,6 +70,7 @@
 			case 'vlan-testid0':
 			case 'Asus RT-AC56U':
 			case 'D-Link DIR868L':
+			case 'Cisco Linksys EA6400':
 			case 'Cisco Linksys EA6500v2':
 			case 'Cisco Linksys EA6700':
 				COL_P0N = '0';
