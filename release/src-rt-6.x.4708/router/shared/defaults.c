@@ -667,27 +667,6 @@ struct nvram_tuple router_defaults[] = {
 	{ "routes_static",		""				, 0 },
 	{ "dhcp_routes",		"1"				, 0 },
 	{ "wk_mode",			"gateway"			, 0 },	// Network mode [gateway|router]
-#ifdef TCONFIG_ZEBRA
-	{ "dr_setting",			"0"				, 0 },	// [ Disable | WAN | LAN | Both ]
-	{ "dr_lan_tx",			"0"				, 0 },	// Dynamic-Routing LAN out
-	{ "dr_lan_rx",			"0"				, 0 },	// Dynamic-Routing LAN in
-	{ "dr_lan1_tx",			"0"				, 0 },	// Dynamic-Routing LAN out
-	{ "dr_lan1_rx",			"0"				, 0 },	// Dynamic-Routing LAN in
-	{ "dr_lan2_tx",			"0"				, 0 },	// Dynamic-Routing LAN out
-	{ "dr_lan2_rx",			"0"				, 0 },	// Dynamic-Routing LAN in
-	{ "dr_lan3_tx",			"0"				, 0 },	// Dynamic-Routing LAN out
-	{ "dr_lan3_rx",			"0"				, 0 },	// Dynamic-Routing LAN in
-	{ "dr_wan_tx",			"0"				, 0 },	// Dynamic-Routing WAN out
-	{ "dr_wan_rx",			"0"				, 0 },	// Dynamic-Routing WAN in
-	{ "dr_wan2_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
-	{ "dr_wan2_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
-#ifdef TCONFIG_MULTIWAN
-	{ "dr_wan3_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
-	{ "dr_wan3_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
-	{ "dr_wan4_tx",			"0"				, 0 },  // Dynamic-Routing WAN out
-	{ "dr_wan4_rx",			"0"				, 0 },  // Dynamic-Routing WAN in
-#endif
-#endif
 
 // advanced-vlan
 	{ "trunk_vlan_so",		"0"				, 0 },	// VLAN trunk support override
@@ -919,9 +898,6 @@ struct nvram_tuple router_defaults[] = {
 	{ "usb_ohci",			"0"				, 0 },
 	{ "usb_usb2",			"1"				, 0 },
 	{ "usb_usb3",			"1"				, 0 },
-#if defined(LINUX26) && defined(TCONFIG_MICROSD)
-	{ "usb_mmc",			"-1"				, 0 },
-#endif
 	{ "usb_irq_thresh",		"0"				, 0 },
 	{ "usb_storage",		"1"				, 0 },
 	{ "usb_printer",		"0"				, 0 },
@@ -1019,19 +995,6 @@ struct nvram_tuple router_defaults[] = {
 	{ "ms_sas",			"0"				, 0 },
 #endif
 
-#ifdef TCONFIG_SDHC
-// admin-sdhc
-	{ "mmc_on",			"0"				, 0 },
-	{ "mmc_cs",			"7"				, 0 },
-	{ "mmc_clk",			"3"				, 0 },
-	{ "mmc_din",			"2"				, 0 },
-	{ "mmc_dout",			"4"				, 0 },
-	{ "mmc_fs_partition",		"1"				, 0 },
-	{ "mmc_fs_type",		"ext2"				, 0 },
-	{ "mmc_exec_mount",		""				, 0 },
-	{ "mmc_exec_umount",		""				, 0 },
-#endif
-
 // admin-sch
 	{ "sch_rboot",			""				, 0 },
 	{ "sch_rcon",			""				, 0 },
@@ -1069,7 +1032,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "vpn_server1_firewall", "auto"          , 0 },
 	{ "vpn_server1_crypt",    "tls"           , 0 },
 	{ "vpn_server1_comp",     "adaptive"      , 0 },
- 	{ "vpn_server1_cipher",   "AES-128-CBC"   , 0 },
+	{ "vpn_server1_cipher",   "AES-128-CBC"   , 0 },
 	{ "vpn_server1_ncp_enable", "1"           , 0 },
 	{ "vpn_server1_ncp_ciphers","AES-128-GCM:AES-256-GCM:AES-128-CBC:AES-256-CBC" , 0 },
 	{ "vpn_server1_digest",   "default"       , 0 },
@@ -1105,7 +1068,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "vpn_server2_firewall", "auto"          , 0 },
 	{ "vpn_server2_crypt",    "tls"           , 0 },
 	{ "vpn_server2_comp",     "adaptive"      , 0 },
- 	{ "vpn_server2_cipher",   "AES-128-CBC"   , 0 },
+	{ "vpn_server2_cipher",   "AES-128-CBC"   , 0 },
 	{ "vpn_server2_ncp_enable", "1"           , 0 },
 	{ "vpn_server2_ncp_ciphers","AES-128-GCM:AES-256-GCM:AES-128-CBC:AES-256-CBC" , 0 },
 	{ "vpn_server2_digest",   "default"       , 0 },

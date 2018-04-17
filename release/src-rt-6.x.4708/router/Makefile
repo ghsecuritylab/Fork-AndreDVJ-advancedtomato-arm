@@ -122,7 +122,6 @@ obj-$(TCONFIG_TOR) += tor
 obj-$(TCONFIG_DNSCRYPT) += libsodium
 obj-$(TCONFIG_DNSCRYPT) += dnscrypt
 obj-$(TCONFIG_SNMP) += snmp
-obj-$(TCONFIG_SDHC) += mmc
 
 obj-y += mssl
 obj-y += mdu
@@ -158,9 +157,6 @@ NEED_EX_NLS = y
 endif
 ifeq ($(TCONFIG_USB_EXTRAS),y)
 NEED_EX_USB = y
-endif
-ifeq ($(TCONFIG_MICROSD),y)
-NEED_SD_MODULES = y
 endif
 endif
 
@@ -684,16 +680,11 @@ endif
 	$(if $(NEED_EX_NLS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/nls_euc-kr.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(NEED_EX_NLS),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/nls_big5.*o $(PLATFORMDIR)/extras/ || true
 
-	$(if $(TCONFIG_USB),@cp -f,$(if $(TCONFIG_SDHC),@cp -f,@mv)) $(TARGETDIR)/lib/modules/*/kernel/fs/nls_*.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/usb/*.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/scsi/*.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/drivers/leds/*.*o $(PLATFORMDIR)/extras/ || true
-	$(if $(TCONFIG_USB),@cp -f,$(if $(TCONFIG_SDHC),@cp -f,@mv)) $(TARGETDIR)/lib/modules/*/kernel/fs/ext2.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/ext3.*o $(PLATFORMDIR)/extras/ || true
-	$(if $(TCONFIG_USB),@cp -f,$(if $(TCONFIG_SDHC),@cp -f,@mv)) $(TARGETDIR)/lib/modules/*/kernel/fs/jbd.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/mbcache.*o $(PLATFORMDIR)/extras/ || true
-	$(if $(TCONFIG_USB),@cp -f,$(if $(TCONFIG_SDHC),@cp -f,@mv)) $(TARGETDIR)/lib/modules/*/kernel/fs/fat.*o $(PLATFORMDIR)/extras/ || true
-	$(if $(TCONFIG_USB),@cp -f,$(if $(TCONFIG_SDHC),@cp -f,@mv)) $(TARGETDIR)/lib/modules/*/kernel/fs/vfat.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/exfat.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/msdos.*o $(PLATFORMDIR)/extras/ || true
 	$(if $(TCONFIG_USB),@cp -f,@mv) $(TARGETDIR)/lib/modules/*/kernel/fs/fuse.*o $(PLATFORMDIR)/extras/ || true
@@ -848,7 +839,7 @@ menuconfig mconf: rmconf kmconf
 
 .ipv6-y .ipv6-n:
 	@rm -f .ipv6-y .ipv6-n
-	@$(MAKE) $(IPTABLES_TARGET)-clean ebtables-clean pppd-clean zebra-clean dnsmasq-clean $(IPROUTE_TARGET)-clean
+	@$(MAKE) $(IPTABLES_TARGET)-clean ebtables-clean pppd-clean dnsmasq-clean $(IPROUTE_TARGET)-clean
 	@touch $@
 
 .fullssl-y .fullssl-n:
@@ -2851,12 +2842,12 @@ ipset: ipset/stamp-h1
 ipset-install:
 	install -D ipset/src/ipset $(INSTALLDIR)/ipset/usr/sbin/ipset
 	install -d $(INSTALLDIR)/ipset/usr/lib/
-	install ipset/lib/.libs/libipset.so.11.0.0 $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.0.0
-	$(STRIP) $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.0.0
+	install ipset/lib/.libs/libipset.so.11.1.0 $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.1.0
+	$(STRIP) $(INSTALLDIR)/ipset/usr/lib/libipset.so.11.1.0
 	$(STRIP) $(INSTALLDIR)/ipset/usr/sbin/ipset
 	cd $(INSTALLDIR)/ipset/usr/lib/ && \
-		ln -sf libipset.so.11.0.0 libipset.so.11 && \
-		ln -sf libipset.so.11.0.0 libipset.so
+		ln -sf libipset.so.11.1.0 libipset.so.11 && \
+		ln -sf libipset.so.11.1.0 libipset.so
 
 ipset-clean:
 	-@$(MAKE) -C ipset clean

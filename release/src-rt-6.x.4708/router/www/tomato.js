@@ -2563,9 +2563,6 @@ function navi() {
 			/* CIFS-BEGIN */
 			'CIFS Client':          'admin-cifs.asp',
 			/* CIFS-END */
-			/* SDHC-BEGIN */
-			'SDHC/MMC':				'admin-sdhc.asp',
-			/* SDHC-END */
 			'Configuration':        'admin-config.asp',
 			'Debugging':            'admin-debug.asp',
 			/* JFFS2-BEGIN */
