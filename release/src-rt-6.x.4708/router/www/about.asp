@@ -196,17 +196,6 @@
 			</div>
 		</div>
 
-		<!-- SDHC-BEGIN -->
-		<div class="box"><div class="heading">"Slodki" feature</div>
-			<div class="content">
-				<p>
-					- SDHC integration and GUI<br>
-				</p>
-				Copyright (C) 2009 Tomasz Słodkowicz <a href='http://gemini.net.pl/~slodki/tomato-sdhc.html' target='_new'>tomato-sdhc</a><br>
-			</div>
-		</div>
-		<!-- SDHC-END -->
-
 		<div class="box"><div class="heading">"Victek/PrinceAMD/Phykris/Shibby" feature</div>
 			<div class="content">
 				- Revised IP/MAC Bandwidth Limiter<br>

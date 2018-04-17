@@ -104,19 +104,9 @@ ifneq ($(TCONFIG_JFFS2),y)
 	sed -i $(INSTALLDIR)/www/nas-media.asp -e "/JFFS2-BEGIN/,/JFFS2-END/d"
 endif
 
-# Only include the Zebra options if Zebra is configured in.
-ifneq ($(TCONFIG_ZEBRA),y)
-	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/ZEBRA-BEGIN/,/ZEBRA-END/d"
-endif
-
 # Only include EMF options if EMF is configured in.
 ifneq ($(TCONFIG_EMF),y)
 	sed -i $(INSTALLDIR)/www/advanced-routing.asp -e "/EMF-BEGIN/,/EMF-END/d"
-endif
-
-# Only include sd/mmc card support if MICROSD is configured in.
-ifneq ($(TCONFIG_MICROSD),y)
-	sed -i $(INSTALLDIR)/www/nas-usb.asp -e "/MICROSD-BEGIN/,/MICROSD-END/d"
 endif
 
 # Only include NTFS settings if NTFS support is configured in.
@@ -287,13 +277,6 @@ ifneq ($(TCONFIG_SNMP),y)
 	sed -i $(INSTALLDIR)/www/about.asp -e "/SNMP-BEGIN/,/SNMP-END/d"
 endif
 
-# Only include the mmc pages if SDHC is compiled in
-ifneq ($(TCONFIG_SDHC),y)
-	rm -f $(INSTALLDIR)/www/admin-sdhc.asp
-	sed -i $(INSTALLDIR)/www/tomato.js -e "/SDHC-BEGIN/,/SDHC-END/d"
-	sed -i $(INSTALLDIR)/www/about.asp -e "/SDHC-BEGIN/,/SDHC-END/d"
-endif
-
 # Only include the dnssec option if is compiled in
 ifneq ($(TCONFIG_DNSSEC),y)
 	sed -i $(INSTALLDIR)/www/basic-network.asp -e "/DNSSEC-BEGIN/,/DNSSEC-END/d"
@@ -339,7 +322,6 @@ else
 		-e "/MEDIA-SRV-BEGIN/d"	-e "/MEDIA-SRV-END/d" \
 		-e "/JFFS2-BEGIN/d"	-e "/JFFS2-END/d" \
 		-e "/CIFS-BEGIN/d"	-e "/CIFS-END/d" \
-		-e "/ZEBRA-BEGIN/d"	-e "/ZEBRA-END/d" \
 		-e "/EMF-BEGIN/d"	-e "/EMF-END/d" \
 		-e "/OPENVPN-BEGIN/d"	-e "/OPENVPN-END/d" \
 		-e "/AES-BEGIN/d"	-e "/AES-END/d" \
@@ -353,7 +335,6 @@ else
 		-e "/NOCAT-BEGIN/d"	-e "/NOCAT-END/d"\
 		-e "/NGINX-BEGIN/d"	-e "/NGINX-END/d"\
 		-e "/SNMP-BEGIN/d"	-e "/SNMP-END/d"\
-		-e "/SDHC-BEGIN/d"	-e "/SDHC-END/d"\
 		-e "/HFS-BEGIN/d"	-e "/HFS-END/d"\
 		-e "/DNSCRYPT-BEGIN/d"	-e "/DNSCRYPT-END/d"\
 		-e "/DNSSEC-BEGIN/d"	-e "/DNSSEC-END/d"\
@@ -361,7 +342,6 @@ else
 		-e "/TINC-BEGIN/d"	-e "/TINC-END/d"\
 		-e "/PARAGON-BEGIN/d"	-e "/PARAGON-END/d"\
 		-e "/TUXERA-BEGIN/d"	-e "/TUXERA-END/d"\
-		-e "/MICROSD-BEGIN/d"	-e "/MICROSD-END/d"\
 		-e "/MULTIWAN-BEGIN/d"	-e "/MULTIWAN-END/d"\
 		-e "/DUALWAN-BEGIN/d"	-e "/DUALWAN-END/d"\
 		|| true; \
