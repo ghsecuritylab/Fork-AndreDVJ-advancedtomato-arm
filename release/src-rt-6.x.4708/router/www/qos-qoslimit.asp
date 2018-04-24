@@ -248,8 +248,11 @@ No part of this file may be used without permission.
 	</script>
 
 	<script type="text/javascript">
-		if (nvram.qos_enable != '1') {
-			$('.container .ajaxwrap').prepend('<div class="alert alert-info"><b>QoS is disabled.</b>&nbsp; <a class="ajaxload" href="#qos-settings.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>');
+		if ((nvram.qos_enable == '0') && (nvram.new_qoslimit_enable == '1')) {
+			$('.container .ajaxwrap').prepend('<div class="alert alert-info"><b>QoS is disabled. If QoS was recently disabled, Bandwidth Limiter needs to be restarted by clicking on "Save" button to apply Upload Limit rules.</b>&nbsp;<a class="close"><i class="icon-cancel"></i></a></div>');
+		}
+		if (nvram.qos_enable == '1') {
+			$('.container .ajaxwrap').prepend('<div class="alert alert-info"><b>QoS is enabled. Upload Limit rules for host IP addresses will not be applied, and Outbound QoS rules will govern upload rates.</b>&nbsp;</a> <a class="close"><i class="icon-cancel"></i></a></div>');
 		}
 	</script>
 
