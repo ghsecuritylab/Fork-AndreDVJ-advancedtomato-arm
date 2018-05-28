@@ -2687,7 +2687,7 @@ udpxy-install:
 	$(STRIP) -s $(INSTALLDIR)/udpxy/bin/udpxy
 
 mdadm:
-	$(MAKE) -C mdadm $(PARALLEL_BUILD)
+	$(MAKE) -C mdadm mdadm $(PARALLEL_BUILD)
 
 mdadm-install:
 	install -D mdadm/mdadm $(INSTALLDIR)/mdadm/usr/sbin/mdadm
