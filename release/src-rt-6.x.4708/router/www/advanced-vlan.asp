@@ -900,7 +900,7 @@
 
 		<div style="display: none;" class="alert alert-warning" id='unknown_router'>
 			<h5>Unknown Port Mapping!</h5>
-			<a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'>Please Follow this Link for Instructions to get it corrected.</a>
+			<a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/' target="_new">Please Follow this Link for Instructions to get it corrected.</a>
 			Include Router Brand/Model (<% nv('t_model_name'); %>), Results from "nvram show | grep vlan1ports"&amp; Port Numbers on BACK of Router Case (Left -> Right viewed from Front).
 		</div>
 
@@ -941,7 +941,7 @@
 				<h4><a href="javascript:toggleVisibility('notes');">Notes <span id='sesdiv_notes_showhide'><i class="icon-chevron-up"></i></span></a></h4>
 				<div class="section" id="sesdiv_notes" style="display:none">
 					<ul>
-						<li>If you notice that the order of the Lan Ports are incorrectly mapped, <a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/'> <b>Please Follow these Instructions to get it corrected.</b></a></li>
+						<li>If you notice that the order of the LAN Ports are incorrectly mapped, <a href='http://www.linksysinfo.org/index.php?threads/can-vlan-gui-port-order-be-corrected.70160/#post-247634/' target="_new"><b>Please Follow these Instructions to get it corrected.</b></a></li>
 						<li><b>VLAN</b> - Unique identifier of a VLAN.</li>
 						<li><b>VID</b> - <i>EXPERIMENTAL</i> - Allows overriding "traditional" VLAN/VID mapping with arbitrary VIDs for each VLAN (set to "0" to use "regular" VLAN/VID mappings instead). Warning: this hasn"t been verified/tested on anything but a Cisco/Linksys E3000 and may not be supported by your particular device/model (<small><b><i>see notes on "VID Offset" below</i></b></small>).</li>
 						<li><b>Ports 1-4 &amp; WAN</b> - Which ethernet ports on the router should be members of this VLAN.</li>
@@ -960,7 +960,7 @@
 					</ul>
 
 					<ul>
-						<li><b>Wireless</b> - Assignments of wireless interfaces to different LAN briges. You should probably be using and/or check things on <a href=advanced-wlanvifs.asp>Advanced/Virtual Wireless</a> and <a href=basic-network.asp>Basic/Network</a>.</li>
+						<li><b>Wireless</b> - Assignments of wireless interfaces to different LAN briges. You should probably be using and/or check things on <a href=#advanced-wlanvifs.asp>Advanced/Virtual Wireless</a> and <a href=#basic-network.asp>Basic/Network</a>.</li>
 					</ul>
 
 					<ul>
