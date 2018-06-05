@@ -94,6 +94,7 @@ No part of this file may be used without permission.
 			fom.udpxy_port.value = E('_f_udpxy_port').value;
 			form.submit(fom, 1);
 		}
+
 	</script>
 
 	<form id="_fom" method="post" action="tomato.cgi">
@@ -162,7 +163,7 @@ No part of this file may be used without permission.
 					{ title: 'Enable client statistics', indent: 2, name: 'f_udpxy_stats', type: 'checkbox', value: (nvram.udpxy_stats == '1') },
 					{ title: 'Max clients', indent: 2, name: 'f_udpxy_clients', type: 'text', maxlen: 4, size: 6, value: fixInt(nvram.udpxy_clients || 3, 1, 5000, 3) },
 					{ title: 'Udpxy port', indent: 2, name: 'f_udpxy_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.udpxy_port, 4022) },
-					{ title: '<a href="https://github.com/pali/igmpproxy"  class="new_window">IGMP proxy<\/a><br />Custom configuration', name: 'multicast_custom', type: 'textarea', value: nvram.multicast_custom, style: 'width: 100%; height:100px;' }
+					{ title: '<a href="https://github.com/pali/igmpproxy" target="_new">IGMP proxy<\/a><br />Custom configuration', name: 'multicast_custom', type: 'textarea', value: nvram.multicast_custom, style: 'width: 100%; height:100px;' }
 				]);
 			</script>
 		</div>
@@ -171,8 +172,8 @@ No part of this file may be used without permission.
 			<div class="heading">IGMP proxy notes</div>
 				<ul>
 					<li><b>LAN / LAN1 / LAN2 / LAN3</b> - Add interface br0 / br1 / br2 / br3 to igmp.conf (Ex.: phyint br0 downstream ratelimit 0 threshold 0).</li>
-					<li><b>Custom configuration</b> - Use custom config for IGMP proxy instead of tomato default config. You must define one (or more) upstream interface(s) and one or more downstream interfaces. Refer to the <a href="https://github.com/pali/igmpproxy/blob/master/igmpproxy.conf" class="new_window">IGMP proxy example configuration</a> and <a href="https://github.com/pali/igmpproxy/commit/b55e0125c79fc9dbc95c6d6ab1121570f0c6f80f" class="new_window">IGMP proxy commit b55e0125c79fc9d</a> for details.</li>
-					<li><b>Other hints</b> - For error messages please check the <a href="status-log.asp">log file</a>.</li>
+					<li><b>Custom configuration</b> - Use custom config for IGMP proxy instead of tomato default config. You must define one (or more) upstream interface(s) and one or more downstream interfaces. Refer to the <a href="https://github.com/pali/igmpproxy/blob/master/igmpproxy.conf" target="_new">IGMP proxy example configuration</a> and <a href="https://github.com/pali/igmpproxy/commit/b55e0125c79fc9dbc95c6d6ab1121570f0c6f80f" target="_new">IGMP proxy commit b55e0125c79fc9d</a> for details.</li>
+					<li><b>Other hints</b> - For error messages please check the <a href="#status-log.asp">log file</a>.</li>
 				</ul>
 		</div>
 
