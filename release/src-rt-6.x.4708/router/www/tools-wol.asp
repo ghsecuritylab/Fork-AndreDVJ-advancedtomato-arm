@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <!--
 Tomato GUI
 Copyright (C) 2006-2010 Jonathan Zarate
@@ -86,7 +85,7 @@ No part of this file may be used without permission.
 
 			e = E('_f_mac');
 			e.value = e.value.replace(/[\t ]+/g, ' ');
-			return 1;
+			return (e.value ? 1 : 0);
 		}
 
 		function spin(x)
@@ -182,7 +181,7 @@ No part of this file may be used without permission.
 
 		<script type="text/javascript">
 			$('.sectionmacs').forms([
-				{ title: 'MAC Address List', name: 'f_mac', type: 'textarea', value: cookie.get('wakemac') || '', style: 'width: 100%; height: 60px;' },
+				{ title: 'MAC Address List', name: 'f_mac', id: 't_f_mac',type: 'textarea', value: cookie.get('wakemac') || '', style: 'width: 100%; height: 60px;' },
 				]);
 		</script>
 

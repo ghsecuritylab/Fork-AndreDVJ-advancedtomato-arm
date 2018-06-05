@@ -363,7 +363,7 @@ int parse_kbinput(WINDOW *win)
 	kbinput = get_input(win, 1);
 
 	if (kbinput == NULL && !waiting_mode)
-		return 0;
+		return ERR;
 
 	while (kbinput == NULL)
 		kbinput = get_input(win, 1);
@@ -984,7 +984,7 @@ int convert_sequence(const int *seq, size_t length, int *consumed)
 				}
 				break;
 #ifndef NANO_TINY
-			case '9': /* To accomodate iTerm2 in "xterm mode". */
+			case '9': /* To accommodate iTerm2 in "xterm mode". */
 			case '3':
 				switch (seq[4]) {
 					case 'A': /* Esc [ 1 ; 3 A == Alt-Up on xterm. */
@@ -1944,7 +1944,7 @@ char *display_string(const char *buf, size_t column, size_t span, bool isdata)
 			continue;
 		}
 
-		/* Represent an invalid sequence with the Replacement Character. */
+		/* Represent an invalid starter byte with the Replacement Character. */
 		converted[index++] = '\xEF';
 		converted[index++] = '\xBF';
 		converted[index++] = '\xBD';
@@ -2159,6 +2159,7 @@ void statusline(message_type importance, const char *msg, ...)
 	/* Curses mode is turned off.  If we use wmove() now, it will muck
 	 * up the terminal settings.  So we just use vfprintf(). */
 	if (isendwin()) {
+		fprintf(stderr, "\n");
 		vfprintf(stderr, msg, ap);
 		va_end(ap);
 		return;
@@ -3502,15 +3503,15 @@ void do_credits(void)
 		"",
 		NULL,                /* "Brought to you by:" */
 		"Chris Allegretta",
+		"Benno Schulenberg",
+		"David Lawrence Ramsey",
 		"Jordi Mallach",
+		"David Benbennick",
+		"Rocco Corsi",
+		"Mike Frysinger",
 		"Adam Rogoyski",
 		"Rob Siemborski",
-		"Rocco Corsi",
-		"David Lawrence Ramsey",
-		"David Benbennick",
 		"Mark Majeres",
-		"Mike Frysinger",
-		"Benno Schulenberg",
 		"Ken Tyler",
 		"Sven Guckes",
 		"Bill Soudan",

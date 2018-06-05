@@ -901,6 +901,7 @@ static const nvset_t nvset_list[] = {
 	{ "multicast_lan1",		V_01				},
 	{ "multicast_lan2",		V_01				},
 	{ "multicast_lan3",		V_01				},
+	{ "multicast_custom",		V_TEXT(0, 2048)			},
 	{ "block_loopback",		V_01				},
 	{ "udpxy_enable",		V_01				},
 	{ "udpxy_stats",		V_01				},
@@ -1915,7 +1916,7 @@ static int save_variables(int write)
 	char *p;
 	int n;
 	int ok;
-	char s[256];
+	char s[256], t[256];
 	int dirty;
 	static const char *msgf = "The field \"%s\" is invalid. Please report this problem.";
 	nv_list_t nv;
@@ -1965,7 +1966,9 @@ static int save_variables(int write)
 		sprintf(s, "rrule%d", n);
 		if ((p = webcgi_get(s)) != NULL) {
             if (strlen(p) > 2048) {
-				sprintf(s, msgf, s);
+				memset(t,0,sizeof(t));
+				strncpy(t,s,sizeof(s));
+				sprintf(s, msgf, t);
 				resmsg_set(s);
 				return 0;
 			}

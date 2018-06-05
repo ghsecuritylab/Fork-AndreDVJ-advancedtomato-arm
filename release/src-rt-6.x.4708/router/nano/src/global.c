@@ -2,7 +2,7 @@
  *   global.c  --  This file is part of GNU nano.                         *
  *                                                                        *
  *   Copyright (C) 1999-2011, 2013-2018 Free Software Foundation, Inc.    *
- *   Copyright (C) 2014-2017 Benno Schulenberg                            *
+ *   Copyright (C) 2014-2018 Benno Schulenberg                            *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -45,11 +45,6 @@ bool focusing = TRUE;
 
 bool as_an_at = TRUE;
 		/* Whether a 0x0A byte should be shown as a ^@ instead of a ^J. */
-
-int margin = 0;
-		/* The amount of space reserved at the left for line numbers. */
-int editwincols = -1;
-		/* The number of usable columns in the edit window: COLS - margin. */
 
 bool suppress_cursorpos = FALSE;
 		/* Should we skip constant position display for current keystroke? */
@@ -98,18 +93,22 @@ char *present_path = NULL;
 
 unsigned flags[4] = {0, 0, 0, 0};
 		/* Our flag containing the states of all global options. */
+
 WINDOW *topwin = NULL;
-		/* The top portion of the window, where we display the version
-		 * number of nano, the name of the current file, and whether the
-		 * current file has been modified. */
+		/* The top portion of the screen, showing the version number of nano,
+		 * the name of the file, and whether the buffer was modified. */
 WINDOW *edit = NULL;
-		/* The middle portion of the window, i.e. the edit window, where
-		 * we display the current file we're editing. */
+		/* The middle portion of the screen: the edit window, showing the
+		 * contents of the current buffer, the file we are editing. */
 WINDOW *bottomwin = NULL;
-		/* The bottom portion of the window, where we display statusbar
+		/* The bottom portion of the screen, where we display statusbar
 		 * messages, the statusbar prompt, and a list of shortcuts. */
 int editwinrows = 0;
 		/* How many rows does the edit window take up? */
+int editwincols = -1;
+		/* The number of usable columns in the edit window: COLS - margin. */
+int margin = 0;
+		/* The amount of space reserved at the left for line numbers. */
 
 filestruct *cutbuffer = NULL;
 		/* The buffer where we store cut text. */
@@ -153,6 +152,8 @@ char *word_chars = NULL;
 
 char *answer = NULL;
 		/* The answer string used by the statusbar prompt. */
+size_t statusbar_x = HIGHEST_POSITIVE;
+		/* The cursor position in answer. */
 
 ssize_t tabsize = -1;
 		/* The width of a tab in spaces.  The default is set in main(). */
@@ -266,7 +267,7 @@ size_t length_of_list(int menu)
 #define BLANKAFTER  TRUE    /* A blank line after this one. */
 #define TOGETHER  FALSE
 
-/* Just throw this here. */
+/* Empty functions, for the most part corresponding to toggles. */
 void case_sens_void(void)
 {
 }
@@ -291,6 +292,9 @@ void goto_dir_void(void)
 }
 #endif
 #ifndef NANO_TINY
+void do_toggle_void(void)
+{
+}
 void dos_format_void(void)
 {
 }
@@ -309,6 +313,9 @@ void backup_file_void(void)
 void flip_execute(void)
 {
 }
+void flip_pipe(void)
+{
+}
 #endif
 #ifdef ENABLE_MULTIBUFFER
 void flip_newbuffer(void)
@@ -316,6 +323,9 @@ void flip_newbuffer(void)
 }
 #endif
 void discard_buffer(void)
+{
+}
+void do_cancel(void)
 {
 }
 
@@ -392,7 +402,6 @@ const sc *first_sc_for(int menu, void (*func)(void))
 #ifdef DEBUG
 	fprintf(stderr, "Whoops, returning null given func %ld in menu %x\n", (long)func, menu);
 #endif
-	/* Otherwise... */
 	return NULL;
 }
 
@@ -576,6 +585,8 @@ void shortcut_init(void)
 	const char *lastline_gist = N_("Go to the last line of the file");
 #ifndef NANO_TINY
 	const char *bracket_gist = N_("Go to the matching bracket");
+#endif
+#ifdef ENABLE_HELP
 	const char *scrollup_gist =
 		N_("Scroll up one line without moving the cursor textually");
 	const char *scrolldown_gist =
@@ -644,6 +655,8 @@ void shortcut_init(void)
 	const char *prepend_gist = N_("Toggle prepending");
 	const char *backup_gist = N_("Toggle backing up of the original file");
 	const char *execute_gist = N_("Execute external command");
+	const char *pipe_gist =
+		N_("Pipe the current buffer (or marked region) to the command");
 #endif
 #ifdef ENABLE_MULTIBUFFER
 	const char *newbuffer_gist = N_("Toggle the use of a new buffer");
@@ -859,7 +872,7 @@ void shortcut_init(void)
 		prevline_tag, WITHORSANS(prevline_gist), TOGETHER, VIEW);
 	add_to_funcs(do_down, MMAIN|MHELP|MBROWSER,
 		nextline_tag, WITHORSANS(nextline_gist), TOGETHER, VIEW);
-#ifndef NANO_TINY
+#ifdef ENABLE_HELP
 	add_to_funcs(do_scroll_up, MMAIN,
 		N_("Scroll Up"), WITHORSANS(scrollup_gist), TOGETHER, VIEW);
 	add_to_funcs(do_scroll_down, MMAIN,
@@ -1028,7 +1041,11 @@ void shortcut_init(void)
 		add_to_funcs(flip_newbuffer, MINSERTFILE|MEXTCMD,
 			N_("New Buffer"), WITHORSANS(newbuffer_gist), TOGETHER, NOVIEW);
 #endif
-
+#ifndef NANO_TINY
+	if (!ISSET(RESTRICTED))
+		add_to_funcs(flip_pipe, MEXTCMD,
+			N_("Pipe Text"), WITHORSANS(pipe_gist), TOGETHER, NOVIEW);
+#endif
 #ifdef ENABLE_BROWSER
 	/* The file browser is only available when not in restricted mode. */
 	if (!ISSET(RESTRICTED))
@@ -1206,7 +1223,7 @@ void shortcut_init(void)
 	add_to_sclist(MMAIN, "M-)", 0, do_para_end_void, 0);
 	add_to_sclist(MMAIN, "M-0", 0, do_para_end_void, 0);
 #endif
-#ifndef NANO_TINY
+#ifdef ENABLE_HELP
 	add_to_sclist(MMAIN, "M--", 0, do_scroll_up, 0);
 	add_to_sclist(MMAIN, "M-_", 0, do_scroll_up, 0);
 	add_to_sclist(MMAIN, "M-+", 0, do_scroll_down, 0);
@@ -1323,8 +1340,12 @@ void shortcut_init(void)
 #endif
 #ifdef ENABLE_MULTIBUFFER
 	/* Only when not in restricted mode, allow multiple buffers. */
-	if (!ISSET(RESTRICTED))
+	if (!ISSET(RESTRICTED)) {
 		add_to_sclist(MINSERTFILE|MEXTCMD, "M-F", 0, flip_newbuffer, 0);
+#ifndef NANO_TINY
+		add_to_sclist(MEXTCMD, "M-\\", 0, flip_pipe, 0);
+#endif
+	}
 #endif
 #ifdef ENABLE_BROWSER
 	/* Only when not in restricted mode, allow entering the file browser. */
@@ -1387,8 +1408,7 @@ const subnfunc *sctofunc(const sc *s)
 }
 
 #ifndef NANO_TINY
-/* Now let's come up with a single (hopefully) function to get a string
- * for each flag. */
+/* Return the textual description that corresponds to the given flag. */
 const char *flagtostr(int flag)
 {
 	switch (flag) {
@@ -1526,10 +1546,6 @@ sc *strtosc(const char *input)
 		s->func = do_indent;
 	else if (!strcasecmp(input, "unindent"))
 		s->func = do_unindent;
-	else if (!strcasecmp(input, "scrollup"))
-		s->func = do_scroll_up;
-	else if (!strcasecmp(input, "scrolldown"))
-		s->func = do_scroll_down;
 	else if (!strcasecmp(input, "cutwordleft"))
 		s->func = do_cut_prev_word;
 	else if (!strcasecmp(input, "cutwordright"))
@@ -1559,6 +1575,12 @@ sc *strtosc(const char *input)
 	else if (!strcasecmp(input, "down") ||
 			 !strcasecmp(input, "nextline"))
 		s->func = do_down;
+#ifdef ENABLE_HELP
+	else if (!strcasecmp(input, "scrollup"))
+		s->func = do_scroll_up;
+	else if (!strcasecmp(input, "scrolldown"))
+		s->func = do_scroll_down;
+#endif
 	else if (!strcasecmp(input, "prevword"))
 		s->func = do_prev_word_void;
 	else if (!strcasecmp(input, "nextword"))
@@ -1631,6 +1653,8 @@ sc *strtosc(const char *input)
 		s->func = backup_file_void;
 	else if (!strcasecmp(input, "flipexecute"))
 		s->func = flip_execute;
+	else if (!strcasecmp(input, "flippipe"))
+		s->func = flip_pipe;
 #endif
 #ifdef ENABLE_MULTIBUFFER
 	else if (!strcasecmp(input, "flipnewbuffer"))
@@ -1652,7 +1676,8 @@ sc *strtosc(const char *input)
 		s->func = do_toggle_void;
 		if (!strcasecmp(input, "nohelp"))
 			s->toggle = NO_HELP;
-		else if (!strcasecmp(input, "constupdate"))
+		else if (!strcasecmp(input, "constantshow") ||
+				 !strcasecmp(input, "constupdate"))  /* Deprecated.  Remove end of 2018. */
 			s->toggle = CONSTANT_SHOW;
 		else if (!strcasecmp(input, "morespace"))
 			s->toggle = MORE_SPACE;
@@ -1660,6 +1685,10 @@ sc *strtosc(const char *input)
 			s->toggle = SMOOTH_SCROLL;
 		else if (!strcasecmp(input, "softwrap"))
 			s->toggle = SOFTWRAP;
+#ifdef ENABLE_LINENUMBERS
+		else if (!strcasecmp(input, "linenumbers"))
+			s->toggle = LINE_NUMBERS;
+#endif
 		else if (!strcasecmp(input, "whitespacedisplay"))
 			s->toggle = WHITESPACE_DISPLAY;
 #ifdef ENABLE_COLOR
@@ -1670,7 +1699,8 @@ sc *strtosc(const char *input)
 			s->toggle = SMART_HOME;
 		else if (!strcasecmp(input, "autoindent"))
 			s->toggle = AUTOINDENT;
-		else if (!strcasecmp(input, "cuttoend"))
+		else if (!strcasecmp(input, "cutfromcursor") ||
+				 !strcasecmp(input, "cuttoend"))  /* Deprecated.  Remove end of 2018. */
 			s->toggle = CUT_FROM_CURSOR;
 #ifdef ENABLE_WRAPPING
 		else if (!strcasecmp(input, "nowrap"))
