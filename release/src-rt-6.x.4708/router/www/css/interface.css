@@ -732,7 +732,7 @@ input::-moz-focus-inner {
   color: #fff;
   font-weight: normal;
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   padding: 0;
   margin: -.4rem 0 0;
   text-shadow: 0 0.1rem 0 rgba(0, 0, 0, 0.15);
@@ -752,7 +752,7 @@ input::-moz-focus-inner {
   width: 4rem;
   text-align: center;
   line-height: 6rem;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: normal;
   color: #526069;
 }
@@ -831,7 +831,7 @@ input::-moz-focus-inner {
 
 .system-ui .router-name {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 500;
   color: #656565;
   border-bottom: .1rem solid #e4eaec;
@@ -1153,7 +1153,7 @@ input::-moz-focus-inner {
   position: absolute;
   display: block;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   width: 100%;
   height: 15rem;
   top: 30%;
@@ -1209,7 +1209,7 @@ a.close {
   right: 1.5rem;
   margin-top: -1rem;
   padding: .2rem;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
@@ -1307,7 +1307,7 @@ a.close:hover {
   white-space: nowrap;
   padding: .8rem 1.6rem;
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: normal;
   line-height: normal !important;
   user-select: none;
@@ -1492,13 +1492,13 @@ button.btn {
 }
 
 .icon-sort:before {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-left: .5rem;
   margin-top: -.2rem;
 }
 
 .icon-large:before {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-right: .3rem;
 }
 
@@ -2853,7 +2853,7 @@ input, select, textarea {
   margin: 0;
   height: 3.4rem;
   line-height: normal;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-family: "Segoe UI", "Roboto", sans-serif, Helvetica, Arial, sans-serif;
   border: .1rem solid #e4eaec;
   background-color: #fff;
@@ -3063,7 +3063,7 @@ input[type=radio]:disabled + span:before {
 
 .customfile-text {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   line-height: normal;
   height: 3.4rem;
   float: left;
@@ -3160,13 +3160,13 @@ input[type=radio]:disabled + span:before {
 }
 
 .icon-sort:before {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-left: .5rem;
   margin-top: -.2rem;
 }
 
 .icon-large:before {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   margin-right: .3rem;
 }
 
@@ -3463,7 +3463,7 @@ table.line-table tr td {
 #table-row-panel a.move-row,
 #table-row-panel a.delete-row {
   float: left;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   text-align: center;
   padding: .4rem .6rem;
   line-height: 1;
