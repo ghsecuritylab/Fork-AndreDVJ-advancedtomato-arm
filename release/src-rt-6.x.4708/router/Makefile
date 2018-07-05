@@ -2568,7 +2568,7 @@ snmp/stamp-h1:
 
 snmp: snmp/stamp-h1
 	@$(SEP)
-	$(MAKE) -C snmp
+	$(MAKE) -C snmp $(PARALLEL_BUILD)
 
 snmp-clean:
 	-@$(MAKE) -C snmp clean
@@ -2620,7 +2620,7 @@ libsodium-install:
 		ln -sf libsodium.so.23.0.0 libsodium.so.23 && \
 		ln -sf libsodium.so.23.0.0 libsodium.so
 
-libsodium-clean:
+# libsodium-clean:
 	-$(MAKE) -C libsodium clean
 	@rm -rf libsodium/stamp-h1
 
