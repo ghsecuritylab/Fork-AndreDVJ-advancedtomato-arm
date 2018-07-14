@@ -1780,7 +1780,8 @@ No part of this file may be used without permission.
 						{ title: 'Watchdog Mode', name: 'wan'+u+'_ckmtd', type: 'select', options: [['1','Ping'],['2','Traceroute*']
 						/* BBT-BEGIN */
 						,['3','Curl']
-						/* BBT-END */], value: nvram['wan'+u+'_ckmtd'], suffix: ' <i>(default: Traceroute; Use the other methods only when Traceroute is not working correctly.</i>' },
+						/* BBT-END */
+						], value: nvram['wan'+u+'_ckmtd'], suffix: ' <i>(default: Traceroute; Use the other methods only when Traceroute is not working correctly.</i>' },
 
 						{ title: 'Bridge WAN port to primary LAN (br0)', name: 'f_wan' + u + '_islan', type: 'checkbox', value: (nvram[ 'wan' + u + '_islan' ] == 1) }
 					]);
