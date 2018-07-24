@@ -174,7 +174,7 @@ No part of this file may be used without permission.
 
 		sg.setup = function() {
 			this.init('survey-grid', 'sort');
-			this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Quality', 'Ch', 'Security', 'Rates']);
+			this.headerSet(['Last Seen', 'SSID', 'BSSID', 'RSSI &nbsp; &nbsp; ', 'Quality (%)', 'Ch', 'Security', 'Rates']);
 			this.populate();
 			this.sort(0);
 		}
