@@ -294,7 +294,7 @@ LAN Access admin module by Augusto Bott
 			<div class="content">
 				<div id="svg-0"></div>
 				<table id="firstTable">
-					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
+					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">&nbsp;</td><td class="thead count">&nbsp;</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
 				</table>
 			</div>
@@ -304,7 +304,6 @@ LAN Access admin module by Augusto Bott
 			<div class="heading">Bandwidth Distribution (Inbound)</div>
 			<div class="content">
 				<div id="svg-1"></div>
-
 				<table id="secondTable">
 					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
@@ -316,7 +315,6 @@ LAN Access admin module by Augusto Bott
 			<div class="heading">Bandwidth Distribution (Outbound)</div>
 			<div class="content">
 				<div id="svg-2"></div>
-
 				<table id="thirdTable">
 					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="obcnt-total" class="total count"></td><td id="obcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
