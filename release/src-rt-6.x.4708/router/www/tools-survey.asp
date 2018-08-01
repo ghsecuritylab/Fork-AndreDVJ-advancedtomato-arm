@@ -233,7 +233,7 @@ No part of this file may be used without permission.
 	</div>
 
 	<div id="survey-controls">
-		<div class="spinner"></div>
+		<div id="refresh-spinner" class="spinner"></div>
 		<button type="button" value="Refresh" onclick="ref.toggle();" id="refresh-button" class="btn">Refresh <i class="icon-refresh"></i></button>
 	</div>
 
