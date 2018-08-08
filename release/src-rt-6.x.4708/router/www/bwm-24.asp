@@ -97,7 +97,7 @@ No part of this file may be used without permission.
 
 		function init()
 		{
-			if (nvram.rstats_enable != '1') { $('#rstats').before('<div class="alert alert-warning">Bandwidth monitoring disabled.</b> <a href="/#admin-bwm.asp">Enable &raquo;</a></div>'); return; }
+			if (nvram.rstats_enable != '1') { $('#rstats').before('<div class="alert alert-info"><b>Bandwidth monitoring is disabled.</b> <a href="/#admin-bwm.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>'); return; }
 
 			try {
 				//<% bandwidth("speed"); %>

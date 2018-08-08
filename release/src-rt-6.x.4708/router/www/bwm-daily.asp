@@ -101,10 +101,12 @@ No part of this file may be used without permission.
 			E('last-total').innerHTML = rescale(lastu + lastd);
 		}
 
-		function init() {
+		function init()
+		{
+			if (nvram.rstats_enable != '1') { $('#rstats').before('<div class="alert alert-info"><b>Bandwidth monitoring is disabled.</b> <a href="/#admin-bwm.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>'); return; }
+
 			var s;
 
-			if (nvram.rstats_enable != '1') { $('#rstats').before('<div class="alert alert-warning">Bandwidth monitoring disabled.</b> <a href="/#admin-bwm.asp">Enable &raquo;</a></div>'); return; }
 			checkRstats();
 
 			if ((s = cookie.get('daily')) != null) {

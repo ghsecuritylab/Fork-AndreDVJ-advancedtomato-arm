@@ -285,7 +285,7 @@ No part of this file may be used without permission.
 		function init() {
 
 			if (nvram.cstats_enable != '1') {
-				$('.cstats').before('<div class="alert alert-info">IP Traffic monitoring disabled.</b> <a href="/#admin-iptraffic.asp">Enable &raquo;</a>');
+				$('#cstats').before('<div class="alert alert-info"><b>IP Traffic monitoring is disabled.</b>&nbsp; <a href="/#admin-iptraffic.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>');
 				return;
 			}
 
@@ -444,6 +444,7 @@ No part of this file may be used without permission.
 
 	<a href="javascript:genData()" class="btn btn-primary">Data <i class="icon-drive"></i></a>
 	<a href="admin-iptraffic.asp" class="btn btn-danger ajaxload">Configure <i class="icon-tools"></i></a>
+
 	<script type="text/javascript">
 		var c;
 		c = [];

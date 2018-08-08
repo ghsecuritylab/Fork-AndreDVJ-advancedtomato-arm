@@ -253,7 +253,7 @@ LAN Access admin module by Augusto Bott
 		function init() {
 
 			if (nvram.cstats_enable != '1') {
-				$('.cstats').before('<div class="alert alert-info">IP Traffic monitoring disabled.</b> <a href="/#admin-iptraffic.asp">Enable &raquo;</a>');
+				$('#cstats').before('<div class="alert alert-info"><b>IP Traffic monitoring is disabled.</b>&nbsp; <a href="/#admin-iptraffic.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>');
 				return;
 			}
 
@@ -314,7 +314,7 @@ LAN Access admin module by Augusto Bott
 		<li><a class="ajaxload" href="bwm-ipt-monthly.asp"><i class="icon-month"></i> Monthly</a></li>
 	</ul>
 
-	<div class="fluid-grid x3">
+	<div id="cstats" class="fluid-grid x3">
 		<div class="box graphs">
 			<div class="heading">IP Traffic</div>
 			<div class="content">
