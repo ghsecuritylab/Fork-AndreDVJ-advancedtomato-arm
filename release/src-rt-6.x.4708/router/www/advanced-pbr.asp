@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN'>
 <!--
 Tomato GUI
 Copyright (C) 2006-2008 Jonathan Zarate
@@ -10,7 +9,6 @@ No part of this file may be used without permission.
 <content>
 	<script type="text/javascript">
 		//	<% nvram("pbr_rules"); %>
-
 		var class1 =  [[1,'WAN1'],[2,'WAN2']
 			/* MULTIWAN-BEGIN */
 			,[3,'WAN3'],[4,'WAN4']
@@ -34,14 +32,10 @@ No part of this file may be used without permission.
 			var c = [];
 			var d = [];
 			var s, i, outif;
-
 			if (data[2] != '0') {
-
 				if (data[3] != '') b.push(((data[2] == 1) ? 'IP ' : 'MAC ') + data[3]);
 				else b.push('All');
-
 			} else b.push('All');
-
 			if (data[5] != '0') {
 				if (data[6] != '') {
 					switch (data[5]) {
@@ -84,7 +78,6 @@ No part of this file may be used without permission.
 
 		// Reset Editor
 		pbr.resetNewEditor = function() {
-
 			var f = fields.getAll(this.newEditor);
 			//Enable
 			f[0].checked = 1;
@@ -111,7 +104,6 @@ No part of this file may be used without permission.
 			f[9].value = '';
 			this.enDiFields(this.newEditor);
 			ferror.clearAll(fields.getAll(this.newEditor));
-
 		}
 
 		pbr._disableNewEditor = pbr.disableNewEditor;
@@ -123,7 +115,6 @@ No part of this file may be used without permission.
 		}
 
 		pbr.enDiFields = function(row) {
-
 			var f = fields.getAll(row);
 			var x;
 			//Enable
@@ -136,10 +127,9 @@ No part of this file may be used without permission.
 			f[3].disabled = (f[2].selectedIndex == 0);
 			//To
 			f[6].disabled = (f[5].selectedIndex == 0);
-
 		}
-		pbr.verifyFields = function(row, quiet) {
 
+		pbr.verifyFields = function(row, quiet) {
 			var f = fields.getAll(row);
 			var a, b, e;
 			this.enDiFields(row);
@@ -167,13 +157,10 @@ No part of this file may be used without permission.
 					if ( !v_length(f[6], quiet) || !v_domain(f[6], quiet) ) return 0;
 					break
 			}
-
 			return v_length(f[9], quiet);
-
 		}
 
 		pbr.setup = function() {
-
 			var i, a, b;
 			a = [[-2, 'All Protocols'],[-1,'TCP/UDP'],[6,'TCP'],[17,'UDP'],[2, 'ICMP']];
 			// what a mess...
@@ -193,7 +180,6 @@ No part of this file may be used without permission.
 				{ type: 'select', options: class1, vtop: 1 },
 				{ type: 'text', maxlen: 32, vtop: 1 }
 			]);
-
 			this.headerSet(['On', 'Protocol', 'Source Address', 'Destination Address', 'Select WAN', 'Description']);
 			/*  Enable(0) < SAddrType(1) < SAddrValue(2) < ProtoType(3) < PortValue(4) < DAddrType(5) < DAddrValue(6) < ProtoType(7) <PortValue(8) < WANx(9) < Desc(10) */
 			a = nvram.pbr_rules.split('>');
@@ -206,20 +192,15 @@ No part of this file may be used without permission.
 					pbr.insertData(-1, b);
 				}
 			}
-
 			this.showNewEditor();
 			this.resetNewEditor();
-
 		}
 
 		function verifyFields(focused, quiet) {
-
 			return 1;
-
 		}
 
 		function save() {
-
 			if (pbr.isEditing()) return;
 			var fom = E('_fom');
 			var i, a, b, c;
@@ -234,31 +215,35 @@ No part of this file may be used without permission.
 			}
 			fom.pbr_rules.value = a.join('>');
 			form.submit(fom, 1);
-
 		}
 
 	</script>
 
-    <form id="_fom" method="post" action="tomato.cgi">
-        <input type="hidden" name="_nextpage" value="advanced-pbr.asp">
-        <input type="hidden" name="_service" value="firewall-restart">
-        <input type="hidden" name="pbr_rules">
+	<form id="_fom" method="post" action="tomato.cgi">
 
-        <div class="box">
-            <div class="heading">MultiWAN Routing Policy</div>
-            <div class="content">
+		<input type="hidden" name="_nextpage" value="advanced-pbr.asp">
+		<input type="hidden" name="_service" value="firewall-restart">
+		<input type="hidden" name="pbr_rules">
 
-                <table class="line-table" id="qg"></table>
-                <br>Note: Policy routing traffic only work on the LAN to the Internet.
+		<div class="box">
+			<div class="heading">MultiWAN Routing Policy</div>
+			<div class="content">
+			<table class="line-table" id="qg"></table>
+			</div>
+		</div>
 
-            </div>
-        </div>
+		<div class="box">
+			<div class="content">
+				<div class="heading">Notes</div>
+					<ul><li>Policy routing traffic only work on the LAN to the Internet.</li></ul>
+				</div>
+		</div>
 
-        <button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save <i class="icon-check"></i></button>
-        <button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel <i class="icon-cancel"></i></button>
-        <span id="footer-msg" class="alert alert-warning" style="visibility: hidden;"></span>
+		<button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save <i class="icon-check"></i></button>
+		<button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel <i class="icon-cancel"></i></button>
+		<span id="footer-msg" class="alert alert-warning" style="visibility: hidden;"></span>
 
-    </form>
+	</form>
 
 	<script type="text/javascript">pbr.setup(); pbr.recolor();</script>
 </content>
