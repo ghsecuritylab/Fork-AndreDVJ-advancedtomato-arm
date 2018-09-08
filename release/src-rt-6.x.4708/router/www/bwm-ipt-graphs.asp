@@ -37,8 +37,10 @@ LAN Access admin module by Augusto Bott
 		}
 
 	</style>
+ 	<script type="text/javascript" src="js/bwm-common.js"></script>
+	<script type="text/javascript" src="js/interfaces.js"></script>
 	<script type="text/javascript">
-		//	<% nvram('cstats_enable,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask,dhcpd_static,web_svg'); %>
+		// <% nvram('cstats_enable,cstats_labels,lan_ipaddr,lan1_ipaddr,lan2_ipaddr,lan3_ipaddr,lan_netmask,lan1_netmask,lan2_netmask,lan3_netmask,dhcpd_static,web_svg'); %>
 		// <% iptraffic(); %>
 
 		nfmarks = [];
@@ -65,6 +67,9 @@ LAN Access admin module by Augusto Bott
 		var difftimestamp;
 		var avgiptraffic = [];
 		var lastiptraffic = iptraffic;
+
+		hostnamecache = [];
+
 		function updateLabels() {
 			var i = 0;
 			while ((i < abc.length) && (i < iptraffic.length)) {
@@ -72,7 +77,9 @@ LAN Access admin module by Augusto Bott
 				i++;
 			}
 		}
+
 		updateLabels();
+
 		i = 0;
 		while (i < 11){
 			if (iptraffic[i] != null) {
@@ -84,9 +91,11 @@ LAN Access admin module by Augusto Bott
 			orates[i] = 0;
 			i++;
 		}
+
 		function mClick(n) {
 			loadPage ('/#bwm-ipt-details.asp?ipt_filterip=' + abc[n]);
 		}
+
 		function showData() {
 			var i, n, p;
 			var ct, rt, ort;
@@ -128,6 +137,7 @@ LAN Access admin module by Augusto Bott
 			E('obcnt-total').innerHTML = (ort / 125).toFixed(2);
 			E('obcntx-total').innerHTML = (ort / 1024).toFixed(2);
 		}
+
 		function getArrayPosByElement(haystack, needle, index) {
 			for (var i = 0; i < haystack.length; ++i) {
 				if (haystack[i][index] == needle) {
@@ -136,6 +146,7 @@ LAN Access admin module by Augusto Bott
 			}
 			return -1;
 		}
+
 		var ref = new TomatoRefresh('update.cgi', 'exec=iptraffic', 2, 'ipt_graphs');
 		ref.refresh = function(text) {
 			var b, i, j, k, l;
@@ -198,8 +209,8 @@ LAN Access admin module by Augusto Bott
 				updateBD(irates, abc);
 				updateOB(orates, abc);
 			}
-
 		}
+
 		function checkSVG() {
 			var i, e, d, w;
 			try {
@@ -227,10 +238,22 @@ LAN Access admin module by Augusto Bott
 			}
 		}
 
+		function showIpName( i ) {
+			if ( (typeof(hostnamecache) == 'undefined') || (hostnamecache[abc[i]] == null) || (nvram['cstats_labels'] == null) ) {
+				return abc[i];
+			} else if ( nvram['cstats_labels'] == '1' ) {	// if known, show only the hostname
+				return hostnamecache[abc[i]];
+			} else if ( nvram['cstats_labels'] == '0' ) {	// show hostname and IP
+				return hostnamecache[abc[i]] + ' <small>(' + abc[i] + ')</small>';
+			} else {                                        // show only IPs
+				return abc[i];
+			}
+		}
+
 		function init() {
 
 			if (nvram.cstats_enable != '1') {
-				$('.cstats').before('<div class="alert alert-info">IP Traffic monitoring disabled.</b> <a href="/#admin-iptraffic.asp">Enable &raquo;</a>');
+				$('#cstats').before('<div class="alert alert-info"><b>IP Traffic monitoring is disabled.</b>&nbsp; <a href="/#admin-iptraffic.asp">Enable &raquo;</a> <a class="close"><i class="icon-cancel"></i></a></div>');
 				return;
 			}
 
@@ -244,10 +267,13 @@ LAN Access admin module by Augusto Bott
 			}
 
 			// Data
+			hostnamecache.length = 0;
+			populateCache();
+
 			for (i = 0; i < 11; ++i) {
 				$('#firstTable').prepend('<tr>' +
 					'<td class="color" style="background:#' + colors[i] + '" onclick="mClick(' + i + ')">&nbsp;</td>' +
-					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + abc[i] + '</a></td>' +
+					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + showIpName(i) + '</a></td>' +
 					'<td id="ccnt' + i + '" class="count"></td>' +
 					'<td id="cpct' + i + '" class="pct"></td></tr>');
 			}
@@ -255,7 +281,7 @@ LAN Access admin module by Augusto Bott
 			for (i = 0; i < 11; ++i) {
 				$('#secondTable').prepend('<tr>' +
 					'<td class="color" style="background:#' + colors[i] + '" onclick="mClick(' + i + ')">&nbsp;</td>' +
-					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + abc[i] + '</a></td>' +
+					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + showIpName(i) + '</a></td>' +
 					'<td id="bcnt' + i + '" class="count"></td>' +
 					'<td id="bcntx' + i + '" class="count"></td>' +
 					'<td id="bpct' + i + '" class="pct"></td></tr>');
@@ -264,7 +290,7 @@ LAN Access admin module by Augusto Bott
 			for (i = 0; i < 11; ++i) {
 				$('#thirdTable').prepend('<tr>' +
 					'<td class="color" style="background:#' + colors[i] + '" onclick="mClick(' + i + ')">&nbsp;</td>' +
-					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + abc[i] + '</a></td>' +
+					'<td class="title" style="padding-left: 8px;"><a class="ajaxload" href="/#bwm-ipt-details.asp?ipt_filterip=' + abc[i] + '">' + showIpName(i) + '</a></td>' +
 					'<td id="obcnt' + i + '" class="count"></td>' +
 					'<td id="obcntx' + i + '" class="count"></td>' +
 					'<td id="obpct' + i + '" class="pct"></td></tr>');
@@ -288,13 +314,13 @@ LAN Access admin module by Augusto Bott
 		<li><a class="ajaxload" href="bwm-ipt-monthly.asp"><i class="icon-month"></i> Monthly</a></li>
 	</ul>
 
-	<div class="fluid-grid x3">
+	<div id="cstats" class="fluid-grid x3">
 		<div class="box graphs">
 			<div class="heading">IP Traffic</div>
 			<div class="content">
 				<div id="svg-0"></div>
 				<table id="firstTable">
-					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
+					<tr><td class="color" style="height:1em"></td><td class="title">&nbsp;</td><td class="thead count">&nbsp;</td><td class="thead count">&nbsp;</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="ccnt-total" class="total count"></td><td class="total pct">100%</td></tr>
 				</table>
 			</div>
@@ -304,9 +330,8 @@ LAN Access admin module by Augusto Bott
 			<div class="heading">Bandwidth Distribution (Inbound)</div>
 			<div class="content">
 				<div id="svg-1"></div>
-
 				<table id="secondTable">
-					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
+					<tr><td class="color" style="height:1em"></td><td class="title">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="bcnt-total" class="total count"></td><td id="bcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
 				</table>
 			</div>
@@ -316,9 +341,8 @@ LAN Access admin module by Augusto Bott
 			<div class="heading">Bandwidth Distribution (Outbound)</div>
 			<div class="content">
 				<div id="svg-2"></div>
-
 				<table id="thirdTable">
-					<tr><td class="color" style="height:1em"></td><td class="title" style="width:45px">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
+					<tr><td class="color" style="height:1em"></td><td class="title">&nbsp;</td><td class="thead count">kbit/s</td><td class="thead count">KB/s</td><td class="pct">&nbsp;</td></tr>
 					<tr><td>&nbsp;</td><td class="total">Total</td><td id="obcnt-total" class="total count"></td><td id="obcntx-total" class="total count"></td><td class="total pct">100%</td></tr>
 				</table>
 			</div>

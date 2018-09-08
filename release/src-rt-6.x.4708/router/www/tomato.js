@@ -2222,7 +2222,7 @@ function genStdTimeList(id, zero, min)
 function genStdRefresh(spin, min, exec)
 {
 	var html = '<div class="tomato-refresh form-inline input-append">';
-	if (spin) html += '<div class="spinner spinner-small"></div>';
+	if (spin) html += '<div id="refresh-spinner" class="spinner spinner-small"></div>';
 	html += genStdTimeList('refresh-time', 'Auto Refresh', min);
 	html += '<button value="Refresh" onclick="' + (exec ? exec : 'refreshClick()') + '; return false;" id="refresh-button" class="btn">Refresh <i class="icon-refresh"></i></button></div>';
 	return html;

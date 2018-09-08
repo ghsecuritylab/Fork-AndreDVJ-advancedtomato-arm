@@ -147,10 +147,12 @@ No part of this file may be used without permission.
 			</div>
 		</div>
 
-		<h4>Notes</h4>
-		<ul>
-			<li>To specify how and on which interface this list should work, use the <a href="#advanced-wlanvifs.asp" class="new_window">Virtual Wireless Interfaces</a> page.</li>
-		</ul>
+		<div class="box">
+			<div class="heading">Notes</div>
+				<ul>
+					<li>To specify how and on which interface this list should work, use the <a href="#advanced-wlanvifs.asp" class="new_window">Virtual Wireless Interfaces</a> page.</li>
+				</ul>
+		</div>
 
 		<button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save <i class="icon-check"></i></button>
 		<button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel <i class="icon-cancel"></i></button>
