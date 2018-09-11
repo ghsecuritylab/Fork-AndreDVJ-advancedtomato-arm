@@ -22,6 +22,9 @@ find_iface() {
     elif [ "$SERVICE" == "client2" ]; then
         IFACE="tun12"
         ID="312"
+    elif [ "$SERVICE" == "client3" ]; then
+        IFACE="tun13"
+        ID="313"
     else
         echo "vpnrouting: Interface not found!"
         logger -t vpnrouting[$PID] "Interface not found!"
