@@ -34,7 +34,7 @@ endif
 	install -m 0700 adblock $(INSTALLDIR)/usr/sbin
 
 #TTB project
-	install -m 0700 ttb $(INSTALLDIR)/usr/sbin
+#	install -m 0700 ttb $(INSTALLDIR)/usr/sbin
 
 #Ethernet state report
 	install -m 0700 ethstate $(INSTALLDIR)/usr/sbin
