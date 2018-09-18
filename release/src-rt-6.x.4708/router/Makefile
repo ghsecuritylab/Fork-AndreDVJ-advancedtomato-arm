@@ -1998,6 +1998,7 @@ php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	--enable-xmlwriter \
 	--enable-zip \
 	--enable-filter \
+	--without-valgrind \
 	--with-libxml-dir="$(TOP)/libxml2/staged/usr"
 	@touch php/stamp-h1
 
