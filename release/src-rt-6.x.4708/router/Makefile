@@ -2613,7 +2613,7 @@ apcupsd-install:
 
 libsodium/stamp-h1:
 	cd $(TOP)/libsodium && CC=$(CC) STRIP=$(STRIP) \
-	autoreconf -fsi && \
+	./autogen.sh && \
 	$(CONFIGURE) --prefix=/usr --disable-ssp --enable-minimal
 	touch libsodium/stamp-h1
 
