@@ -549,7 +549,7 @@ endif
 ifeq ($(TCONFIG_BBT),y)
 	install $(LIBDIR)/librt.so.0 $(TARGETDIR)/lib/librt.so.0
 endif
-ifeq ($(TCONFIG_NGINX),y)
+ifneq ($(TCONFIG_NGINX)$(TCONFIG_NANO),)
 	install $(LIBDIR)/../arm-linux/lib/libstdc++.so.6 $(TARGETDIR)/lib/libstdc++.so.6
 	cd $(TARGETDIR)/lib && ln -sf libstdc++.so.6 libstdc++.so
 	$(STRIP) $(TARGETDIR)/lib/libstdc++.so.6
@@ -2739,7 +2739,7 @@ apcupsd-install:
 
 libsodium/stamp-h1:
 	cd $(TOP)/libsodium && CC=$(CC) STRIP=$(STRIP) \
-	autoreconf -fsi && \
+	./autogen.sh && \
 	$(CONFIGURE) --prefix=/usr --disable-ssp --enable-minimal
 	touch libsodium/stamp-h1
 
@@ -2748,13 +2748,13 @@ libsodium: libsodium/stamp-h1
 
 libsodium-install:
 	install -d $(INSTALLDIR)/libsodium/usr/lib
-	install -D libsodium/src/libsodium/.libs/libsodium.so.23.0.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
-	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
+	install -D libsodium/src/libsodium/.libs/libsodium.so.23.1.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.1.0
+	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.1.0
 	cd $(INSTALLDIR)/libsodium/usr/lib/ && \
-		ln -sf libsodium.so.23.0.0 libsodium.so.23 && \
-		ln -sf libsodium.so.23.0.0 libsodium.so
+		ln -sf libsodium.so.23.1.0 libsodium.so.23 && \
+		ln -sf libsodium.so.23.1.0 libsodium.so
 
-# libsodium-clean:
+libsodium-clean:
 	-$(MAKE) -C libsodium clean
 	@rm -rf libsodium/stamp-h1
 
