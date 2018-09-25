@@ -1217,6 +1217,10 @@ libnfnetlink: libnfnetlink/stamp-h1
 	@$(SEP)
 	$(MAKE) -C libnfnetlink $(PARALLEL_BUILD)
 
+libnfnetlink-clean:
+	-@$(MAKE) -C libnfnetlink distclean
+	@rm -f libnfnetlink/stamp-h1
+
 libnfnetlink-install:
 	install -D libnfnetlink/src/.libs/libnfnetlink.so.0.2.0 $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
 	$(STRIP) -s $(INSTALLDIR)/libnfnetlink/usr/lib/libnfnetlink.so.0.2.0
@@ -2123,7 +2127,8 @@ php/stamp-h1: pcre zlib libiconv sqlite libxml2 libpng jpeg libcurl
 	--enable-xmlreader \
 	--enable-xmlwriter \
 	--enable-zip \
-	--enable-filter \
+	-disable-filter \
+	--without-valgrind \
 	--with-libxml-dir="$(TOP)/libxml2/staged/usr"
 	@touch php/stamp-h1
 
@@ -2748,11 +2753,11 @@ libsodium: libsodium/stamp-h1
 
 libsodium-install:
 	install -d $(INSTALLDIR)/libsodium/usr/lib
-	install -D libsodium/src/libsodium/.libs/libsodium.so.23.1.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.1.0
-	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.1.0
+	install -D libsodium/src/libsodium/.libs/libsodium.so.23.0.0 $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
+	$(STRIP) -s $(INSTALLDIR)/libsodium/usr/lib/libsodium.so.23.0.0
 	cd $(INSTALLDIR)/libsodium/usr/lib/ && \
-		ln -sf libsodium.so.23.1.0 libsodium.so.23 && \
-		ln -sf libsodium.so.23.1.0 libsodium.so
+		ln -sf libsodium.so.23.0.0 libsodium.so.23 && \
+		ln -sf libsodium.so.23.0.0 libsodium.so
 
 libsodium-clean:
 	-$(MAKE) -C libsodium clean

@@ -366,7 +366,7 @@ No part of this file may be used without permission.
 		</div>
 	</div>
 
-	<button name="mybtn" value="Zoom Graphs" type="button" onclick="showGraph()" class="btn">Zoom Graphs <i class="icon-search"></i></button>
+	<button name="mybtn" value="Zoom Graphs" type="button" onclick="showGraph()" class="btn" style="display:none">Zoom Graphs <i class="icon-search"></i></button>
 	<script type="text/javascript">$('button[name="mybtn"]').before(genStdRefresh(1,2,"ref.toggle()"));</script>
 
 	<script type="text/javascript">init();</script>
