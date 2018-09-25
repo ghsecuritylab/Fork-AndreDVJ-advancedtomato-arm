@@ -11,6 +11,7 @@
 <svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" onload="init(evt)" onmouseout="mOut()">
 <style type='text/css'>
 * {
+	font: .85rem 'Segoe UI', 'Roboto', sans-serif;
 	cursor: pointer;
 }
 path {
@@ -20,7 +21,6 @@ path {
 	shape-rendering: geometricPrecision;
 }
 #info {
-	font: 11px sans-serif;
 }
 #tip-mask {
 	fill: #ffffff;
@@ -29,7 +29,6 @@ path {
 	stroke-opacity: 0.2;
 }
 #tip-text {
-	font: 11px sans-serif;
 	font-weight: normal;
 }
 </style>
