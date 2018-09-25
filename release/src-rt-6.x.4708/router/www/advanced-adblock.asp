@@ -106,6 +106,10 @@
 
 	</script>
 
+	<script type="text/javascript">
+		$('.container .ajaxwrap').prepend('<div class="alert alert-info icon"><b>Adblock having too many large blocklists configured may crash the router, as it exhausted all available system memory.</b>&nbsp;<a class="close"><i class="icon-cancel"></i></a></div>');
+	</script>
+
 	<form id="_fom" method="post" action="tomato.cgi">
 
 		<input type="hidden" name="_nextpage" value="/#advanced-adblock.asp">
