@@ -265,7 +265,7 @@
 						{ title: 'Swap Usage', rid: 'swap', text: stats.swap + '<div class="progress small"><div class="bar" style="width: ' + stats.swapperc + ';"></div></div>', hidden: (stats.swap == '') },
 						{ title: 'NVRAM Usage', text: scaleSize(nvstat.size - nvstat.free) + ' <small>/</small> ' + scaleSize(nvstat.size) + ' (' + (a).toFixed(2) + '%) <div class="progress small"><div class="bar" style="width: ' + (a).toFixed(2) + '%;"></div></div>' },
 						null,
-						{ title: 'CPU Temperature', rid: 'temps', text: stats.cputemp + 'C'},
+						{ title: 'CPU Temperature', rid: 'temps', text: stats.cputemp + 'C / ' + Math.round(stats.cputemp.slice(0, -1)*1.8+32) + '°F' },
 						{ title: 'Wireless Temperature', rid: 'wlsense', text: stats.wlsense }
 					], '#sesdiv_system', 'data-table dataonly');
 				</script>
