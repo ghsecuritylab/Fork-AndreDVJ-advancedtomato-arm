@@ -375,7 +375,7 @@ struct nvram_tuple router_defaults[] = {
 	{ "wl_wme_ap_vo",		"3 7 1 3264 1504 off off"	, 0 },	// WME AP AC_VO paramters
 
 	{ "wl_wme_no_ack",		"off"				, 0 },	// WME No-Acknowledgmen mode
-	{ "wl_wme_apsd",		"off"				, 0 },	// WME APSD mode
+	{ "wl_wme_apsd",		"on"				, 0 },	// WME APSD mode
 	{ "wl_wme_bss_disable",		"0"				, 0 },	// WME BSS disable advertising (off|on)
 
 	/* Per AC Tx parameters */
