@@ -2768,6 +2768,7 @@ libjson-c-clean:
 	@rm -rf libjson-c/stamp-h1
 
 uqmi: libjson-c
+	$(call patch_files,libubox)
 	$(MAKE) -C uqmi/libubox $(PARALLEL_BUILD)
 	$(MAKE) -C uqmi SHARED=0 CC='$(CC) -static'
 
@@ -2777,6 +2778,7 @@ uqmi-install:
 
 uqmi-clean: libjson-c-clean
 	-@$(MAKE) -C uqmi/libubox clean
+	$(call unpatch_files,libubox)
 	-@$(MAKE) -C uqmi clean
 
 comgt:
