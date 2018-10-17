@@ -1,4 +1,4 @@
-<!--
+' <!--
 Tomato GUI
 Copyright (C) 2006-2008 Jonathan Zarate
 http://www.polarcloud.com/tomato/
@@ -177,6 +177,7 @@ No part of this file may be used without permission.
 				elem.display(PR('_vpn_'+t+'_ca'), PR('_vpn_'+t+'_crt'), PR('_vpn_'+t+'_dh'), PR('_vpn_'+t+'_key'),
 					PR('_vpn_'+t+'_hmac'), PR('_f_vpn_'+t+'_rgw'), PR('_vpn_'+t+'_reneg'), auth == "tls");
 				elem.display(PR('_vpn_'+t+'_static'), auth == "secret" || (auth == "tls" && hmac.value >= 0));
+				elem.display(PR('_vpn_keygen_'+t+'_button'), auth == "secret" || (auth == "tls" && hmac.value >= 0));
 				elem.display(E(t+'_custom_crypto_text'), auth == "custom");
 				elem.display(PR('_vpn_'+t+'_sn'), PR('_f_vpn_'+t+'_plan'), PR('_f_vpn_'+t+'_plan1'),
 					PR('_f_vpn_'+t+'_plan2'), PR('_f_vpn_'+t+'_plan3'), auth == "tls" && iface.value == "tun");
@@ -495,6 +496,22 @@ No part of this file may be used without permission.
 
 			verifyFields(null, true);
 		}
+
+		var keyGenRequest = null
+
+		function updateStaticKey(serverNumber)
+		{
+			if (keyGenRequest) return;
+
+			keyGenRequest = new XmlHttp();
+			keyGenRequest.onCompleted = function(text, xml) {
+				E('_vpn_server'+serverNumber+'_static').value = text;
+				keyGenRequest = null;
+			}
+			keyGenRequest.onError = function(ex) { keyGenRequest = null; }
+			keyGenRequest.post('vpngenkey.cgi', '');
+		}
+
 	</script>
 
 	<form id="_fom" method="post" action="tomato.cgi">
@@ -599,6 +616,7 @@ No part of this file may be used without permission.
 					htmlOut += '<p class=\'keyhelp\'>For help generating keys, refer to the OpenVPN <a id=\''+t+'-keyhelp\'>HOWTO</a>.</p>';
 					htmlOut += createFormFields([
 						{ title: 'Static Key', name: 'vpn_'+t+'_static', type: 'textarea', value: eval( 'nvram.vpn_'+t+'_static' ), style: 'width: 100%; height: 80px;' },
+						{ title: '', custom: '<input type="button" value="Generate static key" onclick="updateStaticKey('+(i+1)+')" id="_vpn_keygen_'+t+'_button">' },
 						{ title: 'Certificate Authority', name: 'vpn_'+t+'_ca', type: 'textarea', value: eval( 'nvram.vpn_'+t+'_ca' ), style: 'width: 100%; height: 80px;' },
 						{ title: 'Server Certificate', name: 'vpn_'+t+'_crt', type: 'textarea', value: eval( 'nvram.vpn_'+t+'_crt' ), style: 'width: 100%; height: 80px;' },
 						{ title: 'Server Key', name: 'vpn_'+t+'_key', type: 'textarea', value: eval( 'nvram.vpn_'+t+'_key' ), style: 'width: 100%; height: 80px;' },
