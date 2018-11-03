@@ -7,7 +7,7 @@ For use with Tomato Firmware only.
 No part of this file may be used without permission.
 --><title>IPv6 Configuration</title>
 <content>
-	<script type="text/javascript">f
+	<script type="text/javascript">
 		//<% nvram("ipv6_6rd_prefix_length,ipv6_prefix,ipv6_prefix_length,ipv6_accept_ra,ipv6_pdonly,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_relay,ipv6_tun_mtu,ipv6_tun_ttl,ipv6_6rd_ipv4masklen,ipv6_6rd_prefix,ipv6_6rd_borderrelay,lan1_ifname,lan2_ifname,lan3_ifname,ipv6_vlan,ipv6_prefix_len_wan,ipv6_isp_gw,ipv6_wan_addr"); %>
 
 		nvram.ipv6_accept_ra = fixInt( nvram.ipv6_accept_ra, 0, 3, 0 );
