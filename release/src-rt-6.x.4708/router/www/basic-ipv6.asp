@@ -305,10 +305,12 @@ No part of this file may be used without permission.
 			fom.ipv6_dns.value       = joinIPv6Addr( [ fom.f_ipv6_dns_1.value, fom.f_ipv6_dns_2.value, fom.f_ipv6_dns_3.value ] );
 			fom.ipv6_pdonly.value    = fom.f_ipv6_pdonly.checked ? 1 : 0;
 			fom.ipv6_accept_ra.value = 0;
-			if ( fom.f_ipv6_accept_ra_wan.checked && !fom.f_ipv6_accept_ra_wan.disabled )
-				fom.ipv6_accept_ra.value |= 1;
-			if ( fom.f_ipv6_accept_ra_lan.checked && !fom.f_ipv6_accept_ra_lan.disabled )
-				fom.ipv6_accept_ra.value |= 2;
+			if (fom.f_ipv6_accept_ra_wan.checked && !fom.f_ipv6_accept_ra_wan.disabled) {
+				fom.ipv6_accept_ra.value = fom.ipv6_accept_ra.value | 0x01; //set bit 0,  accept_ra enabled for WAN
+			}
+			if (fom.f_ipv6_accept_ra_lan.checked && !fom.f_ipv6_accept_ra_lan.disabled) {
+				fom.ipv6_accept_ra.value = fom.ipv6_accept_ra.value | 0x02; //set bit 1,  accept_ra enabled for LAN (br0...br3 if available)
+			}
 
 			fom.ipv6_prefix_length.value  = fom.f_ipv6_prefix_length.value;
 			fom.ipv6_prefix.value         = fom.f_ipv6_prefix.value;
@@ -410,8 +412,8 @@ No part of this file may be used without permission.
 					{ title: '',           name: 'f_ipv6_dns_2', type: 'text', maxlen: 40, size: 42, value: dns[1] || '' },
 					{ title: '',           name: 'f_ipv6_dns_3', type: 'text', maxlen: 40, size: 42, value: dns[2] || '' },
 					{ title: 'Accept RA from', multi: [
-						{ suffix: '&nbsp; WAN &nbsp;&nbsp;&nbsp;', name: 'f_ipv6_accept_ra_wan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 1) },
-						{ suffix: '&nbsp; LAN &nbsp;',	name: 'f_ipv6_accept_ra_lan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 2) }
+						{ suffix: '&nbsp; WAN &nbsp;&nbsp;&nbsp;', name: 'f_ipv6_accept_ra_wan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 0x01) },
+						{ suffix: '&nbsp; LAN &nbsp;',	name: 'f_ipv6_accept_ra_lan', type: 'checkbox', value: (nvram.ipv6_accept_ra & 0x02) }
 					] },
 					null,
 					{ title: 'Tunnel Remote Endpoint (IPv4 Address)', name: 'ipv6_tun_v4end', type: 'text', maxlen: 15, size: 17, value: nvram.ipv6_tun_v4end },
