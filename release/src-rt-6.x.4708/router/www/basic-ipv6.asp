@@ -435,6 +435,14 @@ No part of this file may be used without permission.
 			</div>
 		</div>
 
+		<div class="box">
+			<div class="heading">Notes</div>
+				<ul>
+					<li><b>Request PD Only</b> - Check for ISP's that require only a Prefix Delegation (usually PPPOE (VDSL2, ADSL1/2(+), Fiber) connections).</li>
+					<li><b>Accept RA from LAN</b> - Please disable Announce IPv6 on LAN (SLAAC) at <a href="#advanced-dhcpdns.asp">DHCP/DNS</a> before enable that option.</li>
+				</ul>
+		</div>
+
 		<button type="button" value="Save" id="save-button" onclick="save()" class="btn btn-primary">Save <i class="icon-check"></i></button>
 		<button type="button" value="Cancel" id="cancel-button" onclick="javascript:reloadPage();" class="btn">Cancel <i class="icon-cancel"></i></button>
 		<span id="footer-msg" class="alert alert-warning" style="visibility: hidden;"></span>
