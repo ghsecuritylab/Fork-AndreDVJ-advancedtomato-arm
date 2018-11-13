@@ -37,7 +37,7 @@
 #ifdef DEBUG
 #define AGENT		"MDU - TEST DDNS CLIENT"
 #else
-#define AGENT		"MDU - FreshTomato Firmware " TOMATO_MAJOR "." TOMATO_MINOR
+#define AGENT		"MDU - AdvancedTomato Firmware " TOMATO_MAJOR "." TOMATO_MINOR
 #endif
 
 #define MAX_OPTION_LENGTH	256
