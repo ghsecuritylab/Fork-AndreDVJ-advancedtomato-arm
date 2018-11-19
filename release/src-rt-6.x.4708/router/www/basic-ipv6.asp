@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>IPv6 Configuration</title>
 <content>
 	<script type="text/javascript">
-		//<% nvram("ipv6_6rd_prefix_length,ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_dhcpd,ipv6_accept_ra,ipv6_pdonly,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_relay,ipv6_tun_mtu,ipv6_tun_ttl,ipv6_6rd_ipv4masklen,ipv6_6rd_prefix,ipv6_6rd_borderrelay,lan1_ifname,lan2_ifname,lan3_ifname,ipv6_vlan,ipv6_prefix_len_wan,ipv6_isp_gw,ipv6_wan_addr"); %>
+		//<% nvram("ipv6_6rd_prefix_length,ipv6_prefix,ipv6_prefix_length,ipv6_radvd,ipv6_dhcpd,ipv6_accept_ra,ipv6_isp_opt,ipv6_pdonly,ipv6_rtr_addr,ipv6_service,ipv6_dns,ipv6_tun_addr,ipv6_tun_addrlen,ipv6_ifname,ipv6_tun_v4end,ipv6_relay,ipv6_tun_mtu,ipv6_tun_ttl,ipv6_6rd_ipv4masklen,ipv6_6rd_prefix,ipv6_6rd_borderrelay,lan1_ifname,lan2_ifname,lan3_ifname,ipv6_vlan,ipv6_prefix_len_wan,ipv6_isp_gw,ipv6_wan_addr"); %>
 
 		nvram.ipv6_accept_ra = fixInt( nvram.ipv6_accept_ra, 0, 3, 0 );
 
@@ -33,6 +33,7 @@ No part of this file may be used without permission.
 				_f_ipv6_dns_3          : 1,
 				_f_ipv6_accept_ra_wan  : 1,
 				_f_ipv6_accept_ra_lan  : 1,
+				_f_ipv6_isp_opt        : 1,
 				_f_ipv6_pdonly         : 1,
 				_ipv6_tun_v4end        : 1,
 				_ipv6_relay            : 1,
@@ -61,6 +62,7 @@ No part of this file may be used without permission.
 					vis._f_ipv6_dns_3         = 0;
 					vis._f_ipv6_accept_ra_wan = 0;
 					vis._f_ipv6_accept_ra_lan = 0;
+					vis._f_ipv6_isp_opt       = 0;
 					vis._f_ipv6_pdonly        = 0;
 					// fall through
 				case 'other':
@@ -76,6 +78,7 @@ No part of this file may be used without permission.
 					vis._ipv6_tun_addrlen       = 0;
 					vis._ipv6_tun_ttl           = 0;
 					vis._ipv6_tun_mtu           = 0;
+					vis._f_ipv6_isp_opt         = 0;
 					vis._f_ipv6_pdonly          = 0;
 					if ( c == 'other' ) {
 						E( '_f_ipv6_rtr_addr_auto' ).value = 1;
@@ -95,10 +98,11 @@ No part of this file may be used without permission.
 					vis._f_ipv6_rtr_addr_auto = 0;
 					vis._f_ipv6_rtr_addr      = 0;
 					vis._f_ipv6_prefix_length = 0;
+					vis._f_ipv6_isp_opt       = 0;
 					vis._f_ipv6_pdonly        = 0;
 					break;
 				case 'native-pd':
-					_fom.f_ipv6_accept_ra_wan.checked = true;
+					_fom.f_ipv6_accept_ra_wan.checked = true; /* must be enabled always for DHCPv6 with PD */
 				case '6rd-pd':
 					vis._f_ipv6_prefix        = 0;
 					vis._f_ipv6_rtr_addr_auto = 0;
@@ -107,6 +111,7 @@ No part of this file may be used without permission.
 						vis._f_ipv6_prefix_length = 0;
 						vis._f_ipv6_accept_ra_lan = 0;
 						vis._f_ipv6_accept_ra_wan = 0;
+						vis._f_ipv6_isp_opt       = 0;
 					}
 					// fall through
 				case 'native':
@@ -142,6 +147,7 @@ No part of this file may be used without permission.
 						vis._f_ipv6_isp_gw         = 1;
 						vis._f_ipv6_accept_ra_wan  = 0;
 						vis._f_ipv6_accept_ra_lan  = 0;
+						vis._f_ipv6_isp_opt        = 0;
 					}
 					break;
 				case '6to4':
@@ -154,6 +160,7 @@ No part of this file may be used without permission.
 					vis._ipv6_tun_addrlen       = 0;
 					vis._f_ipv6_accept_ra_wan   = 0;
 					vis._f_ipv6_accept_ra_lan   = 0;
+					vis._f_ipv6_isp_opt         = 0;
 					vis._f_ipv6_pdonly          = 0;
 					vis._ipv6_6rd_ipv4masklen   = 0;
 					vis._ipv6_6rd_prefix_length = 0;
@@ -165,6 +172,7 @@ No part of this file may be used without permission.
 					vis._ipv6_relay             = 0;
 					vis._f_ipv6_accept_ra_wan   = 0;
 					vis._f_ipv6_accept_ra_lan   = 0;
+					vis._f_ipv6_isp_opt         = 0;
 					vis._f_ipv6_pdonly          = 0;
 					vis._ipv6_6rd_ipv4masklen   = 0;
 					vis._ipv6_6rd_prefix_length = 0;
@@ -309,6 +317,7 @@ No part of this file may be used without permission.
 			var fom = E( '_fom' );
 
 			fom.ipv6_dns.value       = joinIPv6Addr( [ fom.f_ipv6_dns_1.value, fom.f_ipv6_dns_2.value, fom.f_ipv6_dns_3.value ] );
+			fom.ipv6_isp_opt.value   = fom.f_ipv6_isp_opt.checked ? 1 : 0;
 			fom.ipv6_pdonly.value    = fom.f_ipv6_pdonly.checked ? 1 : 0;
 			fom.ipv6_accept_ra.value = 0;
 			if (fom.f_ipv6_accept_ra_wan.checked && !fom.f_ipv6_accept_ra_wan.disabled) {
@@ -382,6 +391,7 @@ No part of this file may be used without permission.
 		<input type="hidden" name="ipv6_accept_ra">
 		<input type="hidden" name="ipv6_vlan">
 		<input type="hidden" name="ipv6_pdonly">
+		<input type="hidden" name="ipv6_isp_opt">
 		<input type="hidden" name="ipv6_wan_addr">
 		<input type="hidden" name="ipv6_prefix_len_wan">
 		<input type="hidden" name="ipv6_isp_gw">
@@ -410,6 +420,7 @@ No part of this file may be used without permission.
 					{ title: '6rd Prefix Length', name: 'ipv6_6rd_prefix_length', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_6rd_prefix_length, suffix: ' <small>(Usually 32)</small>' },
 					{ title: 'Prefix Length', name: 'f_ipv6_prefix_length', type: 'text', maxlen: 3, size: 5, value: nvram.ipv6_prefix_length },
 					{ title: 'Request PD Only', name: 'f_ipv6_pdonly', type: 'checkbox', value: (nvram.ipv6_pdonly != '0'), suffix: ' <small>(Usually PPPOE (VDSL2, ADSL1/2(+), Fiber) connections)</small>' },
+					{ title: 'Add default route ::/0', name: 'f_ipv6_isp_opt', type: 'checkbox', value: (nvram.ipv6_isp_opt != '0'), suffix: ' <small>(see Notes)</small>' },
 					{ title: 'IPv6 Router LAN Address', multi: [
 						{ name: 'f_ipv6_rtr_addr_auto', type: 'select', options: [['0', 'Default'],['1','Manual']], value: (nvram.ipv6_rtr_addr == '' ? '0' : '1') },
 						{ name: 'f_ipv6_rtr_addr', type: 'text', maxlen: 46, size: 48, value: nvram.ipv6_rtr_addr }
@@ -445,6 +456,7 @@ No part of this file may be used without permission.
 			<div class="heading">Notes</div>
 				<ul>
 					<li><b>Request PD Only</b> - Check for ISP's that require only a Prefix Delegation (usually PPPOE (VDSL2, ADSL1/2(+), Fiber) connections).</li>
+					<li><b>Add default route ::/0</b> - Some ISP's may need the default route (workaround).</li>
 					<li><b>Accept RA from LAN</b> - Please disable Announce IPv6 on LAN (SLAAC) at <a href="#advanced-dhcpdns.asp">DHCP/DNS</a> before enable that option.</li>
 				</ul>
 		</div>
