@@ -1716,7 +1716,7 @@ No part of this file may be used without permission.
 						{ title    : 'Modem device',
 							name   : 'wan' + u + '_modem_dev',
 							type   : 'select',
-							options: [ [ 'ttyUSB0', '/dev/ttyUSB0' ], [ 'ttyUSB1', '/dev/ttyUSB1' ], [ 'ttyUSB2', '/dev/ttyUSB2' ], [ 'ttyUSB3', '/dev/ttyUSB3' ], [ 'ttyUSB4', '/dev/ttyUSB4' ], [ 'ttyUSB5', '/dev/ttyUSB5' ], [ 'ttyUSB6', '/dev/ttyUSB6' ], [ 'ttyACM0', '/dev/ttyACM0' ] ],
+							options: [ [ '/dev/ttyUSB0', '/dev/ttyUSB0' ], [ '/dev/ttyUSB1', '/dev/ttyUSB1' ], [ '/dev/ttyUSB2', '/dev/ttyUSB2' ], [ '/dev/ttyUSB3', '/dev/ttyUSB3' ], [ '/dev/ttyUSB4', '/dev/ttyUSB4' ], [ '/dev/ttyUSB5', '/dev/ttyUSB5' ], [ '/dev/ttyUSB6', '/dev/ttyUSB6' ], [ '/dev/ttyACM0', '/dev/ttyACM0' ] ],
 							value  : nvram[ 'wan' + u + '_modem_dev' ]
 						},
 						{ title: 'Load Balance Weight', name: 'wan' + u + '_weight', type: 'text', maxlen: 3, size: 8, value: nvram[ 'wan' + u + '_weight' ], suffix: ' <i>(Failover: 0; Load balancing: 1 - 256)</i>' },
