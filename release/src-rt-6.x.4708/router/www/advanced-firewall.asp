@@ -12,7 +12,7 @@ No part of this file may be used without permission.
 --><title>Firewall</title>
 <content>
 	<script type="text/javascript">
-		//	<% nvram("block_wan,block_wan_limit,block_wan_limit_icmp,block_wan_limit_tr,nf_loopback,ne_syncookies,DSCP_fix_enable,ipv6_ipsec,multicast_pass,multicast_lan,multicast_lan1,multicast_lan2,multicast_lan3,multicast_custom,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,udpxy_enable,udpxy_stats,udpxy_clients,udpxy_port,ne_snat"); %>
+		//	<% nvram("block_wan,block_wan_limit,block_wan_limit_icmp,block_wan_limit_tr,nf_loopback,ne_syncookies,DSCP_fix_enable,ipv6_ipsec,multicast_pass,multicast_lan,multicast_lan1,multicast_lan2,multicast_lan3,multicast_custom,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,udpxy_enable,udpxy_lan,udpxy_lan1,udpxy_lan2,udpxy_lan3,udpxy_stats,udpxy_clients,udpxy_port,ne_snat"); %>
 
 		function verifyFields(focused, quiet)
 		{
@@ -22,6 +22,7 @@ No part of this file may be used without permission.
 			E('_f_icmp_limit_traceroute').disabled = (!E('_f_icmp').checked || !E('_f_icmp_limit').checked);
 
 			/* VLAN-BEGIN */
+			/* IGMP proxy */
 			var enable_mcast = E('_f_multicast').checked;
 			E('_f_multicast_lan').disabled = ((!enable_mcast) || (nvram.lan_ifname.length < 1));
 			E('_f_multicast_lan1').disabled = ((!enable_mcast) || (nvram.lan1_ifname.length < 1));
@@ -40,29 +41,64 @@ No part of this file may be used without permission.
 			var mcast_lan2 = E('_f_multicast_lan2').checked;
 			var mcast_lan3 = E('_f_multicast_lan3').checked;
 			var mcast_custom_enable = 0;
-			<!-- disable multicast_custom textarea if lanX is checked / selected -->
+			/* disable multicast_custom textarea if lanX is checked / selected */
 			E('_multicast_custom').disabled = ((!enable_mcast) ||  (mcast_lan) || (mcast_lan1) || (mcast_lan2) || (mcast_lan3));
-			<!-- check if more than 50 charactars are in the textarea (no plausibility test) -->
+			/* check if more than 50 charactars are in the textarea (no plausibility test) */
 			if (!E('_multicast_custom').disabled && v_length('_multicast_custom', 1, 50, 2048)) {
 				mcast_custom_enable = 1;
 			} else {
 				mcast_custom_enable = 0;
 			}
-			<!-- IGMP proxy enable checked but no lanX checked and no custom config -->
+			/* IGMP proxy enable checked but no lanX checked and no custom config */
 			if ((enable_mcast) && (!mcast_lan) && (!mcast_lan1) && (!mcast_lan2) && (!mcast_lan3) && (!mcast_custom_enable)) {
 				ferror.set('_f_multicast', 'IGMP proxy must be enabled in least one LAN bridge OR you have to use custom configuration', quiet);
 				return 0;
-			<!-- IGMP proxy enable checked but custom config / textarea length not OK -->
+			/* IGMP proxy enable checked but custom config / textarea length not OK */
 			} else if ((enable_mcast) && (mcast_custom_enable) && !v_length('_multicast_custom', quiet, 0, 2048)) {
 				return 0;
-			<!-- clear -->
+			/* IGMP proxy clear */
 			} else {
 				ferror.clear('_f_multicast');
 			}
 			/* VLAN-END */
-			E('_f_udpxy_stats').disabled = !E('_f_udpxy_enable').checked;
-			E('_f_udpxy_clients').disabled = !E('_f_udpxy_enable').checked;
-			E('_f_udpxy_port').disabled = !E('_f_udpxy_enable').checked;
+
+			/* udpxy */
+			var enable_udpxy = E('_f_udpxy_enable').checked;
+			E('_f_udpxy_lan').disabled = ((!enable_udpxy) || (nvram.lan_ifname.length < 1));
+			E('_f_udpxy_lan1').disabled = ((!enable_udpxy) || (nvram.lan1_ifname.length < 1));
+			E('_f_udpxy_lan2').disabled = ((!enable_udpxy) || (nvram.lan2_ifname.length < 1));
+			E('_f_udpxy_lan3').disabled = ((!enable_udpxy) || (nvram.lan3_ifname.length < 1));
+			E('_f_udpxy_stats').disabled = !enable_udpxy;
+			E('_f_udpxy_clients').disabled = !enable_udpxy;
+			E('_f_udpxy_port').disabled = !enable_udpxy;
+
+			if(nvram.lan_ifname.length < 1) {
+				E('_f_udpxy_lan').checked = false;
+			}
+			if(nvram.lan1_ifname.length < 1) {
+				E('_f_udpxy_lan1').checked = false;
+			}
+			if(nvram.lan2_ifname.length < 1) {
+				E('_f_udpxy_lan2').checked = false;
+			}
+			if(nvram.lan3_ifname.length < 1) {
+				E('_f_udpxy_lan3').checked = false;
+			}
+
+			var udpxy_lan = E('_f_udpxy_lan').checked ? 1 : 0;
+			var udpxy_lan1 = E('_f_udpxy_lan1').checked ? 1 : 0;
+			var udpxy_lan2 = E('_f_udpxy_lan2').checked ? 1 : 0;
+			var udpxy_lan3 = E('_f_udpxy_lan3').checked ? 1 : 0;
+			var udpxy_lan_count = udpxy_lan + udpxy_lan1 + udpxy_lan2 + udpxy_lan3;
+
+			/* udpxy check: only one interface can be selected to listen on OR no interface (listen on default: 0.0.0.0) */
+			if (enable_udpxy && (udpxy_lan_count > 1)) {
+				ferror.set('_f_udpxy_enable', 'Udpxy: please select only one interface (LAN, LAN1, LAN2 or LAN3) or none (see notes)', quiet);
+				return 0;
+			/* udpxy clear */
+			} else {
+				ferror.clear('_f_udpxy_enable');
+			}
 			return 1;
 		}
 
@@ -89,6 +125,10 @@ No part of this file may be used without permission.
 			fom.multicast_lan3.value = E('_f_multicast_lan3').checked ? 1 : 0;
 			/* VLAN-END */
 			fom.udpxy_enable.value = E('_f_udpxy_enable').checked ? 1 : 0;
+			fom.udpxy_lan.value = E('_f_udpxy_lan').checked ? 1 : 0;
+			fom.udpxy_lan1.value = E('_f_udpxy_lan1').checked ? 1 : 0;
+			fom.udpxy_lan2.value = E('_f_udpxy_lan2').checked ? 1 : 0;
+			fom.udpxy_lan3.value = E('_f_udpxy_lan3').checked ? 1 : 0;
 			fom.udpxy_stats.value = E('_f_udpxy_stats').checked ? 1 : 0;
 			fom.udpxy_clients.value = E('_f_udpxy_clients').value;
 			fom.udpxy_port.value = E('_f_udpxy_port').value;
@@ -116,6 +156,10 @@ No part of this file may be used without permission.
 		<input type="hidden" name="multicast_lan3">
 
 		<input type="hidden" name="udpxy_enable">
+		<input type="hidden" name="udpxy_lan">
+		<input type="hidden" name="udpxy_lan1">
+		<input type="hidden" name="udpxy_lan2">
+		<input type="hidden" name="udpxy_lan3">
 		<input type="hidden" name="udpxy_stats">
 		<input type="hidden" name="udpxy_clients">
 		<input type="hidden" name="udpxy_port">
@@ -160,6 +204,10 @@ No part of this file may be used without permission.
 					{ title: 'LAN3', indent: 2, name: 'f_multicast_lan3', type: 'checkbox', value: (nvram.multicast_lan3 == '1') },
 					/* VLAN-END */
 					{ title: 'Enable Udpxy', name: 'f_udpxy_enable', type: 'checkbox', value: (nvram.udpxy_enable == '1') },
+					{ title: 'LAN', indent: 2, name: 'f_udpxy_lan', type: 'checkbox', value: (nvram.udpxy_lan == '1') },
+					{ title: 'LAN1', indent: 2, name: 'f_udpxy_lan1', type: 'checkbox', value: (nvram.udpxy_lan1 == '1') },
+					{ title: 'LAN2', indent: 2, name: 'f_udpxy_lan2', type: 'checkbox', value: (nvram.udpxy_lan2 == '1') },
+					{ title: 'LAN3', indent: 2, name: 'f_udpxy_lan3', type: 'checkbox', value: (nvram.udpxy_lan3 == '1') },
 					{ title: 'Enable client statistics', indent: 2, name: 'f_udpxy_stats', type: 'checkbox', value: (nvram.udpxy_stats == '1') },
 					{ title: 'Max clients', indent: 2, name: 'f_udpxy_clients', type: 'text', maxlen: 4, size: 6, value: fixInt(nvram.udpxy_clients || 3, 1, 5000, 3) },
 					{ title: 'Udpxy port', indent: 2, name: 'f_udpxy_port', type: 'text', maxlen: 5, size: 7, value: fixPort(nvram.udpxy_port, 4022) },
@@ -169,11 +217,19 @@ No part of this file may be used without permission.
 		</div>
 
 		<div class="box">
-			<div class="heading">IGMP proxy notes</div>
+			<div class="heading">Notes</div>
 				<ul>
+					<b>IGMP proxy:</b><br/><br/>
 					<li><b>LAN / LAN1 / LAN2 / LAN3</b> - Add interface br0 / br1 / br2 / br3 to igmp.conf (Ex.: phyint br0 downstream ratelimit 0 threshold 1).</li>
 					<li><b>Custom configuration</b> - Use custom config for IGMP proxy instead of tomato default config. You must define one (or more) upstream interface(s) and one or more downstream interfaces. Refer to the <a href="https://github.com/pali/igmpproxy/blob/master/igmpproxy.conf" target="_new">IGMP proxy example configuration</a> and <a href="https://github.com/pali/igmpproxy/commit/b55e0125c79fc9dbc95c6d6ab1121570f0c6f80f" target="_new">IGMP proxy commit b55e0125c79fc9d</a> for details.</li>
 					<li><b>Other hints</b> - For error messages please check the <a href="#status-log.asp">log file</a>.</li>
+				</ul>
+				<br/>
+				<ul>
+					<b>Udpxy:</b><br/><br/>
+					<li><b>LAN / LAN1 / LAN2 / LAN3</b> - Select one interface br0 / br1 / br2 / br3 to listen on.</li>
+					<li><b>Status</b> - To display udpxy status, please go to http://lanaddress:port/status/.</li>
+					<li><b>Other hints</b> - If Udpxy is enabled and no interface is selected default address (0.0.0.0) will be used.</li>
 				</ul>
 		</div>
 
