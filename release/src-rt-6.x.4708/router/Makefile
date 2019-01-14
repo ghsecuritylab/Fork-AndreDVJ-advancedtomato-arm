@@ -1290,6 +1290,7 @@ pptpd/stamp-h1:
 
 pptpd: pptpd/stamp-h1
 	@$(SEP)
+	@$(MAKE) -C pptpd
 
 pptpd-install:
 	@echo pptpd
