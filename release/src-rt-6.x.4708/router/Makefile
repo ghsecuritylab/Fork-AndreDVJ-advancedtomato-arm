@@ -1864,6 +1864,7 @@ pcre/stamp-h1:
 
 pcre: pcre/stamp-h1
 	@$(SEP)
+	@$(MAKE) -C pcre
 
 pcre-install:
 	install -D pcre/.libs/libpcre.so.1 $(INSTALLDIR)/pcre/usr/lib/libpcre.so.1.2.10
