@@ -139,6 +139,7 @@ endif
 	@$(MAKE) -C btools
 	@$(MAKE) -C ctools
 
+	echo "\033[41;1m   Creating image \033[0m\033]2;Creating image\007"
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).trx
 	@rm -f image/tomato-$(ND)$(current_BUILD_USB)$(if $(filter $(NVRAM_SIZE),0),,-NVRAM$(NVRAM_SIZE)K)-$(current_TOMATO_VER).$(V1)$(mips_rev)$(beta)$(V2)-$(current_BUILD_DESC).bin
 
@@ -221,6 +222,7 @@ endif
 	@echo "-----------------"
 	@echo `cat router/shared/tomato_version` " ready"
 	@echo "-----------------"
+	@echo "\033[41;1m   FreshTomato build done! \033[0m\033]2;FreshTomato build done!\007"
 ifneq ($(NOVERSION),1)
 	@cp router/shared/tomato_version router/shared/tomato_version_last
 	@btools/uversion.pl --bump
