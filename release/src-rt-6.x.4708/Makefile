@@ -222,7 +222,7 @@ endif
 	@echo "-----------------"
 	@echo `cat router/shared/tomato_version` " ready"
 	@echo "-----------------"
-	@echo "\033[41;1m   FreshTomato build done! \033[0m\033]2;FreshTomato build done!\007"
+	@echo "\033[41;1m   AdvancedTomato build done! \033[0m\033]2;AdvancedTomato build done!\007"
 ifneq ($(NOVERSION),1)
 	@cp router/shared/tomato_version router/shared/tomato_version_last
 	@btools/uversion.pl --bump
