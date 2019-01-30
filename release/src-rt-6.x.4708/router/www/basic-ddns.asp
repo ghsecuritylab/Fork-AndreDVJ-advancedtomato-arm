@@ -34,7 +34,7 @@ No part of this file may be used without permission.
 			['3322', '3322', 'http://www.3322.org/', 'uhwmb'],
 			['3322-static', '3322 - Static', 'http://www.3322.org/', 'uhwmb'],
 			['dnsexit', 'DNS Exit', 'http://www.dnsexit.com/', 'uh'],
-			['dnsomatic', 'DNS-O-Matic', 'http://www.dnsomatic.com/', 'uj'],
+			['dnsomatic', 'DNS-O-Matic', 'http://www.dnsomatic.com/', 'uj', null, null, 'Domain <small>(optional)</small>'],
 			['dyndns', 'DynDNS - Dynamic', 'http://www.dyndns.com/', 'uhwmbs'],
 			['dyndns-static', 'DynDNS - Static', 'http://www.dyndns.com/', 'uhwmbs'],
 			['dyndns-custom', 'DynDNS - Custom', 'http://www.dyndns.com/', 'uhwmbs'],
@@ -48,7 +48,8 @@ No part of this file may be used without permission.
 			['everydns', 'EveryDNS', 'http://www.everydns.net/', 'uj', null, null, 'Domain <small>(optional)</small>'],
 			['minidns', 'miniDNS', 'http://www.minidns.net/', 'uh'],
 			['enom', 'eNom', 'http://www.enom.com/', 'ut', 'Domain'],
-			['afraid', 'FreeDNS (afraid.org)', 'http://freedns.afraid.org/', 'az'],
+			['afraid', 'FreeDNS', 'http://freedns.afraid.org/', 'a'],
+			['safraid', 'FreeDNS (https)', 'https://freedns.afraid.org/', 'a'],
 			['heipv6tb', 'HE.net IPv6 Tunnel Broker', 'http://www.tunnelbroker.net/', 'uh', 'Account Name', null, 'Tunnel ID'],
 			['sheipv6tb', 'HE.net IPv6 Tunnel Broker (https)', 'https://www.tunnelbroker.net/', 'uh', 'Account Name', null, 'Tunnel ID'],
 			['ieserver', 'ieServer.net', 'http://www.ieserver.net/', 'uhz', 'Username / Hostname', null, 'Domain'],
@@ -123,7 +124,6 @@ No part of this file may be used without permission.
 				op = mop(data[3]);
 
 				elem.display(PR('url' + i), (enabled) && (data[0] != 'custom'));
-				elem.display('row_z' + i, op.z);
 
 				elem.display(PR('_f_hosttop' + i), op.t);
 				elem.display(PR('_f_user' + i), op.u);
@@ -139,7 +139,7 @@ No part of this file may be used without permission.
 				elem.display(PR('_f_ddnsx_save' + i), op.s);
 
 				elem.display(PR('_f_force' + i), 'last-response' + i, enabled);
-				elem.display('last-update' + i, enabled && !op.z);
+				elem.display('last-update' + i, enabled);
 
 				if (enabled) {
 					$('[for="_f_user' + i + '"]').html(data[4] || 'Username');
@@ -417,7 +417,6 @@ No part of this file may be used without permission.
 						$('#ddnsconf').forms([
 		                     { title: 'Service', name: 'f_service' + i, type: 'select', options: services, value: v[0] },
 		                     { title: 'URL', indent: 2, text: '<a href="" id="url' + i + '" target="tomato-ext-ddns"></a>', hidden: 1 },
-		                     { title: '&nbsp;', text: '<small>* This service determines the IP address using its own method.</small>', hidden: 1, rid: 'row_z' + i },
 		                     { title: 'Hostname', name: 'f_hosttop' + i, type: 'text', maxlen: 96, size: 35, value: v[2], hidden: 1 },
 		                     { title: 'Username', name: 'f_user' + i, type: 'text', maxlen: 64, size: 35, value: u[0], hidden: 1 },
 		                     { title: 'Password', name: 'f_pass' + i, type: 'password', maxlen: 64, size: 35, peekaboo: 1, value: u[1], hidden: 1 },
