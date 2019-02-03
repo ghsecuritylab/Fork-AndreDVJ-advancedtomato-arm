@@ -33,14 +33,11 @@ OBJS += buttons.o restrict.o gpio.o sched.o
 OBJS += new_qoslimit.o arpbind.o
 OBJS += tomatoanon.o
 OBJS += blink.o
+OBJS += blink_br.o
 
 ifeq ($(TCONFIG_BCMARM),y)
 OBJS += bcmutils.o
 endif
-
-#ifeq ($(CONFIG_BCMWL6),y)
-#OBJS += blink_5g.o
-#endif
 
 ifeq ($(TCONFIG_FANCTRL),y)
 OBJS += phy_tempsense.o
@@ -139,9 +136,7 @@ endif
 	@cd $(INSTALLDIR)/sbin && ln -sf rc service
 	@cd $(INSTALLDIR)/sbin && ln -sf rc buttons
 	@cd $(INSTALLDIR)/sbin && ln -sf rc blink
-ifeq ($(TCONFIG_BCMARM),n)
-	@cd $(INSTALLDIR)/sbin && ln -sf rc blink_5g
-endif
+	@cd $(INSTALLDIR)/sbin && ln -sf rc blink_br
 ifeq ($(TCONFIG_FANCTRL),y)
 	@cd $(INSTALLDIR)/sbin && ln -sf rc phy_tempsense
 endif

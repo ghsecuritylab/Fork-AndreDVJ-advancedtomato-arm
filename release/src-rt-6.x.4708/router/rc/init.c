@@ -1284,7 +1284,7 @@ static int init_nvram(void)
 			nvram_set("wl0_chanspec","1l");
 			nvram_set("wl1_bw_cap","7");
 			nvram_set("wl1_chanspec","36/80");
-			nvram_set("blink_5g_interface","eth2");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 			//nvram_set("landevs", "vlan1 wl0 wl1");
 			//nvram_set("wandevs", "vlan2");
 
@@ -1313,7 +1313,7 @@ static int init_nvram(void)
 			nvram_set("wl0_chanspec","1l");
 			nvram_set("wl1_bw_cap","7");
 			nvram_set("wl1_chanspec","36/80");
-			nvram_set("blink_5g_interface","eth2");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 
 		// fix WL mac`s
 		nvram_set("wl0_hwaddr", nvram_safe_get("sb/1/macaddr"));
@@ -1610,7 +1610,7 @@ static int init_nvram(void)
 			nvram_set("wl1_nctrlsb", "lower");
 			nvram_set("wl_country", "SG");
 			nvram_set("wl_country_code", "SG");
-			nvram_set("blink_wl", "1");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 
 			// bcm4360ac_defaults - fix problem of loading driver failed with code 21
 			nvram_set("pci/1/1/aa2g", "7");
@@ -3366,7 +3366,7 @@ static int init_nvram(void)
 			nvram_set("wl1_chanspec","36/80");
 			nvram_set("wl0_bw_cap","3");
 			nvram_set("wl0_chanspec","1l");
-			nvram_set("blink_5g_interface","eth2");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 
 			// fix WL mac`s
 			strcpy(s, nvram_safe_get("et0macaddr"));
@@ -3484,7 +3484,7 @@ static int init_nvram(void)
 			nvram_set("wl0_chanspec","36/80");
 			nvram_set("wl1_bw_cap","3");
 			nvram_set("wl1_chanspec","1l");
-			nvram_set("blink_5g_interface","eth1");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 			//nvram_set("landevs", "vlan1 wl0 wl1");
 			//nvram_set("wandevs", "vlan2");
 
@@ -3525,7 +3525,7 @@ static int init_nvram(void)
 			nvram_set("wl0_chanspec","36/80");
 			nvram_set("wl1_bw_cap","3");
 			nvram_set("wl1_chanspec","1l");
-			nvram_set("blink_5g_interface","eth1");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 
 			// fix WL mac`s
 			strcpy(s, nvram_safe_get("et0macaddr"));
@@ -3610,7 +3610,7 @@ static int init_nvram(void)
 			nvram_set("wl0_chanspec","36/80");
 			nvram_set("wl1_bw_cap","3");
 			nvram_set("wl1_chanspec","1l");
-			nvram_set("blink_5g_interface","eth1");
+			nvram_set("blink_wl", "1"); /* Enable WLAN LED if wireless interface is enabled, and turn on blink */
 
 			// fix ssid according to 5G(eth1) and 2.4G(eth2) 
 			nvram_set("wl_ssid","Tomato50");
@@ -4229,15 +4229,8 @@ static void sysinit(void)
 
 	eval("buttons");
 
-/*	blink_5g was made for MIPS AC devices, such as AC66U
-	in order to support 5Ghz LED. Not needed on ARM.
-	blink_5g binary doesn't work on ARM because
-	value blink_5g_interface in NVRAM does not exist
-	so blink_5g doesn't know which interface to listen in
-#ifdef CONFIG_BCMWL6
-	eval("blink_5g");
-#endif
-*/
+	/* enable LED for LAN / Bridge */
+	eval("blink_br");
 
 	if (!noconsole) xstart("console");
 
