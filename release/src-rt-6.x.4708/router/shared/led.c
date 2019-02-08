@@ -61,7 +61,7 @@ int gpio_open(uint32_t mask)
 	int f = _gpio_open();
 
 	if ((f >= 0) && mask) {
-		for (i = 0; i <= 15; i++) {
+		for (i = 0; i <= 18; i++) {
 			bit = 1 << i;
 			if ((mask & bit) == bit) {
 				_gpio_ioctl(f, GPIO_IOC_RESERVE, bit, bit);
@@ -169,7 +169,7 @@ int nvget_gpio(const char *name, int *gpio, int *inv)
 	if (((p = nvram_get(name)) != NULL) && (*p)) {
 		n = strtoul(p, NULL, 0);
 		if ((n & 0xFFFFFF70) == 0) {
-			*gpio = (n & 15);
+			*gpio = (n & 18);
 			*inv = ((n & 0x80) != 0);
 			return 1;
 		}
@@ -552,7 +552,7 @@ int do_led(int which, int mode)
 	}
 
 SET:
-	if (b < 16) {
+	if (b <= 18) {
 		if (mode != LED_PROBE) {
 			gpio_write(1 << b, mode);	// [1] 3(0), [2] 3(0), [3] 2(1), [4] 2(0), [5] 2(1), [6] 2(0)
 
@@ -561,7 +561,7 @@ SET:
 				else c = -c;	// [1] 2(0), [5] 3(1), [6] 3(0)
 			}
 			else mode = !mode;	// [2] 2(1), [3] 3(0), [4] 3(1)
-			if (c < 16) gpio_write(1 << c, mode);	// [1] 2(0), [2] 2(1), [3] 3(0), [4] 3(1), [5] 3(1), [6] 3(0)
+			if (c <= 18) gpio_write(1 << c, mode);	// [1] 2(0), [2] 2(1), [3] 3(0), [4] 3(1), [5] 3(1), [6] 3(0)
 		}
 	}
 
