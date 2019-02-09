@@ -987,10 +987,13 @@ static inline void usbled_proc(char *device, int add)
 		// Remove legacy approach in the code here - rather, use do_led() function, which is designed to do this
 		// The reason for changing this ... some HW (like Netgear WNDR4000) don't work with direct GPIO write -> use do_led()!
 		//f_write_string(add ? "/proc/leds-usb/add" : "/proc/leds-usb/remove", param, 0, 0);
-		if (add)
-			do_led(LED_USB, LED_ON);
-		else
-			do_led(LED_USB, LED_OFF);    
+		// FIXME Kludge added here as this was automatically starting USB 2.0 LED on Netgear R7000 even without a USB device connected at all
+		if (get_model() != MODEL_R7000) {
+			if (add)
+				do_led(LED_USB, LED_ON);
+			else
+				do_led(LED_USB, LED_OFF);
+		}
 	}
 }
 #endif
