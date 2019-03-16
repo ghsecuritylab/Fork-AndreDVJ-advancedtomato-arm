@@ -84,6 +84,9 @@ void start_usb(void)
 {
 	char param[32];
 	int i;
+#if defined(TCONFIG_BCMSMP) && defined(TCONFIG_BCMARM)
+	int fd;
+#endif
 
 	if (nvram_match("boardtype", "0x052b")) { // Netgear WNR3500L v2 - initialize USB port
 		xstart("gpio", "enable", "20");
@@ -197,6 +200,13 @@ void start_usb(void)
 
 		if (nvram_get_int("usb_usb3") == 1) {
 			modprobe(USBXHCI_MOD);
+#if defined(TCONFIG_BCMSMP) && defined(TCONFIG_BCMARM)
+			sleep(1);
+			if ((fd = open("/proc/irq/163/smp_affinity", O_RDWR)) >= 0) {
+				close(fd);
+				f_write_string("/proc/irq/112/smp_affinity", TOMATO_CPU1, 0, 0);	/* xhci_hcd --> CPU 1 */
+			}
+#endif
 		}
 
 		/* if enabled, force USB2 before USB1.1 */
@@ -206,6 +216,13 @@ void start_usb(void)
 				i = 0;
 			sprintf(param, "log2_irq_thresh=%d", i);
 			modprobe(USB20_MOD, param);
+#if defined(TCONFIG_BCMSMP) && defined(TCONFIG_BCMARM)
+			sleep(1);
+			if ((fd = open("/proc/irq/163/smp_affinity", O_RDWR)) >= 0) {
+				close(fd);
+				f_write_string("/proc/irq/111/smp_affinity", TOMATO_CPU1, 0, 0);	/* ehci_hcd --> CPU 1 */
+			}
+#endif
 		}
 
 
