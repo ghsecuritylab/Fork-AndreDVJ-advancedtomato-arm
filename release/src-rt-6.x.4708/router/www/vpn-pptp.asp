@@ -89,7 +89,7 @@ No part of this file may be used without permission.
 			<script type="text/javascript">
 				$('#pptp-client .content').forms([
 					{ title: 'Start with WAN', name: 'f_pptp_client_enable', type: 'checkbox', value: nvram.pptp_client_enable != 0 },
-					{ title: 'Server Address', name: 'pptp_client_srvip', type: 'text', size: 17, value: nvram.pptp_client_srvip },
+					{ title: 'Server Address', name: 'pptp_client_srvip', type: 'text', maxlen: 50, size: 27, value: nvram.pptp_client_srvip },
 					{ title: 'Username: ', name: 'pptp_client_username', type: 'text', maxlen: 50, size: 54, value: nvram.pptp_client_username },
 					{ title: 'Password: ', name: 'pptp_client_passwd', type: 'password', maxlen: 50, size: 54, value: nvram.pptp_client_passwd },
 					{ title: 'Encryption', name: 'pptp_client_crypt', type: 'select', value: nvram.pptp_client_crypt,
