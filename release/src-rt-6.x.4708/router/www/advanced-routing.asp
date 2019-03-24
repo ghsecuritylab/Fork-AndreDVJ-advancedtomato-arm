@@ -8,7 +8,7 @@ No part of this file may be used without permission.
 --><title>Routing</title>
 <content>
 	<script type="text/javascript">
-		// <% nvram("wk_mode,lan_stp,routes_static,dhcp_routes,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,wan_ifname,wan_iface,wan2_ifname,wan2_iface,wan3_ifname,wan3_iface,wan4_ifname,wan4_iface,emf_enable,wan_proto,wan2_proto,wan3_proto,wan4_proto,mwan_num"); %>
+		// <% nvram("wk_mode,lan_stp,routes_static,dhcp_routes,lan_ifname,lan1_ifname,lan2_ifname,lan3_ifname,wan_ifname,wan_iface,wan2_ifname,wan2_iface,wan3_ifname,wan3_iface,wan4_ifname,wan4_iface,emf_enable,force_igmpv2,wan_proto,wan2_proto,wan3_proto,wan4_proto,mwan_num"); %>
 		// <% activeroutes(); %>
 
 		var ara = new TomatoGrid();
@@ -113,6 +113,8 @@ No part of this file may be used without permission.
 			if ( fom.emf_enable.value != nvram.emf_enable ) fom._service.value = '*';
 			/* EMF-END */
 
+			fom.force_igmpv2.value = E('_f_force_igmpv2').checked ? 1 : 0;
+
 			form.submit( fom, 1 );
 		}
 
@@ -137,6 +139,7 @@ No part of this file may be used without permission.
 		<input type="hidden" name="routes_static">
 		<input type="hidden" name="dhcp_routes">
 		<input type="hidden" name="emf_enable">
+		<input type="hidden" name="force_igmpv2">
 
 		<div class="box" data-box="routing-table">
 			<div class="heading">Current Routing Table</div>
@@ -162,6 +165,7 @@ No part of this file may be used without permission.
 					/* EMF-BEGIN */
 					{ title: 'Efficient Multicast Forwarding (IGMP Snooping)', name: 'f_emf', type: 'checkbox', value: nvram.emf_enable != '0' },
 					/* EMF-END */
+					{ title: 'Force IGMPv2', name: 'f_force_igmpv2', type: 'checkbox', value: nvram.force_igmpv2 != '0' },
 					{ title: 'DHCP Routes', name: 'f_dhcp_routes', type: 'checkbox', value: nvram.dhcp_routes != '0' }
 				]);
 			</script>
