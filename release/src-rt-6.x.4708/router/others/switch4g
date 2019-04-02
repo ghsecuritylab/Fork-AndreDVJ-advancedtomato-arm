@@ -978,13 +978,11 @@ else
 	# modem not detected
 	[ ! -f $READYFILE ] && {
 		switchMode
-
 		searchWAN
 
 		# only for non-hilink
 		[ "$MTYPE" == "non-hilink" -o "$MTYPE" == "hw-ether" -o "$MTYPE" == "qmi_wwan" ] && {
 			searchDiag
-
 			setPIN
 		}
 	}
