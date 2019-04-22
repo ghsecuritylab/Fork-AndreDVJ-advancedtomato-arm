@@ -184,6 +184,7 @@ int buttons_main(int argc, char *argv[])
 	case MODEL_RTN18U:
 		reset_mask = 1 << 7;
 		ses_mask = 1 << 11;
+		ses_led = LED_AOSS;
 		break;
 	case MODEL_RTAC56U:
 		reset_mask = 1 << 11;
@@ -211,6 +212,11 @@ int buttons_main(int argc, char *argv[])
 		reset_mask = 1 << 3;
 		ses_mask = 1 << 4;
 		break;
+	case MODEL_EA6400:
+		ses_mask = 1 << 7;
+		reset_mask = 1 << 11;
+		ses_led = LED_AOSS;
+		break;
 	case MODEL_EA6700:
 		ses_mask = 1 << 7;
 		reset_mask = 1 << 11;
@@ -234,14 +240,18 @@ int buttons_main(int argc, char *argv[])
 	case MODEL_R6400:
 		reset_mask = 1 << 5;
 		ses_mask = 1 << 4;
-		ses_led = LED_AOSS;
+		ses_led = LED_AMBER; /* dummy, not used right now. Do not interfere with LED_AOSS --> used for WLAN SUMMARY LED */
 		break;
 	case MODEL_R6250:
 	case MODEL_R6300v2:
-	case MODEL_R7000:
 		reset_mask = 1 << 6;
 		ses_mask = 1 << 5;
 		ses_led = LED_AOSS;
+		break;
+	case MODEL_R7000:
+		reset_mask = 1 << 6;
+		ses_mask = 1 << 5;
+		ses_led = LED_AMBER; /* dummy, not used right now. Do not interfere with LED_AOSS --> used for WLAN SUMMARY LED */
 		break;
 	case MODEL_WZR1750:
 //		reset_mask = 1 << 6;

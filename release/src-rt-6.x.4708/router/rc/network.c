@@ -531,9 +531,18 @@ void restart_wl(void)
 	char *lan_ifnames, *ifname, *p;
 	int unit, subunit;
 	int is_client = 0;
+	int model;
 
 	char tmp[32];
 	char br;
+
+	int wlan_cnt = 0;
+	int wlan_5g_cnt = 0;
+	char blink_wlan_ifname[32];
+	char blink_wlan_5g_ifname[32];
+
+	/* get router model */
+	model = get_model();
 
 	for(br=0 ; br<4 ; br++) {
 		char bridge[2] = "0";
@@ -570,6 +579,25 @@ void restart_wl(void)
 
 #ifdef CONFIG_BCMWL5
 				eval("wlconf", ifname, "start"); /* start wl iface */
+
+				/* Enable WLAN LEDs if wireless interface is enabled */
+				if (nvram_get_int(wl_nvname("radio", unit, 0))) {
+					if ((wlan_cnt == 0) && (wlan_5g_cnt == 0)) {	/* kill all blink at first start up */
+					killall("blink", SIGKILL);
+					memset(blink_wlan_ifname, 0, sizeof(blink_wlan_ifname)); /* reset */
+					memset(blink_wlan_5g_ifname, 0, sizeof(blink_wlan_5g_ifname));
+					}
+					if (unit == 0) {
+						led(LED_WLAN, LED_ON);	/* enable WLAN LED for 2.4 GHz */
+						wlan_cnt++; /* count all wlan units / subunits */
+						if (wlan_cnt < 2) strcpy(blink_wlan_ifname, ifname);
+					}
+					else if (unit == 1) {
+						led(LED_5G, LED_ON);	/* enable WLAN LED for 5 GHz */
+						wlan_5g_cnt++; /* count all 5g units / subunits */
+						if (wlan_5g_cnt < 2) strcpy(blink_wlan_5g_ifname, ifname);
+					}
+				}
 #endif	// CONFIG_BCMWL5
 			}
 			free(lan_ifnames);
@@ -581,14 +609,21 @@ void restart_wl(void)
 
 	if (is_client)
 		xstart("radio", "join");
-		
-	if ((get_model() == MODEL_R6400) || (get_model() == MODEL_R7000)) {
+
+	/* do some LED setup */
+	if ((model == MODEL_R6400) ||
+	    (model == MODEL_R7000)) {
 		if (nvram_match("wl0_radio", "1") || nvram_match("wl1_radio", "1"))
 			led(LED_AOSS, LED_ON);
 		else
 			led(LED_AOSS, LED_OFF);
 	}
 
+	/* Finally: start blink (traffic "control" of LED) if only one unit (for each wlan) is enabled AND stealth mode is off */
+	if (nvram_get_int("blink_wl") && nvram_match("stealth_mode", "0")) {
+		if (wlan_cnt == 1) eval("blink", blink_wlan_ifname, "wlan", "10", "8192");
+		if (wlan_5g_cnt == 1) eval("blink", blink_wlan_5g_ifname, "5g", "10", "8192");
+	}
 }
 
 #ifdef CONFIG_BCMWL5
@@ -611,9 +646,18 @@ void start_wl(void)
 	char *lan_ifname, *lan_ifnames, *ifname, *p;
 	int unit, subunit;
 	int is_client = 0;
+	int model;
 
 	char tmp[32];
 	char br;
+
+	int wlan_cnt = 0;
+	int wlan_5g_cnt = 0;
+	char blink_wlan_ifname[32];
+	char blink_wlan_5g_ifname[32];
+
+	/* get router model */
+	model = get_model();
 
 #ifdef CONFIG_BCMWL5
 		// HACK: When a virtual SSID is disabled, it requires two initialisation
@@ -665,18 +709,23 @@ void start_wl(void)
 
 #ifdef CONFIG_BCMWL5
 					eval("wlconf", ifname, "start"); /* start wl iface */
-					/* Enable WLAN LED if wireless interface is enabled, and turn on blink (traffic "control" of LED) if enabled */
+
+					/* Enable WLAN LEDs if wireless interface is enabled */
 					if (nvram_get_int(wl_nvname("radio", unit, 0))) {
+					if ((wlan_cnt == 0) && (wlan_5g_cnt == 0)) {	/* kill all blink at first start up */
+						killall("blink", SIGKILL);
+						memset(blink_wlan_ifname, 0, sizeof(blink_wlan_ifname)); /* reset */
+						memset(blink_wlan_5g_ifname, 0, sizeof(blink_wlan_5g_ifname));
+					}
 						if (unit == 0) {
 							led(LED_WLAN, LED_ON); /* enable WLAN LED for 2.4 GHz */
-							killall("blink", SIGKILL);
-							if (nvram_get_int("blink_wl"))
-								eval("blink", ifname, "wlan", "20", "8192");
+							wlan_cnt++;	/* count all wlan units / subunits */
+							if (wlan_cnt < 2) strcpy(blink_wlan_ifname, ifname);
 						}
 						else if (unit == 1) {
-							 led(LED_5G, LED_ON); /* enable WLAN LED for 5 GHz */
-							 if (nvram_get_int("blink_wl"))
-							 	eval("blink", ifname, "5g", "20", "8192");
+							led(LED_5G, LED_ON);	/* enable WLAN LED for 5 GHz */
+							wlan_5g_cnt++;	/* count all 5g units / subunits */
+							if (wlan_5g_cnt < 2) strcpy(blink_wlan_5g_ifname, ifname);
 						}
 					}
 #endif	// CONFIG_BCMWL5
@@ -697,14 +746,21 @@ void start_wl(void)
 
 	if (is_client)
 		xstart("radio", "join");
-	
-	if ((get_model() == MODEL_R6400) || (get_model() == MODEL_R7000)) {
+
+	/* do some LED setup */
+	if ((model == MODEL_R6400) ||
+	    (model == MODEL_R7000)) {
 		if (nvram_match("wl0_radio", "1") || nvram_match("wl1_radio", "1"))
 			led(LED_AOSS, LED_ON);
 		else
 			led(LED_AOSS, LED_OFF);
 	}
 
+	/* Finally: start blink (traffic "control" of LED) if only one unit (for each wlan) is enabled AND stealth mode is off */
+	if (nvram_get_int("blink_wl") && nvram_match("stealth_mode", "0")) {
+		if (wlan_cnt == 1) eval("blink", blink_wlan_ifname, "wlan", "10", "8192");
+		if (wlan_5g_cnt == 1) eval("blink", blink_wlan_5g_ifname, "5g", "10", "8192");
+	}
 }
 
 #ifdef TCONFIG_IPV6
