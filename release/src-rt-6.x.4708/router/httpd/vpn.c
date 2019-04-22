@@ -60,7 +60,7 @@ static void prepareCAGeneration(int serverNum)
 
 	if (nvram_match(buffer, "")) {
 		syslog(LOG_WARNING, "No CA KEY was saved for server %d, regenerating", serverNum);
-		sprintf(buffer2, "\"/C=GB/ST=Yorks/L=York/O=FreshTomato/OU=IT/CN=server.%s\"", nvram_safe_get("wan_domain"));
+		sprintf(buffer2, "\"/C=GB/ST=Yorks/L=York/O=AdvancedTomato/OU=IT/CN=server.%s\"", nvram_safe_get("wan_domain"));
 		sprintf(buffer, "openssl req -days 3650 -nodes -new -x509 -keyout /tmp/openssl/cakey.pem -out /tmp/openssl/cacert.pem -subj %s >>/tmp/openssl/openssl.log 2>&1", buffer2);
 		syslog(LOG_WARNING, buffer);
 		system(buffer);
@@ -95,7 +95,7 @@ static void generateKey(const char *prefix)
 	}
 
 	put_to_file("/tmp/openssl/serial", "00");
-	sprintf(subj_buf, "\"/C=GB/ST=Yorks/L=York/O=FreshTomato/OU=IT/CN=%s.%s\"", prefix, nvram_safe_get("wan_domain"));
+	sprintf(subj_buf, "\"/C=GB/ST=Yorks/L=York/O=AdvancedTomato/OU=IT/CN=%s.%s\"", prefix, nvram_safe_get("wan_domain"));
 	sprintf(buffer, "openssl req -days 3650 -nodes -new -keyout /tmp/openssl/%s.key -out /tmp/openssl/%s.csr %s -subj %s >>/tmp/openssl/openssl.log 2>&1", prefix, prefix, str, subj_buf);
 	syslog(LOG_WARNING, buffer);
 	system(buffer);
