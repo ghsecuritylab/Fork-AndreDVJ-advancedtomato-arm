@@ -52,18 +52,25 @@ int stop_redial(char *prefix)
 int redial_main(int argc, char **argv)
 {
 	int tm;
-	int count;
 	int proto;
+	int mwan_num;
 	char c_pid[10];
-	char tmp[100];
+	char tmp[100], tmp2[15];
 	memset(c_pid, 0, 10);
 	sprintf(c_pid, "%d", getpid());
-	char prefix[] = "wanXXX";
+	char prefix[] = "wanXX";
+	char prefix_mwan[] = "wanXX";
 
 	if (argc > 1) {
 		strcpy(prefix, argv[1]);
 	} else {
 		strcpy(prefix, "wan");
+	}
+	strcpy(prefix_mwan, prefix);
+
+	mwan_num = nvram_get_int("mwan_num");
+	if (mwan_num < 1 || mwan_num > MWAN_MAX) {
+		mwan_num = 1;
 	}
 
 	proto = get_wanx_proto(prefix);
@@ -80,7 +87,6 @@ int redial_main(int argc, char **argv)
 
 	syslog(LOG_INFO, "Redial (%s) started, the check interval is %d seconds", prefix, tm);
 
-	count = 0;
 	sleep(10);
 
 	while (1) {
@@ -89,42 +95,24 @@ int redial_main(int argc, char **argv)
 
 			if (!check_wanup(prefix))
 				break;
-
-			count = 0;
 		}
-
-#if 0
-		long ut;
-		char pppdisc_file[256];
-		if ((count < 3) && (get_wanx_proto(prefix) == WP_PPPOE) || (get_wanx_proto(prefix) == WP_PPP3G)) {
-			memset(pppdisc_file, 0, 256);
-			sprintf(pppdisc_file, "/var/lib/misc/%s_pppoe-disc", prefix);
-			if (f_read(pppdisc_file, &ut, sizeof(ut)) == sizeof(ut)) {
-				ut = (get_uptime() - ut);
-				if (ut <= 15) {
-					syslog(LOG_INFO, "Redial: %s PPPoE reconnect in progress (%ld)", prefix, ut);
-					++count;
-					continue;
-				}
-			}
-		}
-#endif
 
 		if ((!wait_action_idle(10)) || (check_wanup(prefix)))
 			continue;
 
-		if (!nvram_match("action_service", "wan1-restart")
-			|| !nvram_match("action_service", "wan2-restart")
-#ifdef TCONFIG_MULTIWAN
-			|| !nvram_match("action_service", "wan3-restart")
-			|| !nvram_match("action_service", "wan4-restart")
-#endif
-			) {
-			syslog(LOG_INFO, "Redial: %s down. Reconnecting...", prefix);
-			xstart("service", (char *)prefix, "restart");
-			break;
+		if (!strcmp(prefix, "wan") && mwan_num != 1) {
+			strcpy(prefix_mwan, "wan1");
+		}
+
+		sprintf(tmp, "%s-restart", prefix_mwan);
+		sprintf(tmp2, "%s-restart-c", prefix_mwan);
+
+		if (nvram_match("action_service", "wan-restart") || nvram_match("action_service", tmp) || nvram_match("action_service", "wan-restart-c") || nvram_match("action_service", tmp2)) {
+			syslog(LOG_INFO, "Redial: %s DOWN. Reconnect is already in progress ...", prefix);
 		} else {
-			syslog(LOG_INFO, "Redial: %s down. Reconnect is already in progress...", prefix);
+			syslog(LOG_INFO, "Redial: %s DOWN. Reconnecting ...", prefix);
+			xstart("service", (char *)prefix_mwan, "restart");
+			break;
 		}
 	}
 
