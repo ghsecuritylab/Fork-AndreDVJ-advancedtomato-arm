@@ -1898,7 +1898,7 @@ libxml2/stamp-h1:
 	cd libxml2 && autoreconf && \
 	CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) LD=$(LD) CFLAGS="-Os -Wall $(EXTRACFLAGS)" \
 	$(CONFIGURE) --prefix=/usr --without-python --enable-static --enable-shared \
-		--includedir="$(TOP)/libxml2/include" --without-lzma
+		--includedir="$(TOP)/libxml2/include" --without-lzma --disable-dependency-tracking
 	touch $@
 
 libxml2: libxml2/stamp-h1
@@ -1907,11 +1907,11 @@ libxml2: libxml2/stamp-h1
 	@$(MAKE) -C libxml2 DESTDIR=$(TOP)/libxml2/staged install
 
 libxml2-install:
-	install -D libxml2/.libs/libxml2.so.2.9.3 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.3
-	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.3
+	install -D libxml2/.libs/libxml2.so.2.9.9 $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.9
+	$(STRIP) $(INSTALLDIR)/libxml2/usr/lib/libxml2.so.2.9.9
 	cd $(INSTALLDIR)/libxml2/usr/lib && \
-		ln -sf libxml2.so.2.9.3 libxml2.so.2 && \
-		ln -sf libxml2.so.2.9.3 libxml2.so
+		ln -sf libxml2.so.2.9.9 libxml2.so.2 && \
+		ln -sf libxml2.so.2.9.9 libxml2.so
 
 libxml2-clean:
 	-@$(MAKE) -C libxml2 clean
