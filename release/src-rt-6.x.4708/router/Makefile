@@ -932,7 +932,7 @@ nettle/stamp-h1: gmp
 
 nettle: nettle/stamp-h1
 	@$(SEP)
-	@$(MAKE) -C nettle $(PARALLEL_BUILD)
+	@$(MAKE) -C nettle
 	@$(MAKE) -C nettle install
 
 nettle-clean:
