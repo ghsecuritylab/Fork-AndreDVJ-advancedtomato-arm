@@ -1277,8 +1277,7 @@ accel-pptp-install:
 pptpd/stamp-h1:
 	$(call patch_files,pptpd)
 	ln -sf ../../pppd/pppd/ pptpd/plugins/pppd
-	cd pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay \
-		CC=$(CC) RANLIB=$(RANLIB) LD=$(LD) STRIP=$(STRIP)
+	cd $(TOP)/pptpd && $(CONFIGURE) --prefix=$(INSTALLDIR)/pptpd --enable-bcrelay
 	touch pptpd/stamp-h1
 
 pptpd: pptpd/stamp-h1
@@ -1286,13 +1285,10 @@ pptpd: pptpd/stamp-h1
 	@$(MAKE) -C pptpd
 
 pptpd-install:
-	@echo pptpd
 	@install -D pptpd/pptpd $(INSTALLDIR)/pptpd/usr/sbin/pptpd
 	@install -D pptpd/bcrelay $(INSTALLDIR)/pptpd/usr/sbin/bcrelay
 	@install -D pptpd/pptpctrl $(INSTALLDIR)/pptpd/usr/sbin/pptpctrl
-	@$(STRIP) $(INSTALLDIR)/pptpd/usr/sbin/pptpd
-	@$(STRIP) $(INSTALLDIR)/pptpd/usr/sbin/bcrelay
-	@$(STRIP) $(INSTALLDIR)/pptpd/usr/sbin/pptpctrl
+	@$(STRIP) $(INSTALLDIR)/pptpd/usr/sbin/*
 
 pptpd-clean:
 	-@$(MAKE) -C pptpd clean
