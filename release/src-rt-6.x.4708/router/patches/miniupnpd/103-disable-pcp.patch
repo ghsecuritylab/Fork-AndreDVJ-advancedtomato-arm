@@ -1,0 +1,11 @@
+--- miniupnpd/genconfig.sh
++++ miniupnpd/genconfig.sh
+@@ -431,7 +431,7 @@ echo "#define ENABLE_NATPMP" >> ${CONFIG
+ echo "" >> ${CONFIGFILE}
+ 
+ echo "/* Comment the following line to disable PCP operations */" >> ${CONFIGFILE}
+-echo "#define ENABLE_PCP" >> ${CONFIGFILE}
++echo "/*#define ENABLE_PCP*/" >> ${CONFIGFILE}
+ echo "" >> ${CONFIGFILE}
+ 
+ echo "#ifdef ENABLE_PCP" >> ${CONFIGFILE}
