@@ -127,6 +127,7 @@
 			c( 'cpu', stats.cpuload );
 			c( 'cpupercent', stats.cpupercent );
 			c( 'wlsense', stats.wlsense );
+			c( 'temps', stats.cputemp + 'C / ' + Math.round(stats.cputemp.slice(0, -1)*1.8+32) + '°F' );
 			c( 'uptime', stats.uptime );
 			c( 'time', stats.time );
 			c( 'memory', stats.memory + '<div class="progress small"><div class="bar" style="width: ' + stats.memoryperc + ';"></div></div>' );
